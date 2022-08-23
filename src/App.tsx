@@ -1,73 +1,83 @@
 import React from 'react'
 import { Wrapper, Counter, Input, Select } from './components'
 import { noteList, TNotes } from './constants/notes'
+import { useCountdown, Units } from './stores'
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>
 type SelectEvent = React.ChangeEvent<HTMLSelectElement>
-type TUnits = 'seconds' | 'minutes' | 'hours'
 type Unit = {
-  value: TUnits
+  value: Units
   label: string
 }
-const MIN_DURATION = 5
+const MIN_DURATION = 0
 const units: Unit[] = [
   {
     label: 'Seconds',
-    value: 'seconds'
+    value: Units.SECONDS
   },
   {
     label: 'Minutes',
-    value: 'minutes'
+    value: Units.MINUTES
   },
   {
     label: 'Hours',
-    value: 'hours'
+    value: Units.HOURS
   }
 ]
 
-function getDurationByUnit(unit: TUnits, value: number) {
-  const durations = {
-    seconds: value,
-    minutes: value * 60,
-    hours: value * 60 * 60
+function getDurationByUnit(unit: Units, value: number) {
+  const durations: Record<Units, number> = {
+    [Units.SECONDS]: value,
+    [Units.MINUTES]: value * 60,
+    [Units.HOURS]: value * 60 * 60
   }
 
-  return durations[unit] ?? durations.seconds
+  return durations[unit] ?? durations.sec
 }
 
 function App() {
-  const [duration, setDuration] = React.useState(15)
-  const [unit, setUnit] = React.useState<TUnits>('seconds')
-  const [exludedNotes, setExludedNotes] = React.useState<Set<TNotes>>(
-    new Set(['C'])
+  const {
+    duration,
+    updateDuration,
+    unit,
+    updateUnit,
+    xorExcludedNote,
+    excludedNotes
+  } = useCountdown(
+    ({
+      duration,
+      updateDuration,
+      unit,
+      updateUnit,
+      xorExcludedNote,
+      excludedNotes
+    }) => ({
+      duration,
+      updateDuration,
+      unit,
+      updateUnit,
+      xorExcludedNote,
+      excludedNotes
+    })
   )
 
   const handleDurationChange = (event: InputEvent) => {
-    const { valueAsNumber = 0 } = event.target
+    const { valueAsNumber } = event.target
     const durationInSeconds = getDurationByUnit(unit, valueAsNumber)
     if (isNaN(valueAsNumber) || durationInSeconds < MIN_DURATION) {
-      return setDuration(MIN_DURATION)
+      return updateDuration(0)
     }
-    setDuration(valueAsNumber)
+    updateDuration(valueAsNumber)
   }
 
   const handleUnitChange = (event: SelectEvent) => {
     const { value } = event.target
-    setUnit(value as TUnits)
+    updateUnit(value as Units)
   }
 
   const handleExludedNotesChange = (event: InputEvent) => {
-    const { value, checked } = event.target
-    if (checked) {
-      return setExludedNotes(
-        (exludedNotes) => new Set([...exludedNotes, value as TNotes])
-      )
-    }
-
-    setExludedNotes(
-      (exludedNotes) =>
-        new Set([...exludedNotes].filter((note) => note !== value))
-    )
+    const { value } = event.target
+    xorExcludedNote(value as TNotes)
   }
 
   return (
@@ -75,7 +85,7 @@ function App() {
       <div className="flex flex-col justify-center py-4">
         <div className="mb-8">
           <Input
-            value={duration}
+            value={duration || ''}
             onChange={handleDurationChange}
             type="number"
             name="duration"
@@ -91,7 +101,7 @@ function App() {
                     <input
                       type="checkbox"
                       onChange={handleExludedNotesChange}
-                      checked={exludedNotes.has(note)}
+                      checked={excludedNotes.has(note)}
                       value={note}
                     />
                     <span>{note}</span>
@@ -101,10 +111,7 @@ function App() {
             </ul>
           </div>
         </div>
-        <Counter
-          excludedNotes={exludedNotes}
-          duration={getDurationByUnit(unit, duration)}
-        />
+        <Counter />
       </div>
     </Wrapper>
   )

@@ -1,4 +1,5 @@
 import { noteList, TNotes } from '../../constants/notes'
+import { Units } from '../../stores'
 import { Queue, shuffle } from '../../utils'
 
 type HexColor = `#${string}`
@@ -27,11 +28,8 @@ export function getTimeListByDuration(duration: number): number[] {
   return values
 }
 
-export function getNotesQueue(excludedNotes: Set<TNotes>) {
-  const unorderedNoteList = shuffle(noteList)
-  const notes = unorderedNoteList.filter((note) => !excludedNotes.has(note))
-  const queue = new Queue(notes)
-  return queue
+export function getShuffleNoteList(excludedNotes?: Set<TNotes>) {
+  return shuffle(noteList).filter((n) => !excludedNotes?.has(n))
 }
 
 const rtf = new Intl.RelativeTimeFormat('en', {
@@ -41,3 +39,10 @@ const rtf = new Intl.RelativeTimeFormat('en', {
 export function formatRelativeTime(time: number) {
   return rtf.format(time, 'seconds')
 }
+
+export const getDurationByUnit = (duration: number, unit: Units): number =>
+  ({
+    [Units.SECONDS]: duration,
+    [Units.MINUTES]: duration * 60,
+    [Units.HOURS]: duration * 60 * 60
+  }[unit])

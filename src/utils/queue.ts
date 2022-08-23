@@ -11,9 +11,13 @@ class Queue<T> {
     this.#tail = initialItems?.length ?? 0
   }
 
-  enqueue(item: T): void {
+  enqueue(item: T) {
     this.items.set(this.#tail, item)
     this.#tail++
+  }
+
+  enqueuGroup(items: T[]) {
+    items.forEach(this.enqueue.bind(this))
   }
 
   dequeue(): T | undefined {
@@ -25,6 +29,12 @@ class Queue<T> {
     this.items.delete(this.#head)
     this.#head++
     return item
+  }
+
+  empty() {
+    this.items.clear()
+    this.#head = 0
+    this.#tail = 0
   }
 
   get peek(): T | undefined {

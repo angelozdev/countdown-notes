@@ -1,41 +1,57 @@
 import React from 'react'
 import { CountdownCircleTimer, OnComplete } from 'react-countdown-circle-timer'
-import { TNotes } from '../../constants/notes'
-import { useToggle } from '../../hooks'
+import { useCountdown } from '../../stores'
+import { Queue } from '../../utils'
 import Display from './display'
-import { getColorList, getTimeListByDuration, getNotesQueue } from './utils'
+import {
+  getColorList,
+  getTimeListByDuration,
+  getDurationByUnit,
+  getShuffleNoteList
+} from './utils'
 
-type Props = {
-  duration: number
-  excludedNotes: Set<TNotes>
-}
+function Counter() {
+  const { excludedNotes, duration, toggleIsPlaying, isPlaying, canPlay } =
+    useCountdown(
+      ({
+        excludedNotes,
+        duration,
+        toggleIsPlaying,
+        isPlaying,
+        getCanPlayState,
+        unit
+      }) => ({
+        canPlay: getCanPlayState(),
+        duration: getDurationByUnit(duration, unit),
+        excludedNotes,
+        isPlaying,
+        toggleIsPlaying
+      })
+    )
 
-function Counter({ duration, excludedNotes }: Props) {
-  const [isPlaying, toggleIsPlaying] = useToggle(false)
-  const [noteList, setNoteList] = React.useState(() =>
-    getNotesQueue(excludedNotes)
+  const { current: noteQueue } = React.useRef(
+    new Queue(getShuffleNoteList(excludedNotes))
   )
   const [currentNote, setCurrentNote] = React.useState(
-    () => noteList.dequeue()!
+    () => noteQueue.dequeue()!
   )
-
-  const nextNote = React.useMemo(() => {
-    const nextNote = noteList.dequeue()!
-    if (noteList.isEmpty) setNoteList(() => getNotesQueue(excludedNotes))
-    return nextNote
-  }, [currentNote])
+  const nextNote = noteQueue.peek!
 
   const onComplete = (): OnComplete => {
-    setCurrentNote(nextNote)
+    setCurrentNote(noteQueue.dequeue()!)
+    if (noteQueue.isEmpty)
+      noteQueue.enqueuGroup(getShuffleNoteList(excludedNotes))
     return { shouldRepeat: true }
   }
 
   React.useEffect(() => {
-    setNoteList(() => getNotesQueue(excludedNotes))
-  }, [excludedNotes])
+    noteQueue.empty()
+    noteQueue.enqueuGroup(getShuffleNoteList(excludedNotes))
+    setCurrentNote(noteQueue.dequeue()!)
+  }, [excludedNotes.size])
 
   return (
-    <button onClick={toggleIsPlaying}>
+    <button disabled={!canPlay} onClick={toggleIsPlaying}>
       <span className="inline-block mb-4">{isPlaying ? '🎵' : '᭸'}</span>
       <div className="flex justify-center">
         <CountdownCircleTimer

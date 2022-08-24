@@ -1,5 +1,6 @@
 export { Button } from './button'
 export { Counter } from './counter'
+export { ExcludedNoteSettings } from './excluded-note-settings'
 export { Input } from './input'
 export { Select } from './select'
 export { Wrapper } from './wrapper'

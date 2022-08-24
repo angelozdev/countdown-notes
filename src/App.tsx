@@ -1,7 +1,20 @@
 import React from 'react'
-import { Wrapper, Counter, Input, Select } from './components'
-import { noteList, TNotes } from './constants/notes'
-import { useCountdown, Units } from './stores'
+import {
+  Wrapper,
+  Counter,
+  Input,
+  Select,
+  ExcludedNoteSettings,
+  Button
+} from './components'
+import {
+  Units,
+  useDuration,
+  useUnit,
+  useCycles,
+  useExcludedNotes,
+  useIsPlaying
+} from './stores'
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>
 type SelectEvent = React.ChangeEvent<HTMLSelectElement>
@@ -36,30 +49,11 @@ function getDurationByUnit(unit: Units, value: number) {
 }
 
 function App() {
-  const {
-    duration,
-    updateDuration,
-    unit,
-    updateUnit,
-    xorExcludedNote,
-    excludedNotes
-  } = useCountdown(
-    ({
-      duration,
-      updateDuration,
-      unit,
-      updateUnit,
-      xorExcludedNote,
-      excludedNotes
-    }) => ({
-      duration,
-      updateDuration,
-      unit,
-      updateUnit,
-      xorExcludedNote,
-      excludedNotes
-    })
-  )
+  const { duration, updateDuration } = useDuration()
+  const { unit, updateUnit } = useUnit()
+  const stop = useIsPlaying(({ stop }) => stop)
+  const resetExcludedNotes = useExcludedNotes(({ removeAll }) => removeAll)
+  const resetCycles = useCycles(({ reset }) => reset)
 
   const handleDurationChange = (event: InputEvent) => {
     const { valueAsNumber } = event.target
@@ -75,42 +69,33 @@ function App() {
     updateUnit(value as Units)
   }
 
-  const handleExludedNotesChange = (event: InputEvent) => {
-    const { value } = event.target
-    xorExcludedNote(value as TNotes)
+  const handleReset = () => {
+    resetCycles()
+    updateUnit(Units.SECONDS)
+    updateDuration(5)
+    resetExcludedNotes()
+    stop()
   }
 
   return (
-    <Wrapper>
+    <Wrapper className="max-w-sm">
       <div className="flex flex-col justify-center py-4">
-        <div className="mb-8">
+        <div className="mb-8 flex gap-2">
           <Input
             value={duration || ''}
             onChange={handleDurationChange}
             type="number"
             name="duration"
           />
-          <Select items={units} value={unit} onChange={handleUnitChange} />
-
-          <div className="mt-4">
-            <h2>Exclude: </h2>
-            <ul className="flex gap-2 flex-wrap">
-              {noteList.map((note) => (
-                <li key={note} className="rounded-lg border">
-                  <label className="cursor-pointer py-1 px-3 flex gap-2 items-center">
-                    <input
-                      type="checkbox"
-                      onChange={handleExludedNotesChange}
-                      checked={excludedNotes.has(note)}
-                      value={note}
-                    />
-                    <span>{note}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <Select
+            className="w-full"
+            items={units}
+            value={unit}
+            onChange={handleUnitChange}
+          />
+          <Button onClick={handleReset}>RESET</Button>
         </div>
+        <ExcludedNoteSettings />
         <Counter />
       </div>
     </Wrapper>

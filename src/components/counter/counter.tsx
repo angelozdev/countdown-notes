@@ -1,6 +1,12 @@
 import React from 'react'
 import { CountdownCircleTimer, OnComplete } from 'react-countdown-circle-timer'
-import { useCountdown } from '../../stores'
+import {
+  useExcludedNotes,
+  useDuration,
+  useUnit,
+  useIsPlaying,
+  useCycles
+} from '../../stores'
 import { Queue } from '../../utils'
 import Display from './display'
 import {
@@ -11,23 +17,13 @@ import {
 } from './utils'
 
 function Counter() {
-  const { excludedNotes, duration, toggleIsPlaying, isPlaying, canPlay } =
-    useCountdown(
-      ({
-        excludedNotes,
-        duration,
-        toggleIsPlaying,
-        isPlaying,
-        getCanPlayState,
-        unit
-      }) => ({
-        canPlay: getCanPlayState(),
-        duration: getDurationByUnit(duration, unit),
-        excludedNotes,
-        isPlaying,
-        toggleIsPlaying
-      })
-    )
+  const { duration } = useDuration()
+  const { unit } = useUnit()
+  const { cycles, increase, reset } = useCycles()
+  const { excludedNotes } = useExcludedNotes(({ excludedNotes }) => ({
+    excludedNotes
+  }))
+  const { isPlaying, toggleIsPlaying, canPlay } = useIsPlaying()
 
   const { current: noteQueue } = React.useRef(
     new Queue(getShuffleNoteList(excludedNotes))
@@ -39,8 +35,10 @@ function Counter() {
 
   const onComplete = (): OnComplete => {
     setCurrentNote(noteQueue.dequeue()!)
-    if (noteQueue.isEmpty)
+    if (noteQueue.isEmpty) {
       noteQueue.enqueuGroup(getShuffleNoteList(excludedNotes))
+      increase()
+    }
     return { shouldRepeat: true }
   }
 
@@ -48,6 +46,7 @@ function Counter() {
     noteQueue.empty()
     noteQueue.enqueuGroup(getShuffleNoteList(excludedNotes))
     setCurrentNote(noteQueue.dequeue()!)
+    reset()
   }, [excludedNotes.size])
 
   return (
@@ -57,7 +56,7 @@ function Counter() {
         <CountdownCircleTimer
           colors={getColorList() as any}
           colorsTime={getTimeListByDuration(duration) as any}
-          duration={duration}
+          duration={getDurationByUnit(duration, unit)}
           isPlaying={isPlaying}
           onComplete={onComplete}
           size={200}
@@ -71,6 +70,10 @@ function Counter() {
             />
           )}
         </CountdownCircleTimer>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-stone-600">{cycles}</p>
       </div>
     </button>
   )

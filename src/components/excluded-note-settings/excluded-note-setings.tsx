@@ -1,4 +1,9 @@
-import { noteList, TNotes } from '../../constants/notes'
+import {
+  naturalNotes,
+  noteList,
+  TNotes,
+  sharpNotes
+} from '../../constants/notes'
 import { useExcludedNotes } from '../../stores'
 import { Button } from '../button'
 
@@ -18,12 +23,38 @@ function ExcludedNoteSettings() {
     removeAllSharps,
     selectAllSharps,
     removeAllNaturals,
-    selectAllNaturals
+    selectAllNaturals,
+    isAllNaturalsChecked,
+    isAllSharpChecked,
+    isAnySharpChecked,
+    isAnyNaturalChecked,
+    isAnyChecked
   } = useExcludedNotes(({ excludedNotes, ...restProps }) => {
     const isAllChecked = excludedNotes.size === noteList.length
+    const isAnyChecked = excludedNotes.size > 0
+    const isAllNaturalsChecked = naturalNotes.every(
+      excludedNotes.has.bind(excludedNotes)
+    )
+    const isAllSharpChecked = sharpNotes.every(
+      excludedNotes.has.bind(excludedNotes)
+    )
+
+    const isAnySharpChecked = sharpNotes.some(
+      excludedNotes.has.bind(excludedNotes)
+    )
+
+    const isAnyNaturalChecked = naturalNotes.some(
+      excludedNotes.has.bind(excludedNotes)
+    )
+
     return {
       excludedNotes,
       isAllChecked,
+      isAllNaturalsChecked,
+      isAllSharpChecked,
+      isAnySharpChecked,
+      isAnyNaturalChecked,
+      isAnyChecked,
       ...restProps
     }
   })
@@ -40,18 +71,23 @@ function ExcludedNoteSettings() {
             Select all
           </Button>
 
-          <Button
-            disabled={excludedNotes.size === NodeList.length}
-            onClick={removeAll}
-          >
+          <Button disabled={!isAnyChecked} onClick={removeAll}>
             Remove all
           </Button>
 
-          <Button onClick={selectAllSharps}>Select all sharps</Button>
-          <Button onClick={removeAllSharps}>Remove all sharps</Button>
+          <Button disabled={isAllSharpChecked} onClick={selectAllSharps}>
+            Select all sharps
+          </Button>
+          <Button disabled={!isAnySharpChecked} onClick={removeAllSharps}>
+            Remove all sharps
+          </Button>
 
-          <Button onClick={selectAllNaturals}>Select all naturals</Button>
-          <Button onClick={removeAllNaturals}>Remove all naturals</Button>
+          <Button disabled={isAllNaturalsChecked} onClick={selectAllNaturals}>
+            Select all naturals
+          </Button>
+          <Button disabled={!isAnyNaturalChecked} onClick={removeAllNaturals}>
+            Remove all naturals
+          </Button>
         </div>
 
         <ul className="flex gap-4 flex-wrap justify-center px-2 py-3 border mt-4">

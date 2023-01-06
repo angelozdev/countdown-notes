@@ -36,8 +36,8 @@ const useExcludedNotes = create<IUseExludedNotes>((set, get) => ({
     })
   },
   selectAll: () => {
-    set(() => {
-      const excludedNotes = new Set(noteList)
+    set(({ excludedNotes }) => {
+      noteList.forEach((note) => excludedNotes.add(note))
       return { excludedNotes }
     })
   },

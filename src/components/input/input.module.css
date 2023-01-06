@@ -1,7 +1,7 @@
 .input {
   @apply py-1
   px-2
-  rounded-lg
+  rounded
   border
   w-full
   border-gray-300;

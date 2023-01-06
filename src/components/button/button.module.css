@@ -1,12 +1,14 @@
 .button {
   @apply py-1
-  rounded-lg
+  rounded
   bg-slate-700
   hover:bg-slate-800
   text-white
   outline-offset-1
   outline-none
   focus:outline-2
+  disabled:opacity-50
+  disabled:cursor-not-allowed
   focus:outline-slate-800;
 }
 

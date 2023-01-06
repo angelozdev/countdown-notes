@@ -20,10 +20,13 @@ function Counter() {
   const { duration } = useDuration()
   const { unit } = useUnit()
   const { cycles, increase, reset } = useCycles()
-  const { excludedNotes } = useExcludedNotes(({ excludedNotes }) => ({
-    excludedNotes
+  const { excludedNotes, size } = useExcludedNotes(({ excludedNotes }) => ({
+    excludedNotes,
+    size: excludedNotes.size
   }))
-  const { isPlaying, toggleIsPlaying, canPlay } = useIsPlaying()
+
+  const { isPlaying, toggleIsPlaying } = useIsPlaying()
+  const canPlay = duration > 0 && size < 12
 
   const { current: noteQueue } = React.useRef(
     new Queue(getShuffleNoteList(excludedNotes))
@@ -47,11 +50,17 @@ function Counter() {
     noteQueue.enqueuGroup(getShuffleNoteList(excludedNotes))
     setCurrentNote(noteQueue.dequeue()!)
     reset()
-  }, [excludedNotes.size])
+  }, [size])
 
   return (
-    <button disabled={!canPlay} onClick={toggleIsPlaying}>
-      <span className="inline-block mb-4">{isPlaying ? '🎵' : '᭸'}</span>
+    <button
+      className="disabled:opacity-50"
+      disabled={!canPlay}
+      onClick={toggleIsPlaying}
+    >
+      <span className="inline-block mb-4 text-3xl">
+        {isPlaying ? '🔔' : '🔕'}
+      </span>
       <div className="flex justify-center">
         <CountdownCircleTimer
           colors={getColorList() as any}
@@ -72,8 +81,8 @@ function Counter() {
         </CountdownCircleTimer>
       </div>
 
-      <div className="mt-4">
-        <p className="text-stone-600">{cycles}</p>
+      <div className="mt-4 border p-2 rounded">
+        <p className="text-stone-600 text-2xl">{cycles}</p>
       </div>
     </button>
   )

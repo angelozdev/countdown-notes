@@ -1,11 +1,16 @@
 import create from 'zustand'
-import { TNotes } from '../constants/notes'
+import { TNotes, noteList, sharpNotes, naturalNotes } from '../constants/notes'
 import useIsPlaying from './useIsPlaying'
 
 interface IUseExludedNotes {
   excludedNotes: Set<TNotes>
   xorExcludedNote: (note: TNotes) => void
   removeAll: () => void
+  selectAll: () => void
+  selectAllSharps: () => void
+  removeAllSharps: () => void
+  selectAllNaturals: () => void
+  removeAllNaturals: () => void
 }
 
 const useExcludedNotes = create<IUseExludedNotes>((set, get) => ({
@@ -13,7 +18,6 @@ const useExcludedNotes = create<IUseExludedNotes>((set, get) => ({
   removeAll: () => {
     set((state) => {
       state.excludedNotes.clear()
-      state.excludedNotes.add('C')
       return { excludedNotes: state.excludedNotes }
     })
   },
@@ -28,6 +32,36 @@ const useExcludedNotes = create<IUseExludedNotes>((set, get) => ({
       const excludedNotes = state.excludedNotes.add(note)
       const allChecked = excludedNotes.size > 10
       allChecked && useIsPlaying.setState({ isPlaying: false })
+      return { excludedNotes }
+    })
+  },
+  selectAll: () => {
+    set(() => {
+      const excludedNotes = new Set(noteList)
+      return { excludedNotes }
+    })
+  },
+  selectAllSharps: () => {
+    set(({ excludedNotes }) => {
+      sharpNotes.forEach((note) => excludedNotes.add(note))
+      return { excludedNotes }
+    })
+  },
+  removeAllSharps: () => {
+    set(({ excludedNotes }) => {
+      sharpNotes.forEach((note) => excludedNotes.delete(note))
+      return { excludedNotes }
+    })
+  },
+  selectAllNaturals: () => {
+    set(({ excludedNotes }) => {
+      naturalNotes.forEach((note) => excludedNotes.add(note))
+      return { excludedNotes }
+    })
+  },
+  removeAllNaturals: () => {
+    set(({ excludedNotes }) => {
+      naturalNotes.forEach((note) => excludedNotes.delete(note))
       return { excludedNotes }
     })
   }

@@ -466,13 +466,19 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   `pnpm test` y `pnpm test:e2e` deben quedar **en verde**. Si el audio en tiempo real falla en WebKit sin interfaz, registrarlo en research.md §12 y consultar al usuario antes de recortar el E2E de `iphone`. **Commit**: `feat: carril de compases con la vuelta siguiente (#19)`.
 
-- [ ] T028 [US5] Pulido visual con el skill `frontend-design`, dentro de la dirección del diseño (§7.4: escenario oscuro, ámbar `#f5a524` y tipografía muy pesada) y del tema actual:
+- [x] T028 [US5] Pulido visual con el skill `frontend-design`, dentro de la dirección del diseño (§7.4: escenario oscuro, ámbar `#f5a524` y tipografía muy pesada) y del tema actual:
   - **Compás actual**: borde o fondo ámbar, 4 marcas de tiempo (la del tiempo que suena encendida) y una barra de progreso. En cada `onBeat`, la barra salta al ancho del tiempo actual y anima hasta el siguiente con `transition: width {60 / bpm}s linear`; al cambiar de compás vuelve a 0 sin transición (research.md §10).
   - **Atenuados**: `data-state` `played` y `far` con opacidad baja.
   - **Desplazamiento**: cuando cambia el compás actual, `rowElement.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })` de su fila, para que la fila siguiente también se vea.
   - **Tamaños**: notas del carril y contador legibles a 1–2 m. Zonas seguras del iPhone (`p-safe`). Sin desplazamiento horizontal a 375 px de ancho.
 
   Comprobar con `pnpm dev` en un ancho de celular y en el de un computador (quickstart §2, filas 11–13). Todos los tests siguen **en verde**. **Commit**: `feat: pulido visual de la pantalla de práctica (#19)`.
+
+  **Hecho**:
+  - El carril se dibuja como una partitura de jazz: barras de compás y 4 barras oblicuas de ritmo por compás, que en el compás actual se encienden tiempo a tiempo.
+  - "Ahora" usa container queries para ser lo más grande que quepa.
+  - ♭ y ♯ (no están en Geist) van con `::first-letter` flotante: alteración más chica, arriba y engrosada, en un solo nodo de texto.
+  - Se verificó con capturas de Playwright en iPhone 15 y a 1280 × 800.
 
 **Checkpoint**: las 5 historias en verde.
 

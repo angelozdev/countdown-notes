@@ -1,24 +1,42 @@
+import { useEffect, useRef, type CSSProperties } from 'react'
+import { cn } from '@/lib/utils'
 import { NOTE_BY_ID } from '@/music/notes'
 import { roundLength, usePractice } from '@/practice/store'
 
-/** El carril: la vuelta que suena en filas de 4 compases, y la primera nota de la siguiente. */
+/** El carril: la vuelta que suena como una partitura, en filas de 4 compases. */
 export function Lane() {
   const round = usePractice((state) => state.rounds[0])
   const next = usePractice((state) => state.rounds[1])
   const bar = usePractice((state) => state.position?.bar)
-  if (!round) return null
+  const beat = usePractice((state) => state.position?.beat ?? 0)
+  const bpm = usePractice((state) => state.bpm)
+  const list = useRef<HTMLOListElement>(null)
 
   // en la cuenta de entrada (compás 0) todavía no hay compás actual
-  const currentIndex = bar === undefined ? -1 : bar - round.firstBar
-  const lastNearRow = Math.floor(Math.max(currentIndex, 0) / 4) + 1
+  const currentIndex = round && bar !== undefined ? bar - round.firstBar : -1
+  const row = Math.floor(Math.max(currentIndex, 0) / 4)
+  const length = round ? roundLength(round) : 0
+
+  // lleva a la vista la fila siguiente, y con ella la actual, que queda justo arriba
+  useEffect(() => {
+    const target = list.current?.children[Math.min(length - 1, (row + 1) * 4)]
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    target?.scrollIntoView?.({
+      block: 'nearest',
+      behavior: reduce?.matches ? 'auto' : 'smooth'
+    })
+  }, [row, length, round?.number])
+
+  if (!round) return null
 
   return (
-    <div className="min-h-0 overflow-y-auto px-4 pb-2">
+    <div className="max-h-[34dvh] shrink-0 overflow-y-auto px-2 pb-2">
       <ol
+        ref={list}
         aria-label="Carril"
-        className="mx-auto grid max-w-3xl grid-cols-4 gap-2"
+        className="mx-auto grid max-w-3xl grid-cols-4 gap-y-3"
       >
-        {Array.from({ length: roundLength(round) }, (_, i) => {
+        {Array.from({ length }, (_, i) => {
           const note =
             NOTE_BY_ID[round.notes[Math.floor(i / round.barsPerNote)]]
           const state =
@@ -26,26 +44,67 @@ export function Lane() {
               ? 'played'
               : i === currentIndex
                 ? 'current'
-                : Math.floor(i / 4) <= lastNearRow
+                : Math.floor(i / 4) <= row + 1
                   ? 'near'
                   : 'far'
+          const current = state === 'current'
           return (
             <li
               key={i}
-              aria-current={state === 'current' ? 'true' : undefined}
+              aria-current={current ? 'true' : undefined}
               data-state={state}
-              className="rounded-lg border border-border py-3 text-center text-3xl font-black data-[state=current]:border-primary data-[state=current]:bg-primary data-[state=current]:text-primary-foreground data-[state=far]:opacity-40 data-[state=played]:opacity-30"
+              className={cn(
+                'relative flex flex-col items-center gap-2 overflow-hidden border-l-2 border-foreground/30 pt-3 pb-4 transition-opacity',
+                (i % 4 === 3 || i === length - 1) && 'border-r-2',
+                current && 'bg-primary text-primary-foreground',
+                state === 'played' && 'opacity-25',
+                state === 'far' && 'opacity-40'
+              )}
             >
-              {note.label}
+              <span className="note-label font-black [--note-size:1.875rem] sm:[--note-size:2.25rem]">
+                {note.label}
+              </span>
+              <BeatSlashes lit={current ? beat + 1 : 0} />
+              {current && (
+                <span
+                  key={beat}
+                  aria-hidden
+                  className="beat-progress absolute inset-x-0 bottom-0 h-1 bg-primary-foreground/70"
+                  style={
+                    {
+                      '--from': beat / 4,
+                      '--to': (beat + 1) / 4,
+                      '--beat': `${60 / bpm}s`
+                    } as CSSProperties
+                  }
+                />
+              )}
             </li>
           )
         })}
       </ol>
       {next && (
-        <p className="mx-auto mt-3 max-w-3xl text-center text-xl font-semibold text-muted-foreground">
+        <p className="mx-auto mt-4 max-w-3xl text-center text-xl font-bold text-muted-foreground">
           Vuelta {next.number}: {NOTE_BY_ID[next.notes[0]].label}
         </p>
       )}
     </div>
+  )
+}
+
+/** Las barras oblicuas de ritmo de una partitura de jazz: una por tiempo. */
+function BeatSlashes({ lit }: { lit: number }) {
+  return (
+    <span aria-hidden className="flex gap-2.5">
+      {[0, 1, 2, 3].map((slash) => (
+        <span
+          key={slash}
+          className={cn(
+            'h-3.5 w-[3px] rotate-[24deg] rounded-full bg-current',
+            slash < lit ? 'opacity-100' : 'opacity-30'
+          )}
+        />
+      ))}
+    </span>
   )
 }

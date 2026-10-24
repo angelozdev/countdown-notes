@@ -1,7 +1,7 @@
 import { NOTE_BY_ID } from '@/music/notes'
 import { nowPlaying, usePractice } from '@/practice/store'
 
-/** "Ahora": la nota que suena, lo más grande posible, con su nombre en español. */
+/** "Ahora": la nota que suena, lo más grande que quepa, con su nombre en español. */
 export function Now() {
   const stopped = usePractice((state) => state.status === 'stopped')
   const id = usePractice((state) => {
@@ -16,19 +16,19 @@ export function Now() {
   return (
     <section
       aria-label="Ahora"
-      className="flex flex-1 flex-col items-center justify-center gap-2 text-center"
+      className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[3cqh] text-center [container-type:size]"
     >
       {countdown !== undefined && (
-        <p className="font-heading text-[min(32vw,38dvh)] leading-none font-black text-primary tabular-nums">
+        <p className="font-heading text-[min(72cqh,60cqw)] leading-none font-black text-primary tabular-nums">
           {countdown}
         </p>
       )}
       {note && (
         <>
-          <p className="font-heading text-[min(32vw,38dvh)] leading-none font-black tracking-tight">
+          <p className="note-label font-heading font-black tracking-tight [--note-size:min(66cqh,46cqw)]">
             {note.label}
           </p>
-          <p className="text-3xl font-semibold text-muted-foreground sm:text-4xl">
+          <p className="text-[clamp(1.5rem,10cqh,3rem)] leading-none font-semibold text-muted-foreground">
             {note.name}
           </p>
         </>

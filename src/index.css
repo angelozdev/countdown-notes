@@ -102,3 +102,38 @@
     color-scheme: dark;
   }
 }
+
+/* Progreso dentro del compás: cada tiempo anima de --from a --to durante --beat.
+   El elemento se vuelve a montar en cada tiempo, así que el reloj de audio lo resincroniza. */
+@keyframes beat-progress {
+  from {
+    transform: scaleX(var(--from));
+  }
+  to {
+    transform: scaleX(var(--to));
+  }
+}
+
+@utility beat-progress {
+  transform-origin: left;
+  transform: scaleX(var(--to));
+  animation: beat-progress var(--beat) linear;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* Cifrado como en una partitura: la letra en --note-size y la alteración más chica, arriba.
+   ♭ y ♯ no están en Geist y el respaldo del sistema es fino, así que se engrosan. */
+@utility note-label {
+  display: flow-root;
+  font-size: calc(var(--note-size) * 0.6);
+  -webkit-text-stroke: 0.06em currentColor;
+  &::first-letter {
+    float: left;
+    font-size: var(--note-size);
+    line-height: 0.82;
+    margin-right: 0.03em;
+    -webkit-text-stroke: 0;
+  }
+}

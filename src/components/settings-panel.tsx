@@ -50,20 +50,15 @@ export function SettingsPanel() {
             decreaseLabel="Bajar BPM"
             increaseLabel="Subir BPM"
           />
-          <div className="flex flex-col gap-1">
-            <Stepper
-              label="Compases por nota"
-              min={1}
-              max={16}
-              value={barsPerNote}
-              onChange={setBarsPerNote}
-              decreaseLabel="Bajar compases por nota"
-              increaseLabel="Subir compases por nota"
-            />
-            <p className="text-sm text-muted-foreground">
-              Se aplica desde la siguiente vuelta.
-            </p>
-          </div>
+          <Stepper
+            label="Compases por nota"
+            min={1}
+            max={16}
+            value={barsPerNote}
+            onChange={setBarsPerNote}
+            decreaseLabel="Bajar compases por nota"
+            increaseLabel="Subir compases por nota"
+          />
           <NoteFilters />
         </div>
       </SheetContent>
@@ -102,7 +97,9 @@ function NoteFilters() {
               pressed={notes.includes(note.id)}
               onPressedChange={() => toggleNote(note.id)}
             >
-              {note.label}
+              <span className="note-label [--note-size:1.25rem]">
+                {note.label}
+              </span>
             </Toggle>
           ))}
         </div>
@@ -123,9 +120,6 @@ function NoteFilters() {
       {notes.length < 2 && (
         <p className="text-sm font-medium text-primary">{NOT_ENOUGH_NOTES}</p>
       )}
-      <p className="text-sm text-muted-foreground">
-        Se aplica desde la siguiente vuelta.
-      </p>
     </section>
   )
 }

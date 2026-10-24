@@ -145,7 +145,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Pantalla: Play/Stop (tests primero)
 
-- [ ] T006 [P] [US1] Crear `src/test/fake-engine.ts` según [contracts](./contracts/interfaces.md) §2:
+- [x] T006 [P] [US1] Crear `src/test/fake-engine.ts` según [contracts](./contracts/interfaces.md) §2:
   - `export function createFakeEngine()` devuelve `{ engine, beat, played, bpm, running }`;
   - `engine` es un objeto que satisface `Engine` (`satisfies Engine`):
     - `start` guarda las opciones, reinicia el contador de tiempos y fija `bpm`;
@@ -156,7 +156,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
     - calcula `bar` y `beat` con `beatsPerBar`;
     - agrega a `played` cada sonido de `soundsAt(bar, beat)` como `{ bar, beat, sound }`;
     - llama a `onBeat(bar, beat)`.
-- [ ] T007 [US1] Reescribir `src/App.test.tsx` (reemplaza el test de la pantalla base; research.md §11). Cada test crea `const fake = createFakeEngine()` y hace `render(<App engine={fake.engine} />)`. Tests:
+- [x] T007 [US1] Reescribir `src/App.test.tsx` (reemplaza el test de la pantalla base; research.md §11). Cada test crea `const fake = createFakeEngine()` y hace `render(<App engine={fake.engine} />)`. Tests:
   - `'tiene el título de la app para lectores de pantalla'`: `screen.getByRole('heading', { level: 1, name: 'Countdown Notes' })`.
   - `'Play arranca el metrónomo en 4/4 a 60 BPM con la cuenta de entrada'`:
     - clic en `Play`; `expect(fake.running).toBe(true)` y `expect(fake.bpm).toBe(60)`;
@@ -167,7 +167,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T008 [P] [US1] Reemplazar el E2E: `git mv e2e/base-screen.spec.ts e2e/practice.spec.ts` y reescribirlo con 3 tests:
+- [x] T008 [P] [US1] Reemplazar el E2E: `git mv e2e/base-screen.spec.ts e2e/practice.spec.ts` y reescribirlo con 3 tests:
   - `'abre la pantalla de práctica'`:
     - `page.goto('/')`;
     - el `heading` nivel 1 `Countdown Notes` cumple `toBeAttached()` (está oculto a la vista);
@@ -184,7 +184,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Implementación de la pantalla
 
-- [ ] T009 [US1] Implementar (data-model.md, "Práctica"):
+- [x] T009 [US1] Implementar (data-model.md, "Práctica"):
   - **`src/practice/store.ts`**:
     - `createPracticeStore(engine: Engine)` con `createStore` de `zustand/vanilla`;
     - estado: `status: 'stopped' | 'countIn' | 'playing'` (inicial `'stopped'`) y `position: { bar: number; beat: number } | null` (inicial `null`);

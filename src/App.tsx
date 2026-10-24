@@ -1,15 +1,40 @@
-import { Badge } from '@/components/ui/badge'
+import { Play, Square } from 'lucide-react'
+import { useState } from 'react'
+import type { Engine } from '@/audio/engine'
+import { Button } from '@/components/ui/button'
+import {
+  createPracticeStore,
+  PracticeContext,
+  usePractice
+} from '@/practice/store'
 
-export default function App() {
+export default function App({ engine }: { engine: Engine }) {
+  const [store] = useState(() => createPracticeStore(engine))
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 p-safe text-center">
-      <Badge>En construcción</Badge>
-      <h1 className="font-heading text-6xl font-black tracking-tight sm:text-8xl">
-        Countdown Notes
-      </h1>
-      <p className="text-lg text-muted-foreground">
-        Acompañamiento para improvisar con la guitarra.
-      </p>
-    </main>
+    <PracticeContext value={store}>
+      <main className="flex min-h-dvh flex-col p-safe">
+        <h1 className="sr-only">Countdown Notes</h1>
+        <div className="flex-1" />
+        <footer className="flex justify-center p-6">
+          <PlayButton />
+        </footer>
+      </main>
+    </PracticeContext>
+  )
+}
+
+function PlayButton() {
+  const stopped = usePractice((state) => state.status === 'stopped')
+  const play = usePractice((state) => state.play)
+  const stop = usePractice((state) => state.stop)
+  return (
+    <Button
+      size="lg"
+      className="h-16 min-w-40 rounded-full text-xl font-bold"
+      onClick={stopped ? play : stop}
+    >
+      {stopped ? <Play aria-hidden /> : <Square aria-hidden />}
+      {stopped ? 'Play' : 'Stop'}
+    </Button>
   )
 }

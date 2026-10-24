@@ -42,8 +42,14 @@ Fecha: 2026-10-24. Las versiones salen del registro de npm de ese día (`pnpm vi
   - `transport.scheduleRepeat(callback, '4n', 0)`: un callback por tiempo (negra en 4/4), que Tone llama con anticipación (`lookAhead`, 0,1 s por defecto) y con el `time` exacto del audio.
   - En cada callback, el motor cuenta el tiempo (`compás = ⌊k / 4⌋`, `tiempo = k mod 4`), pide `soundsAt(compás, tiempo)` y dispara cada sonido en `time`.
   - Avisa a la UI con `getDraw().schedule(() => onBeat(compás, tiempo), time)`, que la llama en el cuadro de animación más cercano al momento en que el tiempo suena.
-  - `setBpm` cambia `transport.bpm.value`. Como el intervalo `'4n'` está en ticks, el tiempo siguiente ya sale con el tempo nuevo.
-  - `stop`: `transport.stop()`, `transport.cancel()`, `draw.cancel()` y `dispose()` de los sintetizadores y sus buses. Desconectarlos corta también los sonidos que ya estaban programados dentro de la anticipación (hasta 0,1 s), así que Stop calla al instante.
+  - El tempo inicial y el arranque usan el mismo instante: `startAt = context.now()`, `transport.bpm.setValueAtTime(bpm, startAt)` y `transport.start(startAt)`. **Hallazgo en T005**: con `transport.bpm.value = bpm`, el tempo se aplica recién en `now + lookAhead`. Mientras tanto corre el tempo anterior (120 por defecto), y a 60 BPM el primer tiempo duraba 0,9 s.
+  - `setBpm` hace `transport.bpm.setValueAtTime(bpm, context.now())`. Como el intervalo `'4n'` está en ticks, el tiempo siguiente ya sale con el tempo nuevo.
+  - El motor guarda el contexto en que arrancó y lo usa en `stop` y `setBpm`. **Hallazgo en T005**: `Tone.Offline` devuelve el contexto global antes del render, así que, en un `setTimeout` del render, `Tone.getTransport()` es el transport real y no el offline.
+  - `stop`: `transport.stop()`, `transport.cancel()`, `draw.cancel()`, y el volumen de cada bus en `-Infinity` en `now − lookAhead`.
+    - Silenciar sin anticipación corta también los sonidos ya programados (hasta 0,1 s), así que Stop calla al instante.
+    - No se usa `immediate()`, porque en `Tone.Offline` vale 0 hasta el render.
+    - No se usa `dispose()`, porque en `Offline` corre antes del render y deja todo el audio mudo.
+    - Los nodos viejos se descartan en el siguiente `start`.
 - **Rationale**: es el patrón que pide la constitución (III): todo evento se programa en el reloj de audio, con anticipación, y la UI sigue al audio. Al programar tiempo por tiempo, el store decide en el último momento (unos 100 ms antes) qué suena. Así los cambios de BPM y de ajustes no requieren reprogramar nada.
 - **Spike**: con `soundsAt` fijo, a 200 BPM, en Chromium y en WebKit, los 20 clicks cayeron a menos de 1 ms de su momento teórico. Un cambio de 60 a 120 BPM al inicio del compás 2 pasó de 1 s a 0,5 s entre golpes, sin golpes dobles ni saltados.
 - **Alternatives considered**: `scheduleRepeat` por compás, calculando los 4 tiempos en segundos (descartado: un cambio de BPM a mitad de compás dejaría los tiempos restantes con el tempo viejo).
@@ -88,7 +94,7 @@ Fecha: 2026-10-24. Las versiones salen del registro de npm de ese día (`pnpm vi
 - **Decision**:
   - **Metrónomo**: `Synth` senoidal, envolvente `{ attack: 0.001, decay: 0.06, sustain: 0, release: 0.01 }`, en un bus `Volume(-8)`. Acento: 1760 Hz con velocidad 1. Otros tiempos: 1175 Hz con velocidad 0,55. Duración 0,05 s.
   - **Bajo**: `MonoSynth` Analógico cálido con los parámetros del Anexo A (volumen -4 dB), en un bus `Volume(0)`. Toca la raíz en la octava 2 (`'C2'` … `'B2'`) y dura el 90 % del compás, para que cada ataque se distinga (spec, Assumptions).
-  - Los sintetizadores y sus buses se crean en cada `start`, en el contexto activo, y se descartan en `stop`. Así el test de precisión los crea dentro del contexto offline.
+  - Los sintetizadores y sus buses se crean en cada `start`, en el contexto activo, y los del arranque anterior se descartan ahí mismo. Así el test de precisión los crea dentro del contexto offline.
   - **Spike**: `Tone.start()` dentro de `Tone.Offline` no falla, en Chromium y en WebKit. `context.setTimeout(fn, s)` dentro de `Offline` corre en el tiempo del render, así que el test puede llamar a `stop` y `setBpm` a mitad de la práctica.
 - **Rationale**: son los valores del prototipo que aprobó el usuario. El ajuste fino de los sonidos queda para la prueba de oído.
 

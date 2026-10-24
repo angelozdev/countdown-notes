@@ -55,7 +55,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Preparación de la historia
 
-- [ ] T002 [US1] Instalar y configurar (research.md §1 y §4):
+- [x] T002 [US1] Instalar y configurar (research.md §1 y §4):
   - `pnpm add -E tone@15.1.22 zustand@5.0.16`;
   - `pnpm add -D -E @vitest/browser-playwright@5.0.5 playwright@1.64.1`;
   - `pnpm dlx shadcn@4.22.1 add button`, que crea `src/components/ui/button.tsx`; después `pnpm format`;
@@ -96,11 +96,11 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui`: debe seguir en verde.
 
-- [ ] T003 [US1] Crear `src/audio/engine.ts` con los tipos `Sound`, `EngineStart` y `Engine`, copiados tal cual de [contracts](./contracts/interfaces.md) §2, comentarios incluidos. Solo tipos, sin código.
+- [x] T003 [US1] Crear `src/audio/engine.ts` con los tipos `Sound`, `EngineStart` y `Engine`, copiados tal cual de [contracts](./contracts/interfaces.md) §2, comentarios incluidos. Solo tipos, sin código.
 
 ### Motor real (test de precisión primero)
 
-- [ ] T004 [US1] Escribir `src/audio/tone-engine.browser.test.ts` (research.md §4). Importa `* as Tone from 'tone'`, `test` y `expect` de `vitest`, y `createToneEngine` de `./tone-engine`. Tiene dos helpers dentro del archivo:
+- [x] T004 [US1] Escribir `src/audio/tone-engine.browser.test.ts` (research.md §4). Importa `* as Tone from 'tone'`, `test` y `expect` de `vitest`, y `createToneEngine` de `./tone-engine`. Tiene dos helpers dentro del archivo:
   - `renderPractice(bpm, soundsAt, seconds, during?)` devuelve `Tone.Offline(async (context) => { … }, seconds)`. Adentro:
     - pone `context.lookAhead = 0.1` (sin esto, los eventos se cuantizan a bloques de 128 muestras);
     - crea `const engine = createToneEngine()`;
@@ -125,7 +125,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project audio` y **verlo fallar**, porque `./tone-engine` no existe.
 
-- [ ] T005 [US1] Crear `src/audio/tone-engine.ts` con `export function createToneEngine(): Engine` (research.md §3, §5 y §6). Por ahora solo maneja `kind: 'click'`; el bajo llega en T021.
+- [x] T005 [US1] Crear `src/audio/tone-engine.ts` con `export function createToneEngine(): Engine` (research.md §3, §5 y §6). Por ahora solo maneja `kind: 'click'`; el bajo llega en T021.
   - **`start(options)`**:
     1. Antes de cualquier `await`, poner `audioSession.type = 'playback'` si existe. Con un tipo mínimo local: `type AudioSessionNavigator = Navigator & { audioSession?: { type: string } }`, y `const { audioSession } = navigator as AudioSessionNavigator; if (audioSession) audioSession.type = 'playback'`.
     2. `await Tone.start()`.
@@ -140,6 +140,8 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
   - **`setBpm(bpm)`**: `Tone.getTransport().bpm.value = bpm`.
 
   Correr `pnpm test --project audio`: debe quedar **en verde en Chromium y WebKit**. Si `context.lookAhead` no tipa dentro de `Offline`, usar `Tone.getContext().lookAhead = 0.1`. **Commit**: `feat: motor de audio con metrónomo preciso (#15)`.
+
+  **Hecho, con 3 ajustes que salieron del test** (research.md §3): el tempo inicial va con `setValueAtTime` en el mismo instante del arranque; el motor guarda su contexto para `stop` y `setBpm`; y `stop` silencia los buses en `now − lookAhead` en lugar de hacer `dispose()`.
 
 ### Pantalla: Play/Stop (tests primero)
 

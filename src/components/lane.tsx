@@ -1,5 +1,6 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
+import { groupOf, METER_BY_ID, type Meter } from '@/music/meters'
 import { NOTE_BY_ID } from '@/music/notes'
 import { roundLength, usePractice } from '@/practice/store'
 
@@ -28,6 +29,7 @@ export function Lane() {
   }, [row, length, round?.number])
 
   if (!round) return null
+  const meter = METER_BY_ID[round.meter]
 
   return (
     <div className="max-h-[34dvh] shrink-0 overflow-y-auto px-2 pb-2">
@@ -64,7 +66,7 @@ export function Lane() {
               <span className="note-label font-black [--note-size:1.875rem] sm:[--note-size:2.25rem]">
                 {note.label}
               </span>
-              <BeatSlashes lit={current ? beat + 1 : 0} />
+              <BeatSlashes meter={meter} beat={current ? beat : undefined} />
               {current && (
                 <span
                   key={beat}
@@ -72,9 +74,9 @@ export function Lane() {
                   className="beat-progress absolute inset-x-0 bottom-0 h-1 bg-primary-foreground/70"
                   style={
                     {
-                      '--from': beat / 4,
-                      '--to': (beat + 1) / 4,
-                      '--beat': `${60 / bpm}s`
+                      '--from': beat / meter.beats,
+                      '--to': (beat + 1) / meter.beats,
+                      '--beat': `${(meter.beatLength * 60) / bpm}s`
                     } as CSSProperties
                   }
                 />
@@ -92,11 +94,19 @@ export function Lane() {
   )
 }
 
-/** Las barras oblicuas de ritmo de una partitura de jazz: una por tiempo. */
-function BeatSlashes({ lit }: { lit: number }) {
+/** Las barras oblicuas de ritmo de una partitura de jazz: una por grupo. En el compás actual, se iluminan hasta el grupo que suena. */
+function BeatSlashes({ meter, beat }: { meter: Meter; beat?: number }) {
+  const groups = meter.groups.length
+  const lit = beat === undefined ? 0 : groupOf(meter, beat) + 1
   return (
-    <span aria-hidden className="flex gap-2.5">
-      {[0, 1, 2, 3].map((slash) => (
+    <span
+      // un <img> no puede contener las marcas
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
+      role="img"
+      aria-label={lit ? `Tiempo ${lit} de ${groups}` : `${groups} tiempos`}
+      className="flex gap-2.5"
+    >
+      {Array.from({ length: groups }, (_, slash) => (
         <span
           key={slash}
           className={cn(

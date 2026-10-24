@@ -10,6 +10,8 @@ import {
   SheetTrigger
 } from '@/components/ui/sheet'
 import { Toggle } from '@/components/ui/toggle'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
 import { NOT_ENOUGH_NOTES, usePractice } from '@/practice/store'
 
@@ -37,7 +39,8 @@ export function SettingsPanel() {
         <SheetHeader>
           <SheetTitle className="text-xl">Ajustes</SheetTitle>
           <SheetDescription>
-            El tempo cambia al instante; lo demás, desde la siguiente vuelta.
+            El tempo y el volumen cambian al instante; el sonido, desde el
+            siguiente compás; la estructura, desde la siguiente vuelta.
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-6 px-4 pb-6">
@@ -59,10 +62,40 @@ export function SettingsPanel() {
             decreaseLabel="Bajar compases por nota"
             increaseLabel="Subir compases por nota"
           />
+          <MeterPicker />
           <NoteFilters />
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+function MeterPicker() {
+  const meter = usePractice((state) => state.meter)
+  const setMeter = usePractice((state) => state.setMeter)
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="text-base font-semibold">Compás</h3>
+      <ToggleGroup
+        type="single"
+        aria-label="Compás"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-4"
+        value={meter}
+        onValueChange={(value) => value && setMeter(value as MeterId)}
+      >
+        {METERS.map(({ id }) => (
+          <ToggleGroupItem
+            key={id}
+            value={id}
+            className="h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          >
+            {id}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </section>
   )
 }
 

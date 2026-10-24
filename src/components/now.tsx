@@ -1,5 +1,6 @@
 import { NOTE_BY_ID } from '@/music/notes'
-import { nowPlaying, usePractice } from '@/practice/store'
+import { groupOf } from '@/music/meters'
+import { meterOf, nowPlaying, usePractice } from '@/practice/store'
 
 /** "Ahora": la nota que suena, lo más grande que quepa, con su nombre en español. */
 export function Now() {
@@ -9,9 +10,12 @@ export function Now() {
     return now && now.round.notes[now.index]
   })
   const note = id && NOTE_BY_ID[id]
-  const countdown = usePractice((state) =>
-    state.status === 'countIn' ? 4 - (state.position?.beat ?? 0) : undefined
-  )
+  const countdown = usePractice((state) => {
+    if (state.status !== 'countIn') return undefined
+    const meter = meterOf(state)
+    const group = state.position ? groupOf(meter, state.position.beat) : 0
+    return meter.groups.length - group
+  })
 
   return (
     <section

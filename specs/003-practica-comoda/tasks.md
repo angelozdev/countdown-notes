@@ -121,8 +121,8 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, filas 1–4.
 
-- [ ] T007 [P] [US1] Correr `pnpm dlx shadcn@4.22.1 add toggle-group`, que crea `src/components/ui/toggle-group.tsx`, y después `pnpm format`.
-- [ ] T008 [US1] Escribir `src/meters.test.tsx`. Helpers en el archivo:
+- [x] T007 [P] [US1] Correr `pnpm dlx shadcn@4.22.1 add toggle-group`, que crea `src/components/ui/toggle-group.tsx`, y después `pnpm format`.
+- [x] T008 [US1] Escribir `src/meters.test.tsx`. Helpers en el archivo:
   - `chooseMeter(app, id)`: abre el panel, hace clic en `getByRole('radio', { name: id })` dentro del `radiogroup` `Compás`, y lo cierra;
   - `clicksOf(fake, bar)`: los `accent` de los clicks de ese compás, en orden.
 
@@ -152,9 +152,9 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
     - `fake.beat(24 * 4 - 1 + 3)`;
     - el compás 24 tiene 4 clicks, el 25 tiene 3, y se ve `… · 60 BPM · 3/4`.
 
-  Correr `pnpm test --project ui` y **verlo fallar**.
+  Correr `pnpm test --project ui` y **verlo fallar**. Done: los 6 tests fallaron con `Unable to find an accessible element with the role "radiogroup" and name "Compás"`; las aserciones de `within(...).getBy*` van envueltas en `expect(...).toBeDefined()` por `vitest/expect-expect`.
 
-- [ ] T009 [P] [US1] Crear `src/music/meters.ts` (data-model.md, "Compás"):
+- [x] T009 [P] [US1] Crear `src/music/meters.ts` (data-model.md, "Compás"):
   - `export type MeterId = '2/4' | '3/4' | '4/4' | '5/4' | '6/8' | '7/8' | '9/8' | '12/8'`;
   - `export type Meter = { id: MeterId; beats: number; beatLength: number; groups: number[]; soft: boolean }`;
   - `export const METERS: Meter[]`, con la tabla exacta de data-model.md, en el orden `2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8, 12/8`, y `METER_BY_ID: Record<MeterId, Meter>`;
@@ -164,7 +164,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   En T009 `Accent` todavía no tiene `'soft'`: agregarlo a `engine.ts` aquí (`'strong' | 'soft' | 'none'`), sin tocar el motor.
 
-- [ ] T010 [US1] Implementar (data-model.md, "Ajustes", "Vuelta" y "Derivados"):
+- [x] T010 [US1] Implementar (data-model.md, "Ajustes", "Vuelta" y "Derivados"):
   - **`store.ts`**:
     - `meter: MeterId` (inicial `'4/4'`) y `setMeter(id)`;
     - `Round` suma `meter`. `play` y `nextRound` copian el `meter` del estado;
@@ -178,7 +178,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
   - **`App.tsx`**: la línea de estado termina en `· {meterOf(state).id}`.
   - **`settings-panel.tsx`**: una sección `Compás` con `ToggleGroup type="single"`, `aria-label="Compás"`, `value={meter}` y `onValueChange={(v) => v && setMeter(v as MeterId)}`. Son 8 `ToggleGroupItem` en una grilla de 4 columnas, con el texto del compás. Ajustar la `SheetDescription`: el tempo y el volumen cambian al instante; el sonido, desde el siguiente compás; la estructura, desde la siguiente vuelta.
 
-  `pnpm test --project ui` debe quedar **en verde**, incluidos los tests de la entrega 1. **Commit**: `feat: compases comunes en ajustes, carril y cuenta (#20)`.
+  `pnpm test --project ui` debe quedar **en verde**, incluidos los tests de la entrega 1. **Commit**: `feat: compases comunes en ajustes, carril y cuenta (#20)`. Done: el `<span role="img">` de `BeatSlashes` lleva un `oxlint-disable-next-line jsx-a11y/prefer-tag-over-role` (un `<img>` no puede contener las marcas).
 
 - [ ] T011 [US1] En `src/audio/tone-engine.browser.test.ts`, agregar:
   - `test.each(METERS)('en $id, cada golpe cae en su tiempo')`:

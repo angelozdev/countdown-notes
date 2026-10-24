@@ -1,4 +1,4 @@
-export type Accent = 'strong' | 'none'
+export type Accent = 'strong' | 'soft' | 'none'
 
 export type Sound =
   | { kind: 'click'; accent: Accent }

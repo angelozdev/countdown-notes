@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import {
   canPlay,
   createPracticeStore,
+  meterOf,
   NOT_ENOUGH_NOTES,
   nowPlaying,
   PracticeContext,
@@ -38,9 +39,10 @@ export default function App({ engine }: { engine: Engine }) {
 
 function StatusLine() {
   const bpm = usePractice((state) => state.bpm)
+  const meter = usePractice((state) => meterOf(state).id)
   return (
     <p className="p-4 text-center text-sm tracking-wide text-muted-foreground">
-      Aleatorio · Analógico cálido · {bpm} BPM · 4/4
+      Aleatorio · Analógico cálido · {bpm} BPM · {meter}
     </p>
   )
 }

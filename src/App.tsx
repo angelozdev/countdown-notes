@@ -26,10 +26,10 @@ export default function App({ engine }: { engine: Engine }) {
         <StatusLine />
         <Now />
         <Lane />
-        <footer className="flex flex-col items-center gap-3 p-6">
+        <footer className="flex flex-col items-center gap-3 pt-4">
           <Counter />
           <NotEnoughNotes />
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex w-full max-w-sm items-center gap-3">
             <QuickTempo delta={-5} />
             <PlayButton />
             <QuickTempo delta={5} />
@@ -59,7 +59,7 @@ function StatusLine() {
   const bpm = usePractice((state) => state.bpm)
   const meter = usePractice((state) => meterOf(state).id)
   return (
-    <p className="p-4 text-center text-sm tracking-wide text-muted-foreground">
+    <p className="p-2 text-center text-sm text-muted-foreground">
       Aleatorio · Analógico cálido · {bpm} BPM · {meter}
     </p>
   )
@@ -98,7 +98,7 @@ function PlayButton() {
   return (
     <Button
       size="lg"
-      className="h-16 min-w-40 rounded-full text-xl font-bold"
+      className="h-16 min-w-0 flex-1 rounded-full text-xl font-bold"
       disabled={stopped && !playable}
       onClick={stopped ? play : stop}
     >
@@ -117,7 +117,7 @@ function QuickTempo({ delta }: { delta: -5 | 5 }) {
     <Button
       variant="secondary"
       size="icon-lg"
-      className="size-14"
+      className="size-14 shrink-0 rounded-full"
       aria-label={`${delta < 0 ? 'Bajar' : 'Subir'} 5 BPM`}
       onClick={() => setBpm(bpm + delta)}
     >

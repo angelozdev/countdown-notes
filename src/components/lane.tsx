@@ -58,7 +58,7 @@ export function Lane() {
               className={cn(
                 'relative flex flex-col items-center gap-2 overflow-hidden border-l-2 border-foreground/30 pt-3 pb-4 transition-opacity',
                 (i % 4 === 3 || i === length - 1) && 'border-r-2',
-                current && 'bg-primary text-primary-foreground',
+                current && 'border-primary bg-primary text-primary-foreground',
                 state === 'played' && 'opacity-25',
                 state === 'far' && 'opacity-40'
               )}
@@ -71,7 +71,7 @@ export function Lane() {
                 <span
                   key={beat}
                   aria-hidden
-                  className="beat-progress absolute inset-x-0 bottom-0 h-1 bg-primary-foreground/70"
+                  className="beat-progress absolute inset-x-0 bottom-0 h-1.5 bg-primary-foreground/70"
                   style={
                     {
                       '--from': beat / meter.beats,
@@ -104,14 +104,19 @@ function BeatSlashes({ meter, beat }: { meter: Meter; beat?: number }) {
       // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
       role="img"
       aria-label={lit ? `Tiempo ${lit} de ${groups}` : `${groups} tiempos`}
-      className="flex gap-2.5"
+      className="flex gap-2"
     >
       {Array.from({ length: groups }, (_, slash) => (
         <span
           key={slash}
           className={cn(
-            'h-3.5 w-[3px] rotate-[24deg] rounded-full bg-current',
-            slash < lit ? 'opacity-100' : 'opacity-30'
+            'h-5 w-1 rotate-[24deg] rounded-full bg-current',
+            // el grupo que suena, más alto y entero; los ya sonados, más tenues
+            slash === lit - 1
+              ? 'scale-y-125 opacity-100'
+              : slash < lit
+                ? 'opacity-60'
+                : 'opacity-30'
           )}
         />
       ))}

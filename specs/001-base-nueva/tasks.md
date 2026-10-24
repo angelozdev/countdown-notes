@@ -262,7 +262,7 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
   **Commit**: `feat: configuración de despliegue estático en Vercel (#14)`.
 
-- [ ] T032 [US5] Entregar al usuario los pasos de quickstart §6. El builder no hace push. El usuario hace push de la rama, la mergea, conecta el repo en Vercel sin tocar el panel y abre la URL en el iPhone. Si el build falla, aplicar los riesgos de research.md §11: revisar en el log la versión de pnpm, y agregar `packages: ['.']` si aparece `packages field missing or empty`.
+- [x] T032 [US5] Entregar al usuario los pasos de quickstart §6. El builder no hace push. El usuario hace push de la rama, la mergea, conecta el repo en Vercel sin tocar el panel y abre la URL en el iPhone. Si el build falla, aplicar los riesgos de research.md §11: revisar en el log la versión de pnpm, y agregar `packages: ['.']` si aparece `packages field missing or empty`.
 
 **Checkpoint**: las 5 historias están implementadas. US5 queda pendiente de la verificación del usuario.
 
@@ -270,13 +270,13 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T033 Validar SC-001 desde un clon limpio:
+- [x] T033 Validar SC-001 desde un clon limpio:
   - `git clone --branch 001-base-nueva <repo> <scratchpad>/clean-clone`;
   - en el clon: `pnpm install`, `pnpm exec playwright install chromium webkit`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`.
 
   Los 6 comandos de quickstart §1 deben pasar (el `playwright install` es solo preparación).
 
-- [ ] T034 Informar al usuario, por cada issue (#10–#14), qué criterios de aceptación quedaron en verde y cuáles necesitan su verificación (Vercel y el iPhone). No cerrar ningún issue: los cierra el usuario después de verificarlos (constitución, Backlog).
+- [x] T034 Informar al usuario, por cada issue (#10–#14), qué criterios de aceptación quedaron en verde y cuáles necesitan su verificación (Vercel y el iPhone). No cerrar ningún issue: los cierra el usuario después de verificarlos (constitución, Backlog).
 
 ---
 

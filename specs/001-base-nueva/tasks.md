@@ -243,7 +243,7 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ### Implementation for User Story 5
 
-- [ ] T028 [P] [US5] Crear `vercel.json` (research.md §11):
+- [x] T028 [P] [US5] Crear `vercel.json` (research.md §11):
 
   ```json
   {
@@ -252,11 +252,11 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
   }
   ```
 
-- [ ] T029 [P] [US5] En `package.json`, agregar `"packageManager": "pnpm@11.28.7"` y `"engines": { "node": "24.x" }`. Correr `pnpm install`: no debe dar errores ni advertencias de versión.
-- [ ] T030 [P] [US5] Zonas seguras del iPhone (FR-017):
+- [x] T029 [P] [US5] En `package.json`, agregar `"packageManager": "pnpm@11.28.7"` y `"engines": { "node": "24.x" }`. Correr `pnpm install`: no debe dar errores ni advertencias de versión.
+- [x] T030 [P] [US5] Zonas seguras del iPhone (FR-017):
   - en `index.html`, cambiar el viewport a `width=device-width, initial-scale=1, viewport-fit=cover`;
   - en `src/index.css`, dentro de `@layer base`, darle a `body` un padding con `env(safe-area-inset-top)`, `env(safe-area-inset-right)`, `env(safe-area-inset-bottom)` y `env(safe-area-inset-left)`.
-- [ ] T031 [US5] Verificar:
+- [x] T031 [US5] Verificar:
   - `pnpm build && find dist -type f` solo lista `dist/index.html` y archivos en `dist/assets/`;
   - pasan `pnpm test:e2e` (incluido el chequeo sin desplazamiento horizontal en iPhone), `pnpm test`, `pnpm lint` y `pnpm format:check`.
 

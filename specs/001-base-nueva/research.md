@@ -104,6 +104,7 @@ Fecha: 2026-10-24. Versiones tomadas del registro de npm ese día (`pnpm view <p
   - `<meta name="theme-color" content="<fondo>">`;
   - padding con `env(safe-area-inset-*)` en el contenedor de la pantalla.
 - **Favicon**: no hay en esta entrega; los íconos llegan con la PWA (entrega 7).
+- **Ajuste en la implementación**: el padding de las zonas seguras va en `<main>`, con la utilidad `p-safe` (`@utility` en `src/index.css`: `max(1rem, env(safe-area-inset-*))`), y no en `body` como decía T030. Con `body`, el viewport más los insets superaba `min-h-dvh`, y en un iPhone con muesca habría desplazamiento vertical. Con `border-box`, el padding queda dentro de `min-h-dvh`.
 - **Rationale**: FR-017 pide que el contenido no quede tapado por la muesca ni se desborde. `viewport-fit=cover` junto con los safe-area insets es la forma estándar en Safari iOS.
 
 ## 10. pnpm

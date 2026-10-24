@@ -83,6 +83,13 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Padding mínimo de 1rem que respeta la muesca y las zonas del sistema en iPhone */
+@utility p-safe {
+  padding: max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

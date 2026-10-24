@@ -7,6 +7,7 @@
 ## Summary
 
 Reconstruir la app desde cero en el mismo repo:
+
 - **Base**: la plantilla oficial de Vite 8 (React 19 + TypeScript 7), con todas las dependencias en versión exacta.
 - **Lint y formato**: oxlint y oxfmt; el formato se migra desde el `.prettierrc.json` actual.
 - **Tests**: Vitest + jsdom + Testing Library para la UI, y Playwright (Chromium + iPhone/WebKit) para E2E contra la build de producción.
@@ -32,6 +33,7 @@ La pantalla base muestra el título "Countdown Notes", una frase en español y u
 **Performance Goals**: N/A en esta entrega. La pantalla base es estática.
 
 **Constraints**:
+
 - Todas las dependencias van en versión exacta (`saveExact: true`).
 - Sin funciones de servidor.
 - Sin ajustes en el panel de Vercel.
@@ -42,17 +44,17 @@ La pantalla base muestra el título "Countdown Notes", una frase en español y u
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principio | Cómo se cumple | Estado |
-|---|---|---|
-| I. Test-first | El test de UI de la pantalla base se escribe antes que la pantalla, y el smoke test E2E antes de la configuración de Playwright que lo hace pasar. Para eso, Vitest se instala como preparación compartida, antes de US1. Los tests buscan por rol y texto accesible ([contracts](./contracts/interfaces.md) §2). | ✅ |
-| II. Entregas verticales | Toda la entrega es una excepción nombrada (preparación compartida, issue #1). Aun así, cada historia termina en algo que se ejecuta desde un punto de entrada real: un comando `pnpm` o la app abierta. | ✅ (excepción nombrada) |
-| III. Precisión del tiempo | No aplica: esta entrega no tiene audio. Tone.js entra en la entrega 1. | ✅ N/A |
-| IV. Manos libres | La pantalla base no tiene controles, y su título es grande y de mucho peso para leerse de lejos. | ✅ |
-| V. Simplicidad | Solo estáticos, sin datos guardados. YAGNI: sin Tone.js, tonal, zod, vite-plugin-pwa ni Zustand (cada uno llega con su entrega), sin jest-dom y sin `Button`. | ✅ |
-| Restricciones técnicas | pnpm; stack de la lista en sus últimas estables; oxfmt con el estilo de Prettier; interfaz en español. | ✅ |
-| Flujo de trabajo | Se trabaja en la rama `001-base-nueva`, con un commit por paso en verde que referencia el issue; nunca en `main` ni push. Dependencias fuera de la lista (Geist, jsdom): las aprobó el usuario el 2026-10-24. | ✅ |
+| Principio                 | Cómo se cumple                                                                                                                                                                                                                                                                                                    | Estado                  |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| I. Test-first             | El test de UI de la pantalla base se escribe antes que la pantalla, y el smoke test E2E antes de la configuración de Playwright que lo hace pasar. Para eso, Vitest se instala como preparación compartida, antes de US1. Los tests buscan por rol y texto accesible ([contracts](./contracts/interfaces.md) §2). | ✅                      |
+| II. Entregas verticales   | Toda la entrega es una excepción nombrada (preparación compartida, issue #1). Aun así, cada historia termina en algo que se ejecuta desde un punto de entrada real: un comando `pnpm` o la app abierta.                                                                                                           | ✅ (excepción nombrada) |
+| III. Precisión del tiempo | No aplica: esta entrega no tiene audio. Tone.js entra en la entrega 1.                                                                                                                                                                                                                                            | ✅ N/A                  |
+| IV. Manos libres          | La pantalla base no tiene controles, y su título es grande y de mucho peso para leerse de lejos.                                                                                                                                                                                                                  | ✅                      |
+| V. Simplicidad            | Solo estáticos, sin datos guardados. YAGNI: sin Tone.js, tonal, zod, vite-plugin-pwa ni Zustand (cada uno llega con su entrega), sin jest-dom y sin `Button`.                                                                                                                                                     | ✅                      |
+| Restricciones técnicas    | pnpm; stack de la lista en sus últimas estables; oxfmt con el estilo de Prettier; interfaz en español.                                                                                                                                                                                                            | ✅                      |
+| Flujo de trabajo          | Se trabaja en la rama `001-base-nueva`, con un commit por paso en verde que referencia el issue; nunca en `main` ni push. Dependencias fuera de la lista (Geist, jsdom): las aprobó el usuario el 2026-10-24.                                                                                                     | ✅                      |
 
 **Re-check post-diseño**: sin cambios. No hay violaciones que justificar.
 

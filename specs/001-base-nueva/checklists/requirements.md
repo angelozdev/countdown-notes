@@ -31,6 +31,6 @@
 
 ## Notes
 
-- Excepción aceptada: esta entrega es "preparación compartida" (constitución, principio II). Su conducta visible *es* el stack: los comandos `pnpm …`, las herramientas, Vercel y el iPhone son la interfaz pública que piden el issue #1 y sus sub-issues, y los fija la constitución (Restricciones técnicas). Por eso se nombran en el spec. Esto no adelanta decisiones de arquitectura: carpetas, módulos y configuración quedan para `/speckit-plan`.
+- Excepción aceptada: esta entrega es "preparación compartida" (constitución, principio II). Su conducta visible _es_ el stack: los comandos `pnpm …`, las herramientas, Vercel y el iPhone son la interfaz pública que piden el issue #1 y sus sub-issues, y los fija la constitución (Restricciones técnicas). Por eso se nombran en el spec. Esto no adelanta decisiones de arquitectura: carpetas, módulos y configuración quedan para `/speckit-plan`.
 - "Written for non-technical stakeholders": el único interesado es el dueño de la app, que también la desarrolla.
 - Validación: 1 iteración. Todos los ítems pasan.

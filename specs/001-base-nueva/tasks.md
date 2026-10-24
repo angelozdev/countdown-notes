@@ -1,6 +1,5 @@
 ---
-
-description: "Lista de tareas de la Entrega 0 · Base nueva"
+description: 'Lista de tareas de la Entrega 0 · Base nueva'
 ---
 
 # Tasks: Base nueva (Entrega 0)
@@ -12,6 +11,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 **Organización**: una fase por historia (sub-issue). Toda la entrega es la excepción nombrada "preparación compartida" (issue #1).
 
 **Reglas que aplican a todas las tareas**:
+
 - Todo en la rama `001-base-nueva`; nunca en `main` y nunca push.
 - Commit después de cada paso en verde, con el número de issue en el mensaje (por ejemplo, `#10`).
 - Toda dependencia se instala con versión exacta (`pnpm add -E`, más `saveExact: true`), usando las versiones de research.md §1.
@@ -29,9 +29,9 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 **Purpose**: rama de trabajo, borrar la app vieja y dejar la plantilla de Vite con versiones exactas.
 
-- [X] T001 Crear la rama `001-base-nueva` desde `main` con `git switch -c 001-base-nueva`. Los cambios sin commitear pasan con ella.
-- [X] T002 Borrar de `.specify/memory/constitution.md` el bloque de comentario HTML `<!-- Sync Impact Report ... -->` del inicio (la constitución dice que se borra antes del commit). Después commitear el material de planificación: `docs/`, `specs/001-base-nueva/`, `.specify/`, `.claude/` y `.gitignore`. `pnpm-lock.yaml` y `pnpm-workspace.yaml` no van en este commit: se rehacen en T005. Mensaje: `docs: spec, plan y tareas de la entrega 0 (#1)`.
-- [X] T003 Borrar la app vieja:
+- [x] T001 Crear la rama `001-base-nueva` desde `main` con `git switch -c 001-base-nueva`. Los cambios sin commitear pasan con ella.
+- [x] T002 Borrar de `.specify/memory/constitution.md` el bloque de comentario HTML `<!-- Sync Impact Report ... -->` del inicio (la constitución dice que se borra antes del commit). Después commitear el material de planificación: `docs/`, `specs/001-base-nueva/`, `.specify/`, `.claude/` y `.gitignore`. `pnpm-lock.yaml` y `pnpm-workspace.yaml` no van en este commit: se rehacen en T005. Mensaje: `docs: spec, plan y tareas de la entrega 0 (#1)`.
+- [x] T003 Borrar la app vieja:
   - `src/` completo;
   - `public/` (solo tiene `vite.svg`);
   - `tailwind.config.cjs` y `postcss.config.cjs`;
@@ -39,10 +39,11 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - `vite.config.ts` e `index.html`.
 
   `.prettierrc.json` se queda hasta T014.
-- [X] T004 Generar la plantilla oficial en el scratchpad, con `pnpm create vite@9.3.1 <scratchpad>/vite-template --template react-ts --no-interactive`. Copiar a la raíz solo `index.html`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` y `vite.config.ts`. No copiar `README.md`, `public/`, `src/` ni `.oxlintrc.json`. Después:
+
+- [x] T004 Generar la plantilla oficial en el scratchpad, con `pnpm create vite@9.3.1 <scratchpad>/vite-template --template react-ts --no-interactive`. Copiar a la raíz solo `index.html`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` y `vite.config.ts`. No copiar `README.md`, `public/`, `src/` ni `.oxlintrc.json`. Después:
   - en `index.html`: cambiar `lang="en"` por `lang="es"`, poner `<title>Countdown Notes</title>` y borrar la línea `<link rel="icon" …>`;
   - en `tsconfig.app.json`: agregar `"strict": true` en `compilerOptions` (la constitución lo exige de forma explícita).
-- [X] T005 Reescribir `package.json` (research.md §1 y §3):
+- [x] T005 Reescribir `package.json` (research.md §1 y §3):
   - `"name": "countdown-notes"`, `"private": true`, `"version": "0.0.0"`, `"type": "module"`;
   - `scripts`: `"dev": "vite"`, `"build": "tsc -b && vite build"` y `"preview": "vite preview"`;
   - `dependencies`: `react` `19.3.1` y `react-dom` `19.3.1`;
@@ -59,8 +60,8 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 **⚠️ CRITICAL**: US1 no puede empezar test-first sin esta fase.
 
-- [X] T006 Instalar los tests de UI con versión exacta: `pnpm add -D -E vitest@5.0.5 jsdom@30.1.3 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8`.
-- [X] T007 Configurar Vitest en `vite.config.ts` (research.md §6):
+- [x] T006 Instalar los tests de UI con versión exacta: `pnpm add -D -E vitest@5.0.5 jsdom@30.1.3 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8`.
+- [x] T007 Configurar Vitest en `vite.config.ts` (research.md §6):
   - agregar `/// <reference types="vitest/config" />` en la primera línea;
   - agregar `test: { environment: 'jsdom', globals: true, include: ['src/**/*.test.{ts,tsx}'] }`, con un comentario de una línea: `globals` solo existe para que Testing Library limpie el DOM entre tests;
   - en `package.json`, agregar el script `"test": "vitest run"`.
@@ -79,7 +80,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T008 [P] [US1] Escribir `src/App.test.tsx`:
+- [x] T008 [P] [US1] Escribir `src/App.test.tsx`:
   - importa `render` y `screen` de `@testing-library/react`, `test` de `vitest` y `App` de `./App`;
   - el test se llama `'muestra la pantalla base en español'`;
   - hace `render(<App />)` y luego `screen.getByRole('heading', { level: 1, name: 'Countdown Notes' })` y `screen.getByText('Acompañamiento para improvisar con la guitarra.')`.
@@ -88,14 +89,15 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Instalar Tailwind con `pnpm add -D -E tailwindcss@4.3.3 @tailwindcss/vite@4.3.3`. En `vite.config.ts`, importar `tailwindcss` de `@tailwindcss/vite` y agregarlo en `plugins: [react(), tailwindcss()]`.
-- [ ] T010 [US1] Crear la pantalla base:
+- [x] T009 [P] [US1] Instalar Tailwind con `pnpm add -D -E tailwindcss@4.3.3 @tailwindcss/vite@4.3.3`. En `vite.config.ts`, importar `tailwindcss` de `@tailwindcss/vite` y agregarlo en `plugins: [react(), tailwindcss()]`.
+- [x] T010 [US1] Crear la pantalla base:
   - `src/index.css` con `@import 'tailwindcss';`;
   - `src/main.tsx`, igual que en la plantilla de Vite: `StrictMode`, `createRoot(document.getElementById('root')!)`, `import './index.css'` e `import App from './App.tsx'`;
   - `src/App.tsx` con `export default function App()`, que devuelve un `<main>` centrado a pantalla completa (`min-h-dvh`, flex, centrado) con un `<h1>` "Countdown Notes" (grande y en `font-black`) y un `<p>` "Acompañamiento para improvisar con la guitarra.".
 
   Correr `pnpm test`: debe quedar **en verde**.
-- [ ] T011 [US1] Verificar:
+
+- [x] T011 [US1] Verificar:
   - `pnpm build` pasa (incluye `tsc -b` con TS 7);
   - con `pnpm dev`, la pantalla se ve en el navegador;
   - los chequeos de quickstart §2: `grep -E 'react-countdown-circle-timer|classnames|zustand' package.json` no imprime nada, y no existen `tailwind.config.cjs` ni `postcss.config.cjs`.
@@ -114,8 +116,8 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Instalar con `pnpm add -D -E oxlint@1.89.0 oxfmt@0.74.0` y agregar a `package.json` los scripts `"lint": "oxlint --deny-warnings"`, `"format": "oxfmt"` y `"format:check": "oxfmt --check"`.
-- [ ] T013 [P] [US2] Crear `.oxlintrc.json` (research.md §4):
+- [x] T012 [US2] Instalar con `pnpm add -D -E oxlint@1.89.0 oxfmt@0.74.0` y agregar a `package.json` los scripts `"lint": "oxlint --deny-warnings"`, `"format": "oxfmt"` y `"format:check": "oxfmt --check"`.
+- [x] T013 [P] [US2] Crear `.oxlintrc.json` (research.md §4):
 
   ```json
   {
@@ -134,12 +136,12 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   }
   ```
 
-- [ ] T014 [P] [US2] Correr `pnpm exec oxfmt --migrate=prettier` para generar `.oxfmtrc.json` desde `.prettierrc.json` (research.md §5).
+- [x] T014 [P] [US2] Correr `pnpm exec oxfmt --migrate=prettier` para generar `.oxfmtrc.json` desde `.prettierrc.json` (research.md §5).
   - Comprobar que queda con `singleQuote: true`, `semi: false`, `trailingComma: "none"`, `tabWidth: 2` y `printWidth: 80`.
   - Poner `"ignorePatterns": [".specify/**", ".claude/**"]`.
   - Borrar `.prettierrc.json`.
-- [ ] T015 [US2] Correr `pnpm format` sobre todo el repo y corregir lo que reporte `pnpm lint`. Al final deben pasar los 4 comandos: `pnpm lint`, `pnpm format:check`, `pnpm test` y `pnpm build`.
-- [ ] T016 [US2] Verificar que los chequeos fallan cuando deben (quickstart §3):
+- [x] T015 [US2] Correr `pnpm format` sobre todo el repo y corregir lo que reporte `pnpm lint`. Al final deben pasar los 4 comandos: `pnpm lint`, `pnpm format:check`, `pnpm test` y `pnpm build`.
+- [x] T016 [US2] Verificar que los chequeos fallan cuando deben (quickstart §3):
   - con `printf 'const a = "x";\n' > src/tmp-check.ts`, `pnpm format:check` falla y nombra el archivo; `pnpm format` lo corrige y el chequeo vuelve a pasar;
   - con `debugger` en ese archivo, `pnpm lint` falla.
 
@@ -178,6 +180,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - `projects`: `{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }` y `{ name: 'iphone', use: { ...devices['iPhone 15'] } }`.
 
   En `tsconfig.node.json`, cambiar `include` a `["vite.config.ts", "playwright.config.ts", "e2e"]`. Correr `pnpm test:e2e`: debe quedar **en verde en los 2 proyectos**.
+
 - [ ] T020 [US3] Verificar SC-005: cambiar el texto del `<h1>` en `src/App.tsx`, comprobar que fallan `pnpm test` y `pnpm test:e2e`, y deshacer el cambio. Al final deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. **Commit**: `test: smoke E2E con Playwright en Chromium y iPhone (#12)`.
 
 **Checkpoint**: US1–US3 en verde.
@@ -207,6 +210,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - en `tsconfig.json` y en `tsconfig.app.json`, `compilerOptions.paths: { "@/*": ["./src/*"] }`, **sin `baseUrl`** (TS 7 lo eliminó).
 
   `pnpm build` debe seguir en verde.
+
 - [ ] T024 [US4] Correr `pnpm dlx shadcn@4.22.1 init -t vite -b radix -p nova --no-monorepo -y`. Crea `components.json`, `src/lib/utils.ts` y `src/components/ui/button.tsx`, reescribe `src/index.css` e instala `shadcn`, `radix-ui`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css` y `@fontsource-variable/geist`.
   - Comprobar que en `package.json` todas las versiones quedaron exactas, sin `^`.
   - Borrar `src/components/ui/button.tsx` (YAGNI: vuelve en la entrega 1).
@@ -224,6 +228,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - agregar `<Badge>En construcción</Badge>`, importado de `@/components/ui/badge`.
 
   Correr `pnpm test` y `pnpm test:e2e`: deben quedar **en verde**.
+
 - [ ] T027 [US4] Correr `pnpm format`, porque los archivos de shadcn vienen con comillas dobles. Después deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. Hacer la revisión visual de quickstart §5 con `pnpm dev`: título en Geist grande y en peso 900, badge ámbar, y la app sigue en oscuro con el sistema en modo claro. **Commit**: `feat: tema oscuro con acento ámbar y shadcn/ui (#13)`.
 
 **Checkpoint**: US1–US4 en verde.
@@ -256,6 +261,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - pasan `pnpm test:e2e` (incluido el chequeo sin desplazamiento horizontal en iPhone), `pnpm test`, `pnpm lint` y `pnpm format:check`.
 
   **Commit**: `feat: configuración de despliegue estático en Vercel (#14)`.
+
 - [ ] T032 [US5] Entregar al usuario los pasos de quickstart §6. El builder no hace push. El usuario hace push de la rama, la mergea, conecta el repo en Vercel sin tocar el panel y abre la URL en el iPhone. Si el build falla, aplicar los riesgos de research.md §11: revisar en el log la versión de pnpm, y agregar `packages: ['.']` si aparece `packages field missing or empty`.
 
 **Checkpoint**: las 5 historias están implementadas. US5 queda pendiente de la verificación del usuario.
@@ -269,6 +275,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - en el clon: `pnpm install`, `pnpm exec playwright install chromium webkit`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`.
 
   Los 6 comandos de quickstart §1 deben pasar (el `playwright install` es solo preparación).
+
 - [ ] T034 Informar al usuario, por cada issue (#10–#14), qué criterios de aceptación quedaron en verde y cuáles necesitan su verificación (Vercel y el iPhone). No cerrar ningún issue: los cierra el usuario después de verificarlos (constitución, Backlog).
 
 ---
@@ -325,6 +332,7 @@ Task: "viewport-fit=cover en index.html y padding con safe-area en src/index.css
 ### Incremental Delivery
 
 Después de cada historia, todos los comandos que ya existen siguen en verde y se hace commit:
+
 - US1: pantalla base;
 - US2: lint y formato;
 - US3: E2E;

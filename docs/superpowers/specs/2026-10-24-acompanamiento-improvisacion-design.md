@@ -25,6 +25,7 @@ La primera vez que la pruebe con la guitarra, "ya me sirve" si tiene: **modo ale
 ## 2. Objetivos, no objetivos y anti-objetivos
 
 **Objetivos**
+
 - Dos modos: **aleatorio** (una nota a la vez, sorteada) y **progresión** (loop de acordes).
 - Bajo en la raíz con figura rítmica elegible; acordes opcionales con el vocabulario completo de jazz.
 - Metrónomo preciso con los compases más comunes.
@@ -33,15 +34,17 @@ La primera vez que la pruebe con la guitarra, "ya me sirve" si tiene: **modo ale
 - Funciona igual en celular y computador; se puede instalar en la pantalla de inicio.
 
 **No objetivos (por ahora)**
+
 - Línea de bajo caminante (walking bass). El bajo toca solo la raíz.
 - Acompañamiento rítmico de acordes (comping). El acorde suena al inicio del compás y se sostiene.
 - Sonidos realistas o sampleados. El usuario pidió "un buen sonido, no un sonido real".
 - Cuentas de usuario, nube, compartir progresiones.
 - Grabar, MIDI, escuchar o analizar lo que toca el usuario.
-- Mostrar la escala en pantalla *(mi decisión: el usuario elige mentalmente qué escala practica)*.
-- Modo claro *(mi decisión: v1 es solo oscuro, ver 7.4)*.
+- Mostrar la escala en pantalla _(mi decisión: el usuario elige mentalmente qué escala practica)_.
+- Modo claro _(mi decisión: v1 es solo oscuro, ver 7.4)_.
 
 **Anti-objetivos (aunque funcione, sería un fracaso)**
+
 - Un metrónomo que se desfase, tiemble o se atrase cuando la pestaña o el celular están ocupados.
 - Tener que tocar la pantalla mientras se toca la guitarra.
 - Una pantalla de práctica llena de controles.
@@ -50,28 +53,28 @@ La primera vez que la pruebe con la guitarra, "ya me sirve" si tiene: **modo ale
 
 ## 3. Modo aleatorio
 
-- **Qué notas entran**: las 12, con los filtros de la app actual (incluir o excluir cada nota, todas las naturales, todas las alteradas). Mínimo 2 notas, porque con 1 no se puede evitar que salga la misma nota dos veces seguidas *(mi decisión)*.
-- **Orden**: aleatorio, sin repetir hasta completar la vuelta (igual que hoy). Al pasar de una vuelta a otra, la primera nota de la nueva vuelta no puede ser igual a la última de la anterior *(mi decisión)*.
-- **Cambio de nota**: cada N compases (configurable, 1–16, por defecto 2 *(mi decisión)*). Siempre en el tiempo 1.
+- **Qué notas entran**: las 12, con los filtros de la app actual (incluir o excluir cada nota, todas las naturales, todas las alteradas). Mínimo 2 notas, porque con 1 no se puede evitar que salga la misma nota dos veces seguidas _(mi decisión)_.
+- **Orden**: aleatorio, sin repetir hasta completar la vuelta (igual que hoy). Al pasar de una vuelta a otra, la primera nota de la nueva vuelta no puede ser igual a la última de la anterior _(mi decisión)_.
+- **Cambio de nota**: cada N compases (configurable, 1–16, por defecto 2 _(mi decisión)_). Siempre en el tiempo 1.
 - **Qué suena**: "solo bajo" o "bajo + acorde". Con acorde, todas las notas usan **el mismo tipo de acorde**, elegido de la lista de la sección 5.2 (por ejemplo, todas m7).
-- **Duración**: hasta que el usuario le dé Stop, o hasta completar N vueltas si lo configura *(mi decisión: el "toca esto 100 veces" que pidió para las progresiones aplica también aquí)*.
-- **Nombres de las notas negras**: se escriben con la grafía más común en jazz: D♭, E♭, F♯, A♭, B♭ *(mi decisión)*.
+- **Duración**: hasta que el usuario le dé Stop, o hasta completar N vueltas si lo configura _(mi decisión: el "toca esto 100 veces" que pidió para las progresiones aplica también aquí)_.
+- **Nombres de las notas negras**: se escriben con la grafía más común en jazz: D♭, E♭, F♯, A♭, B♭ _(mi decisión)_.
 
 ## 4. Modo progresión
 
 - **Origen de la progresión**: la biblioteca de la sección 4.1 o una progresión propia (4.2).
-- **Qué suena**: igual que en el modo aleatorio, "solo bajo" o "bajo + acorde" *(mi decisión)*.
-- **Tonalidad de origen** *(mi decisión)*:
+- **Qué suena**: igual que en el modo aleatorio, "solo bajo" o "bajo + acorde" _(mi decisión)_.
+- **Tonalidad de origen** _(mi decisión)_:
   - Cada progresión guarda la tonalidad en que está escrita. La biblioteca está en Do; la cadencia andaluza, en La menor.
   - Una progresión propia guarda la tonalidad en que la escribiste y suena así hasta que elijas otra.
-- **Tonalidad**: la elige el usuario y transporta la progresión desde su tonalidad de origen. Opcionalmente, "cambiar de tonalidad cada N vueltas", **al azar** o **por cuartas** (C → F → B♭ → …) *(decisión mía que el usuario no objetó)*.
+- **Tonalidad**: la elige el usuario y transporta la progresión desde su tonalidad de origen. Opcionalmente, "cambiar de tonalidad cada N vueltas", **al azar** o **por cuartas** (C → F → B♭ → …) _(decisión mía que el usuario no objetó)_.
 - **Duración de cada acorde** (el usuario pidió poder usar medio compás):
   - La unidad mínima es **medio compás**, así que caben dos acordes en un compás (`C7 A7 | Dm7 G7`).
   - Un acorde puede durar medio compás, uno o varios compases.
-  - Medio compás existe en los compases que se parten en dos mitades iguales: 2/4, 4/4, 6/8 y 12/8. En 3/4, 5/4, 7/8 y 9/8, la unidad mínima es el compás entero *(mi decisión; el builder puede ampliarlo partiendo por grupos si sale natural)*.
+  - Medio compás existe en los compases que se parten en dos mitades iguales: 2/4, 4/4, 6/8 y 12/8. En 3/4, 5/4, 7/8 y 9/8, la unidad mínima es el compás entero _(mi decisión; el builder puede ampliarlo partiendo por grupos si sale natural)_.
 - **Repetición**: en loop hasta Stop, o N vueltas.
 - **El largo es variable**: 4, 8, 12 o más compases, ya no "4 o 6 acordes fijos".
-- **Ciclos que recorren las 12 tonalidades** (ciclo de cuartas, ciclo de quintas, ii–V–I por las 12) *(mis decisiones)*:
+- **Ciclos que recorren las 12 tonalidades** (ciclo de cuartas, ciclo de quintas, ii–V–I por las 12) _(mis decisiones)_:
   - La "tonalidad" elegida es el punto de partida.
   - Una vuelta es el recorrido completo.
   - El cambio automático de tonalidad no aplica, porque ya recorren las 12.
@@ -79,57 +82,59 @@ La primera vez que la pruebe con la guitarra, "ya me sirve" si tiene: **modo ale
 
 ### 4.1 Biblioteca de progresiones (aprobada por el usuario)
 
-Escritas en Do; se transportan a la tonalidad elegida. Las duraciones exactas de cada una las define el builder siguiendo la forma estándar. Ahora que existe el medio compás, se usa donde la forma estándar lo pide (final del blues de jazz, turnarounds, *Giant Steps*). Los ejemplos de las tablas son simplificados.
+Escritas en Do; se transportan a la tonalidad elegida. Las duraciones exactas de cada una las define el builder siguiendo la forma estándar. Ahora que existe el medio compás, se usa donde la forma estándar lo pide (final del blues de jazz, turnarounds, _Giant Steps_). Los ejemplos de las tablas son simplificados.
 
 **Ciclos (recorren las 12 tonalidades)**
 
-| Progresión | Ejemplo en Do |
-|---|---|
-| Ciclo de cuartas | C F B♭ E♭ A♭ D♭ G♭ B E A D G |
-| Ciclo de quintas | C G D A E B F♯ D♭ A♭ E♭ B♭ F |
+| Progresión                    | Ejemplo en Do                                                    |
+| ----------------------------- | ---------------------------------------------------------------- |
+| Ciclo de cuartas              | C F B♭ E♭ A♭ D♭ G♭ B E A D G                                     |
+| Ciclo de quintas              | C G D A E B F♯ D♭ A♭ E♭ B♭ F                                     |
 | ii–V–I por las 12 tonalidades | Dm7 G7 Cmaj7 Cmaj7 → Gm7 C7 Fmaj7 Fmaj7 → … (avanza por cuartas) |
-| Dominantes encadenados | E7 A7 D7 G7 Cmaj7 |
+| Dominantes encadenados        | E7 A7 D7 G7 Cmaj7                                                |
 
-En los dos primeros ciclos solo hay raíces: el tipo de acorde lo elige el usuario, como en el modo aleatorio *(mi decisión)*.
+En los dos primeros ciclos solo hay raíces: el tipo de acorde lo elige el usuario, como en el modo aleatorio _(mi decisión)_.
 
 Corrección respecto a lo que se habló en el chat: el ejemplo del ii–V–I que mostré bajaba por tonos (C → B♭ → …), y así solo se recorren 6 tonalidades. Por cuartas se recorren las 12.
 
 **Jazz**
 
-| Progresión | Ejemplo en Do |
-|---|---|
-| ii–V–I mayor | Dm7 G7 Cmaj7 Cmaj7 |
-| ii–V–i menor | Dm7♭5 G7♭9 Cm6 Cm6 |
-| I–vi–ii–V (turnaround) | Cmaj7 A7 Dm7 G7 |
-| iii–vi–ii–V | Em7 A7 Dm7 G7 |
-| Ciclo diatónico (tipo *Autumn Leaves*) | Cmaj7 Fmaj7 Bm7♭5 Em7 Am7 Dm7 G7 Cmaj7 |
-| Sustituto tritonal | Dm7 D♭7 Cmaj7 |
-| ii–V "backdoor" | Fm7 B♭7 Cmaj7 |
-| Blues de jazz (12 compases) | C7 F7 C7 C7 · F7 F7 C7 A7 · Dm7 G7 C7 G7 |
-| Blues menor (12 compases) | Cm7 ×4 · Fm7 ×2 · Cm7 ×2 · A♭7 G7 Cm7 G7 |
-| Modal (tipo *So What*) | Dm7 sostenido varios compases, para practicar dórico |
-| Coltrane (*Giant Steps*, avanzado) | Cmaj7 E♭7 A♭maj7 B7 Emaj7 G7 Cmaj7 |
+| Progresión                             | Ejemplo en Do                                        |
+| -------------------------------------- | ---------------------------------------------------- |
+| ii–V–I mayor                           | Dm7 G7 Cmaj7 Cmaj7                                   |
+| ii–V–i menor                           | Dm7♭5 G7♭9 Cm6 Cm6                                   |
+| I–vi–ii–V (turnaround)                 | Cmaj7 A7 Dm7 G7                                      |
+| iii–vi–ii–V                            | Em7 A7 Dm7 G7                                        |
+| Ciclo diatónico (tipo _Autumn Leaves_) | Cmaj7 Fmaj7 Bm7♭5 Em7 Am7 Dm7 G7 Cmaj7               |
+| Sustituto tritonal                     | Dm7 D♭7 Cmaj7                                        |
+| ii–V "backdoor"                        | Fm7 B♭7 Cmaj7                                        |
+| Blues de jazz (12 compases)            | C7 F7 C7 C7 · F7 F7 C7 A7 · Dm7 G7 C7 G7             |
+| Blues menor (12 compases)              | Cm7 ×4 · Fm7 ×2 · Cm7 ×2 · A♭7 G7 Cm7 G7             |
+| Modal (tipo _So What_)                 | Dm7 sostenido varios compases, para practicar dórico |
+| Coltrane (_Giant Steps_, avanzado)     | Cmaj7 E♭7 A♭maj7 B7 Emaj7 G7 Cmaj7                   |
 
 **Pop, rock y latino**
 
-| Progresión | Ejemplo |
-|---|---|
-| I–V–vi–IV | C G Am F |
-| vi–IV–I–V | Am F C G |
-| I–vi–IV–V (doo-wop) | C Am F G |
-| I–IV–V | C F G G |
+| Progresión                  | Ejemplo                             |
+| --------------------------- | ----------------------------------- |
+| I–V–vi–IV                   | C G Am F                            |
+| vi–IV–I–V                   | Am F C G                            |
+| I–vi–IV–V (doo-wop)         | C Am F G                            |
+| I–IV–V                      | C F G G                             |
 | Blues de rock (12 compases) | C7 ×4 · F7 ×2 · C7 ×2 · G7 F7 C7 G7 |
-| Cadencia andaluza | Am G F E |
+| Cadencia andaluza           | Am G F E                            |
 
 ### 4.2 Progresiones propias (aprobado por el usuario)
 
 Hay dos formas de armarlas, y las dos llenan el mismo carril:
+
 - **Tocando**: tocas un compás del carril, eliges la raíz (12 botones) y el tipo de acorde (agrupados por familias).
-- **Escribiendo**: escribes texto como `Dm7 G7 Cmaj7 Cmaj7` y se llena el carril, con un acorde por compás. Si un acorde no se reconoce, se marca el error en el texto y no se guarda *(mi decisión)*.
+- **Escribiendo**: escribes texto como `Dm7 G7 Cmaj7 Cmaj7` y se llena el carril, con un acorde por compás. Si un acorde no se reconoce, se marca el error en el texto y no se guarda _(mi decisión)_.
 
 Para que un acorde dure más, lo repites o le cambias la duración. Para poner dos acordes en un compás:
+
 - **Tocando**: partes el compás en dos mitades.
-- **Escribiendo**: la sintaxis exacta la decide el builder. Mi sugerencia es separar compases con `|` y repartir en partes iguales los acordes que caigan dentro: `Cmaj7 | C7 A7 | Dm7 G7`. Las progresiones se guardan en el dispositivo con nombre, y se pueden renombrar y borrar *(mi decisión: renombrar y borrar)*.
+- **Escribiendo**: la sintaxis exacta la decide el builder. Mi sugerencia es separar compases con `|` y repartir en partes iguales los acordes que caigan dentro: `Cmaj7 | C7 A7 | Dm7 G7`. Las progresiones se guardan en el dispositivo con nombre, y se pueden renombrar y borrar _(mi decisión: renombrar y borrar)_.
 
 ## 5. Sonido
 
@@ -139,13 +144,13 @@ El usuario escuchó cuatro estilos en un prototipo y eligió dos: **Analógico c
 
 ### 5.2 Tipos de acorde (aprobados por el usuario: "todos los más normales para jazz")
 
-| Familia | Acordes (sobre Do) |
-|---|---|
-| Tríadas | C, Cm, Cdim, Caug, Csus4, Csus2 |
-| Sextas | C6, Cm6, C6/9 |
-| Séptimas | Cmaj7, Cm7, C7, Cm7♭5 (Cø), C°7, Cm(maj7), C7sus4 |
-| Extensiones | Cmaj9, Cm9, C9, Cm11, C13 |
-| Dominantes alterados | C7♭9, C7♯9, C7♯11, C7alt |
+| Familia              | Acordes (sobre Do)                                |
+| -------------------- | ------------------------------------------------- |
+| Tríadas              | C, Cm, Cdim, Caug, Csus4, Csus2                   |
+| Sextas               | C6, Cm6, C6/9                                     |
+| Séptimas             | Cmaj7, Cm7, C7, Cm7♭5 (Cø), C°7, Cm(maj7), C7sus4 |
+| Extensiones          | Cmaj9, Cm9, C9, Cm11, C13                         |
+| Dominantes alterados | C7♭9, C7♯9, C7♯11, C7alt                          |
 
 El selector los muestra agrupados por estas familias.
 
@@ -153,16 +158,16 @@ El selector los muestra agrupados por estas familias.
 
 - **Tríadas**: voicing abierto, con raíz y quinta en la octava 3 y la tercera en la octava 4 (como en el prototipo).
 - **Acordes de 4 notas o más**: voicings de jazz que omiten la raíz cuando el bajo ya la toca.
-- **Registro**: el acorde se mantiene aproximadamente entre C3 y C5 *(mi decisión)*.
+- **Registro**: el acorde se mantiene aproximadamente entre C3 y C5 _(mi decisión)_.
 - **Movimiento de voces**: que en las progresiones los voicings se muevan poco entre acordes es deseable; el algoritmo lo decide el builder.
 
 ### 5.4 Bajo
 
 - **Qué toca**: solo la raíz.
 - **Figura rítmica a elegir**: corcheas, negras, blancas o redondas.
-- **Cambio de acorde**: el bajo siempre ataca la raíz nueva cuando cambia el acorde, aunque la figura elegida no caiga en ese tiempo (por ejemplo, redondas con un cambio a mitad de compás) *(mi decisión)*.
-- **Acorde de varios compases**: el acorde vuelve a atacar al inicio de cada compás, igual que el bajo *(mi decisión)*.
-- **Octava a elegir**: 1, 2 o 3; por defecto 2 *(mi decisión)*. Existe porque los parlantes del celular casi no reproducen frecuencias por debajo de ~100 Hz.
+- **Cambio de acorde**: el bajo siempre ataca la raíz nueva cuando cambia el acorde, aunque la figura elegida no caiga en ese tiempo (por ejemplo, redondas con un cambio a mitad de compás) _(mi decisión)_.
+- **Acorde de varios compases**: el acorde vuelve a atacar al inicio de cada compás, igual que el bajo _(mi decisión)_.
+- **Octava a elegir**: 1, 2 o 3; por defecto 2 _(mi decisión)_. Existe porque los parlantes del celular casi no reproducen frecuencias por debajo de ~100 Hz.
 
 ### 5.5 Metrónomo
 
@@ -176,16 +181,16 @@ Separado para bajo, acorde y metrónomo, con opción de silenciar cada uno.
 
 ## 6. Tempo y compás
 
-- **BPM**: configurable de 30 a 240 *(mi decisión)*; por defecto 60.
-- **Qué cuenta el BPM** *(mi decisión, siguiendo la convención musical)*:
+- **BPM**: configurable de 30 a 240 _(mi decisión)_; por defecto 60.
+- **Qué cuenta el BPM** _(mi decisión, siguiendo la convención musical)_:
   - En 2/4, 3/4, 4/4 y 5/4, la negra.
   - En 6/8, 9/8 y 12/8, la negra con puntillo.
   - En 7/8, la corchea.
 - **Compases**: 2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8 y 12/8.
-  - En 6/8, 9/8 y 12/8 el metrónomo marca cada corchea, agrupadas de a tres: acento fuerte en el 1 y acento suave al inicio de cada grupo *(mi decisión)*.
-  - En 7/8 agrupa 2+2+3 *(mi decisión)*.
+  - En 6/8, 9/8 y 12/8 el metrónomo marca cada corchea, agrupadas de a tres: acento fuerte en el 1 y acento suave al inicio de cada grupo _(mi decisión)_.
+  - En 7/8 agrupa 2+2+3 _(mi decisión)_.
   - Qué significa cada figura del bajo en compases compuestos (por ejemplo, si "negras" en 6/8 se vuelve negra con puntillo) lo decide el builder.
-- **Cambios mientras suena** *(mis decisiones)*:
+- **Cambios mientras suena** _(mis decisiones)_:
   - El BPM y el volumen cambian de inmediato.
   - Los ajustes de sonido (figura, tipo de acorde, estilo, octava) aplican desde el siguiente compás.
   - Los ajustes de estructura (compás, compases por nota, filtros de notas, tonalidad) aplican desde la siguiente vuelta.
@@ -216,7 +221,8 @@ Separado para bajo, acorde y metrónomo, con opción de silenciar cada uno.
 
 ### 7.2 Ajustes
 
-Un panel aparte (en el celular, un panel que sube desde abajo *(mi decisión)*) con:
+Un panel aparte (en el celular, un panel que sube desde abajo _(mi decisión)_) con:
+
 - modo;
 - notas (filtros) o progresión + tonalidad;
 - qué suena y tipo de acorde;
@@ -233,7 +239,7 @@ Un panel aparte (en el celular, un panel que sube desde abajo *(mi decisión)*) 
 - La interfaz está en español.
 - Los acordes se escriben con cifrado americano (C, Dm7, B♭maj7) y llevan su nombre en español debajo, en la pantalla de práctica.
 
-### 7.4 Estilo visual *(mi decisión, para que la revises)*
+### 7.4 Estilo visual _(mi decisión, para que la revises)_
 
 - Oscuro, tipo escenario, como los bocetos: fondo casi negro, texto claro, acento ámbar (#f5a524), tipografía grande y de mucho peso para el acorde actual.
 - Botones grandes, fáciles de tocar.
@@ -248,22 +254,23 @@ La app recuerda la última configuración y las progresiones propias en el dispo
 Cada entrega es una conducta visible, de punta a punta, que el usuario puede probar con la guitarra.
 
 **El backlog lo maneja GitHub Issues**, en el repo `angelozdev/countdown-notes`:
+
 - Las entregas son los issues #1–#9, con la etiqueta `entrega`.
 - Sus tareas son sub-issues, con la etiqueta `tarea` (#10–#43).
 
 Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están en la sección Backlog de `.specify/memory/constitution.md`.
 
-| # | Entrega | Qué puede hacer el usuario al terminarla |
-|---|---|---|
-| 0 | **Base nueva** (excepción: preparación compartida, no es una conducta) | Abrir la app reconstruida con el stack nuevo, con lint, formato y tests corriendo, y abrirla desde el iPhone en Vercel. |
-| 1 | **"Ya me sirve"**: aleatorio + bajo + metrónomo + BPM | Elegir notas (filtros), BPM y compases por nota; dar Play y oír la cuenta de entrada, el metrónomo con acento y el bajo en la raíz (una vez por compás, estilo Analógico cálido), mientras el carril muestra la vuelta y avanza. Compás fijo 4/4. Suena en el iPhone aunque el interruptor de silencio esté activado. |
-| 2 | **Práctica cómoda** | Elegir cualquier compás de la lista, la figura y la octava del bajo, apagar el metrónomo, ajustar el volumen de cada canal, parar tras N vueltas. La pantalla no se apaga, la barra espaciadora funciona y los ajustes se recuerdan. |
-| 3 | **Acordes en modo aleatorio** | Elegir "bajo + acorde" y cualquier tipo de la lista, oír los voicings, y elegir entre los dos estilos de sonido. |
-| 4 | **Modo progresión con biblioteca** | Elegir una progresión de la biblioteca y una tonalidad, y tocar encima en loop o N vueltas, con la progresión completa en el carril, incluidos los compases con dos acordes. |
-| 5 | **Progresiones propias** | Armar una progresión tocando o escribiendo, con duraciones (incluido medio compás), y guardarla, renombrarla y borrarla. |
-| 6 | **Cambio automático de tonalidad** | Activar "cambiar de tonalidad cada N vueltas", al azar o por cuartas. |
-| 7 | **Instalable y sin internet** | Instalar la app en el iPhone (con una indicación de "Agregar a pantalla de inicio", porque iOS no muestra un aviso para instalar) y usarla sin conexión. |
-| 8 | **Audio en segundo plano** (deseable, no obligatorio; última prioridad) | Cambiar a otra app o bloquear el iPhone y que la música siga sonando; al volver, la pantalla se sincroniza con lo que suena. Si en iOS resulta demasiado frágil, se documenta y se deja fuera. |
+| #   | Entrega                                                                 | Qué puede hacer el usuario al terminarla                                                                                                                                                                                                                                                                              |
+| --- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0   | **Base nueva** (excepción: preparación compartida, no es una conducta)  | Abrir la app reconstruida con el stack nuevo, con lint, formato y tests corriendo, y abrirla desde el iPhone en Vercel.                                                                                                                                                                                               |
+| 1   | **"Ya me sirve"**: aleatorio + bajo + metrónomo + BPM                   | Elegir notas (filtros), BPM y compases por nota; dar Play y oír la cuenta de entrada, el metrónomo con acento y el bajo en la raíz (una vez por compás, estilo Analógico cálido), mientras el carril muestra la vuelta y avanza. Compás fijo 4/4. Suena en el iPhone aunque el interruptor de silencio esté activado. |
+| 2   | **Práctica cómoda**                                                     | Elegir cualquier compás de la lista, la figura y la octava del bajo, apagar el metrónomo, ajustar el volumen de cada canal, parar tras N vueltas. La pantalla no se apaga, la barra espaciadora funciona y los ajustes se recuerdan.                                                                                  |
+| 3   | **Acordes en modo aleatorio**                                           | Elegir "bajo + acorde" y cualquier tipo de la lista, oír los voicings, y elegir entre los dos estilos de sonido.                                                                                                                                                                                                      |
+| 4   | **Modo progresión con biblioteca**                                      | Elegir una progresión de la biblioteca y una tonalidad, y tocar encima en loop o N vueltas, con la progresión completa en el carril, incluidos los compases con dos acordes.                                                                                                                                          |
+| 5   | **Progresiones propias**                                                | Armar una progresión tocando o escribiendo, con duraciones (incluido medio compás), y guardarla, renombrarla y borrarla.                                                                                                                                                                                              |
+| 6   | **Cambio automático de tonalidad**                                      | Activar "cambiar de tonalidad cada N vueltas", al azar o por cuartas.                                                                                                                                                                                                                                                 |
+| 7   | **Instalable y sin internet**                                           | Instalar la app en el iPhone (con una indicación de "Agregar a pantalla de inicio", porque iOS no muestra un aviso para instalar) y usarla sin conexión.                                                                                                                                                              |
+| 8   | **Audio en segundo plano** (deseable, no obligatorio; última prioridad) | Cambiar a otra app o bloquear el iPhone y que la música siga sonando; al volver, la pantalla se sincroniza con lo que suena. Si en iOS resulta demasiado frágil, se documenta y se deja fuera.                                                                                                                        |
 
 ## 9. Cómo se construye (decidido por el usuario)
 
@@ -271,9 +278,9 @@ Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están 
 - **Publicación**: en **Vercel**, **solo archivos estáticos** (sin funciones de servidor). Es una SPA servida en la raíz (`/`) con HTTPS. El usuario conecta el repo a Vercel; el builder deja la configuración lista, pero no hace push (regla del usuario).
 - **Últimas versiones estables** de todo lo que ya hay: React, TypeScript, Vite, Tailwind CSS (v4) y Zustand.
 - **Se agregan**: Tone.js (audio y reloj musical), tonal (teoría musical: leer cifrados, transportar, convertir grados en acordes, escribir bien las alteraciones), shadcn/ui (componentes sobre Radix + Tailwind), vite-plugin-pwa, Vitest, Testing Library con user-event, Playwright, oxlint y oxfmt.
-- **zod**: el usuario lo pidió "si es necesario". *Mi decisión: sí*, para validar los datos guardados en el dispositivo (7.5) y, si sirve, la entrada de texto de progresiones.
+- **zod**: el usuario lo pidió "si es necesario". _Mi decisión: sí_, para validar los datos guardados en el dispositivo (7.5) y, si sirve, la entrada de texto de progresiones.
 - **Se eliminan**: `react-countdown-circle-timer`, `classnames` y Prettier (lo reemplaza oxfmt).
-- **Formato** *(mi decisión)*: oxfmt conserva el estilo actual del `.prettierrc.json`: comillas simples, sin punto y coma, sin coma final, indentación de 2.
+- **Formato** _(mi decisión)_: oxfmt conserva el estilo actual del `.prettierrc.json`: comillas simples, sin punto y coma, sin coma final, indentación de 2.
 - **Flujo de trabajo**: los planes se arman con **Spec Kit** (constitution → specify → plan → tasks), con una feature por entrega. Cada feature parte del issue de su entrega en GitHub, y sus sub-issues son las historias de usuario. Este documento queda como referencia de diseño.
 - **Reglas del usuario para implementar**:
   - Test-first en pasos pequeños.
@@ -285,11 +292,11 @@ Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están 
 
 - **Dispositivos objetivo**:
   - Navegador de escritorio actual (Chrome o Safari).
-  - iPhone con Safari iOS reciente, tanto en el navegador como instalada en la pantalla de inicio. *Mi decisión*: iOS 17 o superior, que es donde existe `navigator.audioSession`. Android no es objetivo, aunque debería funcionar.
+  - iPhone con Safari iOS reciente, tanto en el navegador como instalada en la pantalla de inicio. _Mi decisión_: iOS 17 o superior, que es donde existe `navigator.audioSession`. Android no es objetivo, aunque debería funcionar.
 - **Precisión del tiempo** (anti-objetivo principal):
   - El audio se programa con el reloj de Tone.js (`Transport`, con anticipación), nunca con `setTimeout` ni `setInterval`.
   - La UI se sincroniza con lo que suena (`Tone.Draw` o equivalente).
-  - **Criterio para dar por buena la precisión** *(mi decisión)*: un test que renderiza el audio sin parlantes (`Tone.Offline` o equivalente) y comprueba que cada evento cae en su momento exacto, más una prueba de oído de 10 minutos a 60 y a 200 BPM en el iPhone y en el computador.
+  - **Criterio para dar por buena la precisión** _(mi decisión)_: un test que renderiza el audio sin parlantes (`Tone.Offline` o equivalente) y comprueba que cada evento cae en su momento exacto, más una prueba de oído de 10 minutos a 60 y a 200 BPM en el iPhone y en el computador.
 - **Wake Lock en iOS**: con la app instalada en la pantalla de inicio, en versiones anteriores a iOS 18.4 fallaba. El builder verifica y, si hace falta, usa una alternativa.
 - **Desbloqueo de audio**: los navegadores exigen un gesto del usuario. El primer Play inicia el contexto de audio.
 - **iOS en silencio**: con el interruptor de silencio activado, iOS calla Web Audio. Donde exista, se usa `navigator.audioSession.type = 'playback'`; el builder verifica qué más hace falta en Safari iOS.
@@ -311,7 +318,7 @@ Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están 
 
 ## 12. Decisiones que tomé yo (revísalas)
 
-Todas están marcadas *(mi decisión)* en el texto. Las más relevantes:
+Todas están marcadas _(mi decisión)_ en el texto. Las más relevantes:
 
 1. Solo tema oscuro en v1, con acento ámbar.
 2. zod se incluye, para validar los datos guardados.
@@ -345,11 +352,23 @@ bass = new Tone.MonoSynth({
   oscillator: { type: 'sawtooth' },
   filter: { type: 'lowpass', Q: 3, rolloff: -24 },
   envelope: { attack: 0.005, decay: 0.2, sustain: 0.8, release: 0.3 },
-  filterEnvelope: { attack: 0.005, decay: 0.3, sustain: 0.3, release: 0.3, baseFrequency: 120, octaves: 3.2 }
+  filterEnvelope: {
+    attack: 0.005,
+    decay: 0.3,
+    sustain: 0.3,
+    release: 0.3,
+    baseFrequency: 120,
+    octaves: 3.2
+  }
 }) // volume -4 dB
 // acorde: PolySynth(Synth) → Filter(1400 Hz lowpass) → Chorus → Reverb → bus
 chordReverb = new Tone.Reverb({ decay: 2.5, wet: 0.3 })
-chordChorus = new Tone.Chorus({ frequency: 0.8, delayTime: 3.5, depth: 0.6, wet: 0.5 }).start()
+chordChorus = new Tone.Chorus({
+  frequency: 0.8,
+  delayTime: 3.5,
+  depth: 0.6,
+  wet: 0.5
+}).start()
 chordFilter = new Tone.Filter(1400, 'lowpass')
 chord = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type: 'fatsawtooth', count: 3, spread: 20 },
@@ -361,10 +380,22 @@ bass = new Tone.MonoSynth({
   oscillator: { type: 'triangle' },
   filter: { type: 'lowpass', Q: 0.5 },
   envelope: { attack: 0.15, decay: 0.5, sustain: 0.9, release: 1.5 },
-  filterEnvelope: { attack: 0.2, decay: 0.5, sustain: 1, release: 1.5, baseFrequency: 300, octaves: 1 }
+  filterEnvelope: {
+    attack: 0.2,
+    decay: 0.5,
+    sustain: 1,
+    release: 1.5,
+    baseFrequency: 300,
+    octaves: 1
+  }
 })
 chordReverb = new Tone.Reverb({ decay: 6, wet: 0.5 })
-chordChorus = new Tone.Chorus({ frequency: 0.4, delayTime: 4, depth: 0.8, wet: 0.6 }).start()
+chordChorus = new Tone.Chorus({
+  frequency: 0.4,
+  delayTime: 4,
+  depth: 0.8,
+  wet: 0.6
+}).start()
 chordFilter = new Tone.Filter(1100, 'lowpass')
 chord = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type: 'fattriangle', count: 3, spread: 30 },

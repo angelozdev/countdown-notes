@@ -6,30 +6,30 @@ Fecha: 2026-10-24. Versiones tomadas del registro de npm ese día (`pnpm view <p
 
 - **Decision**: instalar cada dependencia con versión exacta (pedido del usuario). Se fija `saveExact: true` en `pnpm-workspace.yaml`, para que cualquier `pnpm add` futuro también guarde la versión exacta.
 
-  | Paquete | Versión | Tipo |
-  |---|---|---|
-  | react, react-dom | 19.3.1 | dep |
-  | typescript | 7.0.2 | dev |
-  | vite | 8.3.5 | dev |
-  | @vitejs/plugin-react | 6.1.2 | dev |
-  | tailwindcss, @tailwindcss/vite | 4.3.3 | dev |
-  | shadcn (CLI + `shadcn/tailwind.css`) | 4.22.1 | la instala `shadcn init` |
-  | radix-ui | 1.8.1 | la instala `shadcn init` |
-  | class-variance-authority | 0.7.1 | la instala `shadcn init` |
-  | cn | 0.5.0 | la instala `shadcn init` |
-  | lucide-react | 1.61.0 | la instala `shadcn init` |
-  | tw-animate-css | 1.4.0 | la instala `shadcn init` |
-  | @fontsource-variable/geist | 5.3.0 | la instala `shadcn init` (preset Nova) |
-  | vitest | 5.0.5 | dev |
-  | jsdom | 30.1.3 | dev |
-  | @testing-library/react | 16.3.3 | dev |
-  | @testing-library/dom | 10.4.2 | dev (peer de @testing-library/react) |
-  | @testing-library/user-event | 14.6.8 | dev |
-  | @playwright/test | 1.64.1 | dev |
-  | oxlint | 1.89.0 | dev |
-  | oxfmt | 0.74.0 | dev |
-  | @types/react, @types/react-dom | 19.3.0 | dev |
-  | @types/node | 24.19.2 | dev (para `vite.config.ts` y `playwright.config.ts`) |
+  | Paquete                              | Versión | Tipo                                                 |
+  | ------------------------------------ | ------- | ---------------------------------------------------- |
+  | react, react-dom                     | 19.3.1  | dep                                                  |
+  | typescript                           | 7.0.2   | dev                                                  |
+  | vite                                 | 8.3.5   | dev                                                  |
+  | @vitejs/plugin-react                 | 6.1.2   | dev                                                  |
+  | tailwindcss, @tailwindcss/vite       | 4.3.3   | dev                                                  |
+  | shadcn (CLI + `shadcn/tailwind.css`) | 4.22.1  | la instala `shadcn init`                             |
+  | radix-ui                             | 1.8.1   | la instala `shadcn init`                             |
+  | class-variance-authority             | 0.7.1   | la instala `shadcn init`                             |
+  | cn                                   | 0.5.0   | la instala `shadcn init`                             |
+  | lucide-react                         | 1.61.0  | la instala `shadcn init`                             |
+  | tw-animate-css                       | 1.4.0   | la instala `shadcn init`                             |
+  | @fontsource-variable/geist           | 5.3.0   | la instala `shadcn init` (preset Nova)               |
+  | vitest                               | 5.0.5   | dev                                                  |
+  | jsdom                                | 30.1.3  | dev                                                  |
+  | @testing-library/react               | 16.3.3  | dev                                                  |
+  | @testing-library/dom                 | 10.4.2  | dev (peer de @testing-library/react)                 |
+  | @testing-library/user-event          | 14.6.8  | dev                                                  |
+  | @playwright/test                     | 1.64.1  | dev                                                  |
+  | oxlint                               | 1.89.0  | dev                                                  |
+  | oxfmt                                | 0.74.0  | dev                                                  |
+  | @types/react, @types/react-dom       | 19.3.0  | dev                                                  |
+  | @types/node                          | 24.19.2 | dev (para `vite.config.ts` y `playwright.config.ts`) |
 
 - **Rationale**: son las últimas estables al 2026-10-24, y los peer deps son compatibles entre sí: `@vitejs/plugin-react@6` pide `vite ^8`; `vitest@5` acepta `vite ^8`; `@tailwindcss/vite@4.3.3` acepta `vite ^8`; `@testing-library/react@16` acepta React 19.
 - **Alternatives considered**: rangos `^` (descartado por el usuario).
@@ -51,6 +51,7 @@ Fecha: 2026-10-24. Versiones tomadas del registro de npm ese día (`pnpm view <p
 ## 4. Lint: oxlint
 
 - **Decision**: `.oxlintrc.json` de la plantilla (plugins `react`, `typescript` y `oxc`), más `jsx-a11y` (accesibilidad) y `vitest`. Se agrega un override que apaga `react/only-export-components` en `src/components/ui/**`, porque los componentes de shadcn exportan también sus variantes. Script: `oxlint --deny-warnings`, para que un warning también haga fallar el lint.
+- **Ajuste en la implementación**: `vitest/expect-expect` acepta `screen.getBy*` como aserción (`assertFunctionNames: ["expect", "screen.getBy*"]`). En Testing Library, `getBy*` ya falla si no encuentra el elemento. Así los tests quedan en el estilo de Testing Library sin agregar jest-dom, y la regla sigue detectando los tests que no tienen ninguna aserción.
 - **Rationale**: `--deny-warnings` deja el chequeo binario (pasa o falla), que es lo que piden FR-005 y FR-008.
 - **Alternatives considered**: dejar pasar los warnings (descartado: se acumulan sin que nadie los mire).
 

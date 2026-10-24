@@ -10,7 +10,7 @@
 
 **Excepción nombrada (constitución, principio II): preparación compartida.** Esta entrega no agrega una conducta musical. Deja lista la base sobre la que se construyen las entregas 1–8. El "usuario" de las historias es el dueño de la app, que también la desarrolla. Las herramientas y comandos que se nombran abajo son la interfaz pública de esta entrega, y vienen fijados por la constitución (Restricciones técnicas) y por el issue #1.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Abrir la app reconstruida (Priority: P1) · #10
 
@@ -104,7 +104,7 @@ El usuario conecta el repo a Vercel y hace push él mismo. El build de Vercel pa
 - **Test roto a propósito**: un cambio en el texto de la pantalla base hace fallar el test de UI. Así se comprueba que el test prueba algo real (US3, escenario 3).
 - **Datos guardados por la app vieja**: la app vieja no guardaba nada en el dispositivo, así que no hay datos que migrar ni descartar.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -141,7 +141,7 @@ El usuario conecta el repo a Vercel y hace push él mismo. El build de Vercel pa
 - **FR-017**: La pantalla base MUST leerse en Safari del iPhone sin zoom ni desplazamiento horizontal, sin contenido tapado por la muesca o las zonas del sistema.
 - **FR-018**: El builder MUST NOT hacer push ni conectar el repo a Vercel. Eso lo hace el usuario.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

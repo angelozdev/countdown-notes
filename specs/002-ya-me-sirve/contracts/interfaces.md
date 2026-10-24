@@ -46,11 +46,11 @@ Garantías que cumple todo motor, sea el real o el falso:
 
 **Motor real** (`src/audio/tone-engine.ts`): `createToneEngine(): Engine`. Con el BPM `b`, cada sonido del tiempo k suena en `t₀ + k × 60 / b` (± 1 ms), y `onBeat` corre en el cuadro de animación más cercano a ese momento ([research](../research.md) §3–§4).
 
-**Motor falso** (`src/test/fake-engine.ts`), solo para tests de UI: `createFakeEngine()` devuelve `{ engine, beat(n?), played, bpmChanges, running }`.
+**Motor falso** (`src/test/fake-engine.ts`), solo para tests de UI: `createFakeEngine()` devuelve `{ engine, beat(n?), played, bpm, running }`.
 
 - `beat(n = 1)`: avanza n tiempos. Para cada uno llama a `soundsAt` y después a `onBeat`, dentro de `act`.
 - `played`: lista de `{ bar, beat, sound }` con todo lo que se le pidió tocar.
-- `bpmChanges`: valores recibidos en `setBpm`.
+- `bpm`: el tempo actual del motor: el de `start` y, después, el último recibido en `setBpm`. `undefined` si nunca arrancó.
 - `running`: `true` entre `start` y `stop`.
 
 ## 3. `App`
@@ -67,17 +67,18 @@ Los tests buscan por rol y nombre accesible, nunca por clases ni por estructura.
 
 ### Pantalla de práctica
 
-| Elemento                 | Rol / atributo                        | Nombre accesible o texto                                                                  |
-| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Título de la app         | `heading` nivel 1 (oculto a la vista) | `Countdown Notes`                                                                         |
-| Línea de estado (arriba) | texto                                 | `Aleatorio · Analógico cálido · {bpm} BPM · 4/4`                                          |
-| "Ahora"                  | `region`                              | `Ahora`. Adentro: la cuenta (`4`…`1`), o la nota (`B♭`) y su nombre (`Si bemol`)          |
-| Carril                   | `list`                                | `Carril`. Cada compás es un `listitem` con su nota; el actual tiene `aria-current="true"` |
-| Vista previa             | texto dentro del carril               | `Vuelta {n + 1}: {nota}` (la primera nota de la vuelta siguiente)                         |
-| Contador                 | texto                                 | `Vuelta {n} · nota {i} de {total}`                                                        |
-| Play/Stop                | `button`                              | `Play` o `Stop`, según el estado. Deshabilitado si hay menos de 2 notas                   |
-| Aviso de 2 notas         | texto                                 | `Elige al menos 2 notas para tocar.`                                                      |
-| Acceso a ajustes         | `button`                              | `Ajustes`                                                                                 |
+| Elemento                          | Rol / atributo                        | Nombre accesible o texto                                                                  |
+| --------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Título de la app                  | `heading` nivel 1 (oculto a la vista) | `Countdown Notes`                                                                         |
+| Línea de estado (arriba)          | texto                                 | `Aleatorio · Analógico cálido · {bpm} BPM · 4/4`                                          |
+| "Ahora"                           | `region`                              | `Ahora`. Adentro: la cuenta (`4`…`1`), o la nota (`B♭`) y su nombre (`Si bemol`)          |
+| Carril                            | `list`                                | `Carril`. Cada compás es un `listitem` con su nota; el actual tiene `aria-current="true"` |
+| Vista previa                      | texto, debajo de la lista del carril  | `Vuelta {n + 1}: {nota}`, la primera nota de la vuelta siguiente (no es un `listitem`)    |
+| Contador                          | texto                                 | `Vuelta {n} · nota {i} de {total}`                                                        |
+| Play/Stop                         | `button`                              | `Play` o `Stop`, según el estado. Deshabilitado si hay menos de 2 notas                   |
+| Aviso de 2 notas                  | texto                                 | `Elige al menos 2 notas para tocar.`                                                      |
+| Indicación con la música detenida | texto dentro de "Ahora"               | `Toca Play para empezar.`                                                                 |
+| Acceso a ajustes                  | `button`                              | `Ajustes`                                                                                 |
 
 La pantalla de práctica no tiene `spinbutton`, `slider` ni `textbox` fuera del panel (FR-013).
 

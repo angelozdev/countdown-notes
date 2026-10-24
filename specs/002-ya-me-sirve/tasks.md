@@ -338,7 +338,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Bajo real (test de precisión primero)
 
-- [ ] T020 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar `'el bajo ataca en el tiempo 1 de su compás'`:
+- [x] T020 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar `'el bajo ataca en el tiempo 1 de su compás'`:
   - a 60 BPM, 14 s;
   - `soundsAt = (bar, beat) => [bar === 0 && beat === 0 ? [{ kind: 'click', accent: true }] : [], beat === 0 && bar % 2 === 1 ? [{ kind: 'bass', pitch: 'Bb2' }] : []].flat()`;
   - `onsets` con `threshold = 1e-5` y `minGap = 1` (research.md §4);
@@ -346,7 +346,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project audio` y **verlo fallar**, porque el motor todavía ignora el bajo.
 
-- [ ] T021 [US3] En `tone-engine.ts`:
+- [x] T021 [US3] En `tone-engine.ts`:
   - en `start`, crear el bajo Analógico cálido del Anexo A, `new Tone.MonoSynth({ oscillator: { type: 'sawtooth' }, filter: { type: 'lowpass', Q: 3, rolloff: -24 }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.8, release: 0.3 }, filterEnvelope: { attack: 0.005, decay: 0.3, sustain: 0.3, release: 0.3, baseFrequency: 120, octaves: 3.2 }, volume: -4 })`, conectado a un bus `new Tone.Volume(0).toDestination()`, y guardarlo con los demás nodos;
   - en el callback, para `kind: 'bass'`, `bass.triggerAttackRelease(sound.pitch, transport.toSeconds('1m') * 0.9, time)`.
 

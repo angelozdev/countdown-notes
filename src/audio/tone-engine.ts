@@ -25,8 +25,24 @@ export function createToneEngine(): Engine {
         oscillator: { type: 'sine' },
         envelope: { attack: 0.001, decay: 0.06, sustain: 0, release: 0.01 }
       }).connect(clickBus)
-      nodes = [click, clickBus]
-      buses = [clickBus]
+      // bajo Analógico cálido (diseño, Anexo A)
+      const bassBus = new Tone.Volume(0).toDestination()
+      const bass = new Tone.MonoSynth({
+        oscillator: { type: 'sawtooth' },
+        filter: { type: 'lowpass', Q: 3, rolloff: -24 },
+        envelope: { attack: 0.005, decay: 0.2, sustain: 0.8, release: 0.3 },
+        filterEnvelope: {
+          attack: 0.005,
+          decay: 0.3,
+          sustain: 0.3,
+          release: 0.3,
+          baseFrequency: 120,
+          octaves: 3.2
+        },
+        volume: -4
+      }).connect(bassBus)
+      nodes = [click, clickBus, bass, bassBus]
+      buses = [clickBus, bassBus]
 
       // bpm.value aplicaría el tempo recién en now + lookAhead y el primer tiempo saldría corto
       const startAt = context.now()
@@ -46,6 +62,10 @@ export function createToneEngine(): Engine {
                 time,
                 sound.accent ? 1 : 0.55
               )
+            } else {
+              // 90 % del compás, para que cada ataque se distinga
+              const duration = transport.toSeconds('1m') * 0.9
+              bass.triggerAttackRelease(sound.pitch, duration, time)
             }
           }
           draw.schedule(() => onBeat(bar, beat), time)

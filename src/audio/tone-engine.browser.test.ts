@@ -100,3 +100,23 @@ test('un cambio de BPM no duplica ni salta golpes', async () => {
     expect(gap).toBeLessThan(1.001)
   }
 })
+
+test('el bajo ataca en el tiempo 1 de su compás', async () => {
+  // un compás sí y otro no, para que haya silencio antes de cada ataque
+  const buffer = await renderPractice(
+    60,
+    (bar, beat) => [
+      ...(bar === 0 && beat === 0
+        ? [{ kind: 'click', accent: true } as const]
+        : []),
+      ...(beat === 0 && bar % 2 === 1
+        ? [{ kind: 'bass', pitch: 'Bb2' } as const]
+        : [])
+    ],
+    14
+  )
+  const times = onsets(buffer, 1e-5, 1).map((onset) => onset.time)
+  expect(times).toHaveLength(3)
+  expect(Math.abs(times[1] - (times[0] + 4))).toBeLessThan(0.001)
+  expect(Math.abs(times[2] - (times[0] + 12))).toBeLessThan(0.001)
+})

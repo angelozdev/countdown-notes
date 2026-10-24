@@ -270,7 +270,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, filas 8–9.
 
-- [ ] T021 [P] [US3] Preparación:
+- [x] T021 [P] [US3] Preparación:
   - correr `pnpm dlx shadcn@4.22.1 add slider` y después `pnpm format`;
   - en `src/components/ui/slider.tsx`, hacer que el `aria-label` que recibe el componente llegue a cada `Thumb`, que es el elemento con `role="slider"`;
   - crear `src/test/setup.ts` con un `ResizeObserver` vacío en `globalThis` (`observe`, `unobserve` y `disconnect` sin hacer nada), porque el `Slider` de Radix lo usa y jsdom no lo tiene;
@@ -278,7 +278,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `pnpm test --project ui` sigue en verde.
 
-- [ ] T022 [US3] Escribir `src/mix.test.tsx`. Los sliders se buscan con `getByRole('slider', { name: 'Volumen del bajo' })` y `getByRole('slider', { name: 'Volumen del metrónomo' })`; para moverlos, `slider.focus()` y `user.keyboard('{ArrowLeft}')`. Tests:
+- [x] T022 [US3] Escribir `src/mix.test.tsx`. Los sliders se buscan con `getByRole('slider', { name: 'Volumen del bajo' })` y `getByRole('slider', { name: 'Volumen del metrónomo' })`; para moverlos, `slider.focus()` y `user.keyboard('{ArrowLeft}')`. Tests:
   - `'los dos canales empiezan en 80 y sin silenciar'`: los dos sliders tienen `aria-valuenow="80"`, y `Silenciar bajo` y `Silenciar metrónomo` tienen `aria-pressed="false"`.
   - `'Play arranca con la mezcla del panel'`: Play → `fake.mix` es `{ click: { volume: 80, muted: false }, bass: { volume: 80, muted: false } }`.
   - `'el volumen cambia de inmediato sin detener la música'`: Play, `fake.beat(5)`, `{ArrowLeft}` en el bajo → `fake.mix.bass.volume` es 79 y `fake.running` es `true`.
@@ -290,7 +290,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T023 [US3] Implementar:
+- [x] T023 [US3] Implementar:
   - **`engine.ts`**: `Channel = 'click' | 'bass'`, `Mix = Record<Channel, { volume: number; muted: boolean }>`, `Bar` suma `countIn?: boolean`, `EngineStart` suma `mix: Mix` y `Engine` suma `setMix: (mix: Mix) => void`.
   - **`tone-engine.ts`**: `setMix` vacío por ahora. La cadena real llega en T025.
   - **`fake-engine.ts`**: guarda `mix` en `start` y `setMix` (getter `mix`), y agrega a `bars` cada `Bar` que devuelve `barAt`.

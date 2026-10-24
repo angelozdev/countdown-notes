@@ -1,10 +1,16 @@
 import * as Tone from 'tone'
 import { expect, test } from 'vitest'
 import { accentAt, METERS, type Meter } from '@/music/meters'
-import type { Bar, Engine, EngineStart } from './engine'
+import type { Bar, Engine, EngineStart, Mix } from './engine'
 import { createToneEngine } from './tone-engine'
 
 type During = (engine: Engine, context: Tone.OfflineContext) => void
+
+// la mezcla de la entrega 1; el motor real todavía no la usa (T025)
+const MIX: Mix = {
+  click: { volume: 80, muted: false },
+  bass: { volume: 80, muted: false }
+}
 
 function renderPractice(
   bpm: number,
@@ -16,7 +22,7 @@ function renderPractice(
     // sin anticipación, Offline cuantiza los eventos a bloques de 128 muestras
     context.lookAhead = 0.1
     const engine = createToneEngine()
-    await engine.start({ bpm, barAt, onBeat: () => {} })
+    await engine.start({ bpm, mix: MIX, barAt, onBeat: () => {} })
     during?.(engine, context)
   }, seconds)
 }

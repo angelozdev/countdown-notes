@@ -18,6 +18,7 @@ export default defineConfig({
           environment: 'jsdom',
           // globals solo para que Testing Library registre su limpieza con afterEach
           globals: true,
+          setupFiles: ['src/test/setup.ts'],
           include: ['src/**/*.test.{ts,tsx}'],
           exclude: ['src/**/*.browser.test.ts']
         }

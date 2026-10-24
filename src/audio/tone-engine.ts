@@ -105,6 +105,8 @@ export function createToneEngine(): Engine {
     },
     setBpm(bpm) {
       context?.transport.bpm.setValueAtTime(bpm, context.now())
-    }
+    },
+    // la cadena de volumen y silencio llega en T025
+    setMix() {}
   }
 }

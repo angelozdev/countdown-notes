@@ -1,4 +1,5 @@
-import { Settings } from 'lucide-react'
+import { Settings, Volume2, VolumeX } from 'lucide-react'
+import type { Channel } from '@/audio/engine'
 import { Stepper } from '@/components/stepper'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,6 +10,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/ui/sheet'
+import { Slider } from '@/components/ui/slider'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
@@ -64,6 +66,7 @@ export function SettingsPanel() {
           />
           <MeterPicker />
           <BassPicker />
+          <Volumes />
           <NoteFilters />
         </div>
       </SheetContent>
@@ -158,6 +161,62 @@ function BassPicker() {
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
+    </section>
+  )
+}
+
+const CHANNELS: { id: Channel; label: string; slider: string; mute: string }[] =
+  [
+    {
+      id: 'bass',
+      label: 'Bajo',
+      slider: 'Volumen del bajo',
+      mute: 'Silenciar bajo'
+    },
+    {
+      id: 'click',
+      label: 'Metrónomo',
+      slider: 'Volumen del metrónomo',
+      mute: 'Silenciar metrónomo'
+    }
+  ]
+
+function Volumes() {
+  const mix = usePractice((state) => state.mix)
+  const setVolume = usePractice((state) => state.setVolume)
+  const toggleMute = usePractice((state) => state.toggleMute)
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="text-base font-semibold">Volumen</h3>
+      {CHANNELS.map(({ id, label, slider, mute }) => (
+        <div key={id} className="flex flex-col gap-2">
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <div className="flex items-center gap-4">
+            <Slider
+              aria-label={slider}
+              min={0}
+              max={100}
+              step={1}
+              value={[mix[id].volume]}
+              onValueChange={([volume]) => setVolume(id, volume)}
+            />
+            <Toggle
+              variant="outline"
+              size="lg"
+              className="size-12 shrink-0"
+              aria-label={mute}
+              pressed={mix[id].muted}
+              onPressedChange={() => toggleMute(id)}
+            >
+              {mix[id].muted ? (
+                <VolumeX aria-hidden />
+              ) : (
+                <Volume2 aria-hidden />
+              )}
+            </Toggle>
+          </div>
+        </div>
+      ))}
     </section>
   )
 }

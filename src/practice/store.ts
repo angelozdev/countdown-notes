@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
-import type { Bar, Engine } from '@/audio/engine'
+import type { Bar, Channel, Engine, Mix } from '@/audio/engine'
 import {
   accentAt,
   type BassFigure,
@@ -37,6 +37,7 @@ export type PracticeState = {
   meter: MeterId
   bassFigure: BassFigure
   bassOctave: 1 | 2 | 3
+  mix: Mix
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
   play: () => void
@@ -46,6 +47,8 @@ export type PracticeState = {
   setMeter: (meter: MeterId) => void
   setBassFigure: (figure: BassFigure) => void
   setBassOctave: (octave: 1 | 2 | 3) => void
+  setVolume: (channel: Channel, volume: number) => void
+  toggleMute: (channel: Channel) => void
   toggleNote: (id: NoteId) => void
   setGroup: (natural: boolean, included: boolean) => void
 }
@@ -109,7 +112,7 @@ export function createPracticeStore(engine: Engine) {
       const { rounds } = get()
       if (bar === 0) {
         const meter = METER_BY_ID[rounds[0].meter]
-        return { ...planOf(meter), events: clicksOf(meter) }
+        return { ...planOf(meter), countIn: true, events: clicksOf(meter) }
       }
 
       const round = rounds.find(
@@ -152,6 +155,11 @@ export function createPracticeStore(engine: Engine) {
       })
     }
 
+    function changeMix(mix: Mix) {
+      set({ mix })
+      if (get().status !== 'stopped') engine.setMix(mix)
+    }
+
     return {
       status: 'stopped',
       position: null,
@@ -160,10 +168,14 @@ export function createPracticeStore(engine: Engine) {
       meter: '4/4',
       bassFigure: 'whole',
       bassOctave: 2,
+      mix: {
+        click: { volume: 80, muted: false },
+        bass: { volume: 80, muted: false }
+      },
       notes: NOTES.map((note) => note.id),
       rounds: [],
       play() {
-        const { status, notes, barsPerNote, meter, bpm } = get()
+        const { status, notes, barsPerNote, meter, bpm, mix } = get()
         if (status !== 'stopped' || !canPlay(get())) return
         set({
           status: 'countIn',
@@ -178,7 +190,7 @@ export function createPracticeStore(engine: Engine) {
             }
           ]
         })
-        engine.start({ bpm, barAt, onBeat }).catch(() => get().stop())
+        engine.start({ bpm, mix, barAt, onBeat }).catch(() => get().stop())
       },
       stop() {
         engine.stop()
@@ -200,6 +212,20 @@ export function createPracticeStore(engine: Engine) {
       },
       setBassOctave(bassOctave) {
         set({ bassOctave })
+      },
+      setVolume(channel, volume) {
+        const { mix } = get()
+        changeMix({
+          ...mix,
+          [channel]: { ...mix[channel], volume: clamp(volume, 0, 100) }
+        })
+      },
+      toggleMute(channel) {
+        const { mix } = get()
+        changeMix({
+          ...mix,
+          [channel]: { ...mix[channel], muted: !mix[channel].muted }
+        })
       },
       toggleNote(id) {
         const { notes } = get()

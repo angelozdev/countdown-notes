@@ -38,6 +38,8 @@ export type PracticeState = {
   bassFigure: BassFigure
   bassOctave: 1 | 2 | 3
   mix: Mix
+  /** Parar tras `count` vueltas, si `on`. */
+  repeats: { on: boolean; count: number }
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
   play: () => void
@@ -49,6 +51,7 @@ export type PracticeState = {
   setBassOctave: (octave: 1 | 2 | 3) => void
   setVolume: (channel: Channel, volume: number) => void
   toggleMute: (channel: Channel) => void
+  setRepeats: (patch: Partial<PracticeState['repeats']>) => void
   toggleNote: (id: NoteId) => void
   setGroup: (natural: boolean, included: boolean) => void
 }
@@ -108,24 +111,28 @@ export function createPracticeStore(engine: Engine) {
 
     const planOf = ({ beats, beatLength }: Meter) => ({ beats, beatLength })
 
-    function barAt(bar: number): Bar {
-      const { rounds } = get()
+    function barAt(bar: number): Bar | undefined {
+      const { rounds, repeats } = get()
       if (bar === 0) {
         const meter = METER_BY_ID[rounds[0].meter]
         return { ...planOf(meter), countIn: true, events: clicksOf(meter) }
       }
 
-      const round = rounds.find(
+      // la siguiente vuelta se sortea al empezar la última nota, para mostrarla por adelantado.
+      // Es >=, no ===: si N sube o se apaga durante la última nota, el compás pedido ya es el primero de ella
+      const last = rounds.at(-1)!
+      const lastNoteBar =
+        last.firstBar + (last.notes.length - 1) * last.barsPerNote
+      if (bar >= lastNoteBar && (!repeats.on || last.number < repeats.count)) {
+        set({ rounds: [...rounds, nextRound(last)] })
+      }
+      const round = get().rounds.find(
         (r) => bar >= r.firstBar && bar < r.firstBar + roundLength(r)
-      )!
+      )
+      // ninguna vuelta contiene el compás: la práctica termina aquí
+      if (!round) return undefined
       const meter = METER_BY_ID[round.meter]
       const index = noteIndexAt(round, bar)
-      const lastNoteBar =
-        round.firstBar + (round.notes.length - 1) * round.barsPerNote
-      // la siguiente vuelta se sortea al empezar la última nota, para mostrarla por adelantado
-      if (bar === lastNoteBar && round === rounds.at(-1)) {
-        set({ rounds: [...rounds, nextRound(round)] })
-      }
       // figura y octava se leen aquí, al armar el compás: un cambio aplica desde el siguiente
       const { bassFigure, bassOctave } = get()
       const bass = bassAttacks(meter, bassFigure).map(
@@ -173,6 +180,7 @@ export function createPracticeStore(engine: Engine) {
         bass: { volume: 80, muted: false }
       },
       notes: NOTES.map((note) => note.id),
+      repeats: { on: false, count: 10 },
       rounds: [],
       play() {
         const { status, notes, barsPerNote, meter, bpm, mix } = get()
@@ -190,7 +198,9 @@ export function createPracticeStore(engine: Engine) {
             }
           ]
         })
-        engine.start({ bpm, mix, barAt, onBeat }).catch(() => get().stop())
+        engine
+          .start({ bpm, mix, barAt, onBeat, onEnd: get().stop })
+          .catch(() => get().stop())
       },
       stop() {
         engine.stop()
@@ -226,6 +236,15 @@ export function createPracticeStore(engine: Engine) {
           ...mix,
           [channel]: { ...mix[channel], muted: !mix[channel].muted }
         })
+      },
+      setRepeats(patch) {
+        const { repeats, rounds } = get()
+        const next = { ...repeats, ...patch }
+        next.count = clamp(next.count, 1, 999)
+        // la vuelta en curso ya es la última: se descarta la vista previa de la siguiente
+        const dropNext =
+          next.on && rounds.length > 1 && rounds[0].number >= next.count
+        set({ repeats: next, rounds: dropNext ? rounds.slice(0, 1) : rounds })
       },
       toggleNote(id) {
         const { notes } = get()

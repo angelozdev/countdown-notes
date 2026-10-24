@@ -23,10 +23,12 @@ export type Bar = {
 export type EngineStart = {
   bpm: number
   mix: Mix
-  /** El compás que sigue. Se llama con anticipación, al programarlo. */
-  barAt: (bar: number) => Bar
+  /** El compás que sigue, o undefined si la práctica termina ahí. Se llama con anticipación, al programarlo. */
+  barAt: (bar: number) => Bar | undefined
   /** Se llama cuando el golpe suena, sincronizado con el audio. */
   onBeat: (bar: number, beat: number) => void
+  /** Se llama, una vez, cuando barAt devolvió undefined: en el momento en que ese compás empezaría. */
+  onEnd: () => void
 }
 
 export type Engine = {

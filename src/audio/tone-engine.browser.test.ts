@@ -24,7 +24,7 @@ function renderPractice(
     // sin anticipación, Offline cuantiza los eventos a bloques de 128 muestras
     context.lookAhead = 0.1
     const engine = createToneEngine()
-    await engine.start({ bpm, mix, barAt, onBeat: () => {} })
+    await engine.start({ bpm, mix, barAt, onBeat: () => {}, onEnd: () => {} })
     during?.(engine, context)
   }, seconds)
 }
@@ -182,7 +182,8 @@ test('después de stop no se llama a ningún onBeat', async () => {
       barAt: clicks,
       onBeat: () => {
         if (++calls === 1) firstBeatAt = Tone.getContext().currentTime
-      }
+      },
+      onEnd: () => {}
     })
     while (calls === 0) await wait(2)
     while (Tone.getContext().currentTime < firstBeatAt + stopAfter)
@@ -331,7 +332,8 @@ test('un setMix que llega antes de que exista la cadena no se pierde', async () 
       bpm: 60,
       mix: MIX,
       barAt: clicks,
-      onBeat: () => {}
+      onBeat: () => {},
+      onEnd: () => {}
     })
     engine.setMix({ ...MIX, click: { volume: 80, muted: true } })
     await started

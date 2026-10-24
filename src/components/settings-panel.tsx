@@ -1,4 +1,5 @@
 import { Settings, Volume2, VolumeX } from 'lucide-react'
+import { useId } from 'react'
 import type { Channel } from '@/audio/engine'
 import { Stepper } from '@/components/stepper'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import {
   SheetTrigger
 } from '@/components/ui/sheet'
 import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
@@ -67,6 +69,7 @@ export function SettingsPanel() {
           <MeterPicker />
           <BassPicker />
           <Volumes />
+          <Repeats />
           <NoteFilters />
         </div>
       </SheetContent>
@@ -217,6 +220,38 @@ function Volumes() {
           </div>
         </div>
       ))}
+    </section>
+  )
+}
+
+function Repeats() {
+  const id = useId()
+  const { on, count } = usePractice((state) => state.repeats)
+  const setRepeats = usePractice((state) => state.setRepeats)
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="text-base font-semibold">Repeticiones</h3>
+      <div className="flex items-center justify-between gap-4">
+        <label htmlFor={id} className="text-sm text-muted-foreground">
+          Parar tras N vueltas
+        </label>
+        <Switch
+          id={id}
+          checked={on}
+          onCheckedChange={(checked) => setRepeats({ on: checked })}
+        />
+      </div>
+      {on && (
+        <Stepper
+          label="Vueltas"
+          min={1}
+          max={999}
+          value={count}
+          onChange={(value) => setRepeats({ count: value })}
+          decreaseLabel="Menos vueltas"
+          increaseLabel="Más vueltas"
+        />
+      )}
     </section>
   )
 }

@@ -30,7 +30,7 @@ export function createToneEngine(): Engine {
   let latestMix: Mix | undefined
 
   return {
-    async start({ bpm, mix, barAt, onBeat }) {
+    async start({ bpm, mix, barAt, onBeat, onEnd }) {
       latestMix = mix
       // iOS trata Web Audio como "ambient" y lo calla con el interruptor de silencio
       const { audioSession } = navigator as AudioSessionNavigator
@@ -115,6 +115,11 @@ export function createToneEngine(): Engine {
       function scheduleBar(bar: number, tick: number) {
         transport.scheduleOnce((time) => {
           const plan = barAt(bar)
+          // el fin: avisa a la UI cuando el compás empezaría, y no programa nada más
+          if (!plan) {
+            draw.schedule(onEnd, time)
+            return
+          }
           const perBeat = Math.round(transport.PPQ * plan.beatLength)
           const barTicks = plan.beats * perBeat
           // los eventos de at = 0 suenan ya, en time; el resto se programa en su tick

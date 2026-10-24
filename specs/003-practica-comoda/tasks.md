@@ -339,8 +339,8 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, fila 10.
 
-- [ ] T027 [P] [US4] Correr `pnpm dlx shadcn@4.22.1 add switch` y después `pnpm format`.
-- [ ] T028 [US4] Escribir `src/repeats.test.tsx`. Para acortar, cada test pone compases por nota en `1`, así que una vuelta dura 12 compases (`12 * 4` golpes). Helper `setRepeats(app, n | 'off')`: en el panel, `switch` `Parar tras N vueltas` y el `spinbutton` `Vueltas` (`typeNumber`). Tests:
+- [x] T027 [P] [US4] Correr `pnpm dlx shadcn@4.22.1 add switch` y después `pnpm format`.
+- [x] T028 [US4] Escribir `src/repeats.test.tsx`. Para acortar, cada test pone compases por nota en `1`, así que una vuelta dura 12 compases (`12 * 4` golpes). Helper `setRepeats(app, n | 'off')`: en el panel, `switch` `Parar tras N vueltas` y el `spinbutton` `Vueltas` (`typeNumber`). Tests:
   - `'por defecto la práctica sigue hasta Stop'`: el `switch` tiene `aria-checked="false"`, y no hay `spinbutton` `Vueltas`.
   - `'con N vueltas, el contador muestra el total'`: N = 2, Play, `fake.beat(4 + 1)` → `Vuelta 1 de 2 · nota 1 de 12`; `fake.beat(12 * 4)` → `Vuelta 2 de 2 · nota 1 de 12`.
   - `'la última vuelta no muestra la siguiente, y al terminar vuelve a Play'`:
@@ -352,9 +352,9 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
   - `'apagarlo mientras suena sigue hasta Stop'`: N = 1, Play, `fake.beat(5)`, apagar → `fake.beat(12 * 4)` y se ve `Vuelta 2 · nota 1 de 12`.
   - `'bajar N descarta la vista previa de la vuelta siguiente'`: N = 3, Play, `fake.beat(4 + 11 * 4 + 1)` → se ve `/^Vuelta 2: /`; N = 1 → ya no se ve.
 
-  Correr `pnpm test --project ui` y **verlo fallar**.
+  Correr `pnpm test --project ui` y **verlo fallar**. Done: los 7 tests fallaron con `Unable to find an accessible element with the role "switch" and name "Parar tras N vueltas"` (el panel todavía no tiene el switch).
 
-- [ ] T029 [US4] Implementar:
+- [x] T029 [US4] Implementar:
   - **`engine.ts`**: `barAt` devuelve `Bar | undefined`, y `EngineStart` suma `onEnd: () => void`.
   - **`tone-engine.ts`**: si `barAt` devuelve `undefined`, `draw.schedule(onEnd, time)` y no programa nada más. El test de audio llega en T030.
   - **`fake-engine.ts`**: si `barAt` devuelve `undefined`, guarda `onEnd`, borra `options` y llama a `onEnd()`.
@@ -367,7 +367,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
   - **`App.tsx`**: el contador es `Vuelta {n} de {count} · nota {i} de {total}` con `repeats.on`.
   - **`settings-panel.tsx`**: una sección `Repeticiones` con un `Switch` (`aria-label="Parar tras N vueltas"`) y, si está activado, un `Stepper` (`label="Vueltas"`, de 1 a 999, `decreaseLabel="Menos vueltas"` e `increaseLabel="Más vueltas"`).
 
-  `pnpm test --project ui` **en verde**. **Commit**: `feat: parar tras N vueltas (#23)`.
+  `pnpm test --project ui` **en verde**. **Commit**: `feat: parar tras N vueltas (#23)`. Done: el nombre del `switch` sale de un `<label htmlFor>` visible (y no de `aria-label`), para que el texto también sea área de toque y pase `jsx-a11y/label-has-associated-control`; `tone-engine.browser.test.ts` ya pasa `onEnd: () => {}` en sus llamadas a `start` (adelanto de T030), porque `tsc -b` compila ese archivo y el build tiene que quedar en verde.
 
 - [ ] T030 [US4] En `tone-engine.browser.test.ts`, `renderPractice` pasa `onEnd: () => {}`. Agregar `'después del último compás no suena nada'`: 4/4 a 60 BPM con clicks y un `bass` `'Bb2'` (`length: 4`) en los compases 0 y 1, y `undefined` desde el 2, en 10 s. `onsets(buffer, 1e-3, 0.1)` da 8 inicios, y desde 8,5 s ninguna muestra supera 1e-3.
   - Es un **test de regresión**: T029 ya corta la programación al recibir `undefined`, así que se espera que pase al primer intento. Si falla, corregir el fin en `tone-engine.ts`.

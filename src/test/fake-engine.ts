@@ -50,7 +50,15 @@ export function createFakeEngine() {
       act(() => {
         for (let i = 0; i < n && options; i++) {
           if (beat === 0) {
-            plan = options.barAt(bar)
+            const next = options.barAt(bar)
+            if (!next) {
+              // como el motor real: avisa del fin y no avanza más
+              const { onEnd } = options
+              options = undefined
+              onEnd()
+              break
+            }
+            plan = next
             bars.push(plan)
           }
           for (const event of plan!.events) {

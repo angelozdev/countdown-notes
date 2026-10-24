@@ -50,9 +50,10 @@ function StatusLine() {
 function Counter() {
   const text = usePractice((state) => {
     const now = nowPlaying(state)
+    const { on, count } = state.repeats
     return (
       now &&
-      `Vuelta ${now.round.number} · nota ${now.index + 1} de ${now.round.notes.length}`
+      `Vuelta ${now.round.number}${on ? ` de ${count}` : ''} · nota ${now.index + 1} de ${now.round.notes.length}`
     )
   })
   return text ? (

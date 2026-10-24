@@ -8,7 +8,7 @@ import {
   METERS,
   type Meter
 } from '@/music/meters'
-import type { Bar, Engine, EngineStart, Mix } from './engine'
+import type { Bar, Engine, EngineStart, Mix, Sound, Style } from './engine'
 import { createToneEngine } from './tone-engine'
 
 type During = (engine: Engine, context: Tone.OfflineContext) => void
@@ -644,6 +644,86 @@ test('con el acorde, la mezcla tampoco pasa de 1', async () => {
   for (const mix of [MIX, maxed]) {
     const data = (
       await renderPractice(120, loudBarsWithChord(), 6.5, undefined, mix)
+    ).getChannelData(0)
+    expect(data.some((sample) => Math.abs(sample) > 0.5)).toBe(true)
+    expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)
+  }
+})
+
+// el RMS del canal 0 en [from, from + 0,02 s]
+const rms = (buffer: Tone.ToneAudioBuffer, from: number) => {
+  const part = buffer
+    .getChannelData(0)
+    .slice(
+      Math.round(from * buffer.sampleRate),
+      Math.round((from + 0.02) * buffer.sampleRate)
+    )
+  return Math.sqrt(part.reduce((sum, x) => sum + x * x, 0) / part.length)
+}
+
+const CHORD: Sound = { kind: 'chord', pitches: ['C3', 'G3', 'E4'], length: 4 }
+const BASS: Sound = { kind: 'bass', pitch: 'C2', length: 4 }
+
+// la cuenta y, luego, un compás por estilo, cada uno con el mismo sonido
+const styledBars =
+  (styles: Style[], sound: Sound): EngineStart['barAt'] =>
+  (bar): Bar | undefined => {
+    if (bar === 0) {
+      return { beats: 4, beatLength: 1, countIn: true, events: clickEvents }
+    }
+    if (bar > styles.length) return undefined
+    return {
+      beats: 4,
+      beatLength: 1,
+      style: styles[bar - 1],
+      events: [{ at: 0, sound }]
+    }
+  }
+
+// el inicio del compás 1 es el primer click de la cuenta más cuatro segundos (60 BPM)
+async function renderStyled(styles: Style[], sound: Sound) {
+  const buffer = await renderPractice(60, styledBars(styles, sound), 9)
+  return { buffer, t: onsets(buffer, 1e-4, 0.5)[0].time + 4 }
+}
+
+test('el bajo y el acorde de un compás suenan con su estilo', async () => {
+  // uno tras otro: Tone.Offline cambia el contexto global mientras renderiza
+  const warmChord = await renderStyled(['warm'], CHORD)
+  const padChord = await renderStyled(['pad'], CHORD)
+  const warmBass = await renderStyled(['warm'], BASS)
+  const padBass = await renderStyled(['pad'], BASS)
+  // el cálido ataca de golpe y el Pad entra lento
+  const chordRatio = ({ buffer, t }: typeof warmChord) =>
+    rms(buffer, t + 0.05) / rms(buffer, t + 1.5)
+  const bassRatio = ({ buffer, t }: typeof warmBass) =>
+    rms(buffer, t + 0.01) / rms(buffer, t + 0.5)
+  expect(chordRatio(warmChord)).toBeGreaterThan(0.8)
+  expect(chordRatio(padChord)).toBeLessThan(0.3)
+  expect(bassRatio(warmBass)).toBeGreaterThan(0.8)
+  expect(bassRatio(padBass)).toBeLessThan(0.3)
+})
+
+test('cambiar de estilo no corta lo que sigue sonando', async () => {
+  const { buffer, t } = await renderStyled(['warm', 'pad'], CHORD)
+  const t2 = t + 4
+  // la cola del acorde cálido sigue ahí cuando entra el compás del Pad
+  expect(rms(buffer, t2 + 0.02)).toBeGreaterThan(0.3 * rms(buffer, t2 - 0.04))
+})
+
+test('con el Pad, la mezcla tampoco pasa de 1', async () => {
+  const base = loudBarsWithChord()
+  const padBars: EngineStart['barAt'] = (bar) => {
+    const plan = base(bar)
+    return plan && bar > 0 ? { ...plan, style: 'pad' } : plan
+  }
+  const maxed: Mix = {
+    click: { volume: 100, muted: false },
+    bass: { volume: 100, muted: false },
+    chord: { volume: 100, muted: false }
+  }
+  for (const mix of [MIX, maxed]) {
+    const data = (
+      await renderPractice(120, padBars, 6.5, undefined, mix)
     ).getChannelData(0)
     expect(data.some((sample) => Math.abs(sample) > 0.5)).toBe(true)
     expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)

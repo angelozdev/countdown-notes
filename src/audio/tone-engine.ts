@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import type { Accent, Channel, Engine, Mix, Sound } from './engine'
+import type { Accent, Channel, Engine, Mix, Sound, Style } from './engine'
 
 // audioSession existe en Safari 17+, pero no está en los tipos del DOM
 type AudioSessionNavigator = Navigator & { audioSession?: { type: string } }
@@ -15,6 +15,92 @@ const CLICKS: Record<Accent, [number, number]> = {
 // el acorde, a −4 dB (Anexo A)
 const BASE_DB: Record<Channel, number> = { click: -8, bass: 0, chord: -4 }
 const CHANNELS: Channel[] = ['click', 'bass', 'chord']
+
+// parámetros de partida de cada estilo (diseño, Anexo A); se afinan de oído (quickstart §4)
+const STYLES: Record<
+  Style,
+  {
+    bass: ConstructorParameters<typeof Tone.MonoSynth>[0]
+    reverb: Partial<Tone.ReverbOptions>
+    chorus: Partial<Tone.ChorusOptions>
+    cutoff: number
+    chord: Partial<Tone.PolySynthOptions<Tone.Synth>>['options']
+  }
+> = {
+  warm: {
+    bass: {
+      oscillator: { type: 'sawtooth' },
+      filter: { type: 'lowpass', Q: 3, rolloff: -24 },
+      envelope: { attack: 0.005, decay: 0.2, sustain: 0.8, release: 0.3 },
+      filterEnvelope: {
+        attack: 0.005,
+        decay: 0.3,
+        sustain: 0.3,
+        release: 0.3,
+        baseFrequency: 120,
+        octaves: 3.2
+      },
+      volume: -4
+    },
+    reverb: { decay: 2.5, wet: 0.3 },
+    chorus: { frequency: 0.8, delayTime: 3.5, depth: 0.6, wet: 0.5 },
+    cutoff: 1400,
+    chord: {
+      oscillator: { type: 'fatsawtooth', count: 3, spread: 20 },
+      envelope: { attack: 0.04, decay: 0.6, sustain: 0.5, release: 1.5 },
+      volume: -18
+    }
+  },
+  pad: {
+    bass: {
+      oscillator: { type: 'triangle' },
+      filter: { type: 'lowpass', Q: 0.5 },
+      envelope: { attack: 0.15, decay: 0.5, sustain: 0.9, release: 1.5 },
+      filterEnvelope: {
+        attack: 0.2,
+        decay: 0.5,
+        sustain: 1,
+        release: 1.5,
+        baseFrequency: 300,
+        octaves: 1
+      },
+      volume: -4
+    },
+    reverb: { decay: 6, wet: 0.5 },
+    chorus: { frequency: 0.4, delayTime: 4, depth: 0.8, wet: 0.6 },
+    cutoff: 1100,
+    chord: {
+      oscillator: { type: 'fattriangle', count: 3, spread: 30 },
+      envelope: { attack: 0.8, decay: 1, sustain: 0.8, release: 3 },
+      volume: -10
+    }
+  }
+}
+
+// bajo y acorde de un estilo: PolySynth → Filter → Chorus → Reverb. Sin conectar a la mezcla todavía
+function createStyle({
+  bass,
+  reverb,
+  chorus,
+  cutoff,
+  chord
+}: (typeof STYLES)[Style]) {
+  const reverbNode = new Tone.Reverb(reverb)
+  const chorusNode = new Tone.Chorus(chorus).connect(reverbNode).start()
+  const filter = new Tone.Filter(cutoff, 'lowpass').connect(chorusNode)
+  const chordSynth = new Tone.PolySynth({
+    voice: Tone.Synth,
+    // con el Pad a tempo rápido, las notas con su release encima pasan de las 32 voces por defecto (research §4)
+    maxPolyphony: 64,
+    options: chord
+  }).connect(filter)
+  return {
+    bass: new Tone.MonoSynth(bass),
+    chord: chordSynth,
+    reverb: reverbNode,
+    nodes: [chordSynth, filter, chorusNode, reverbNode]
+  }
+}
 
 const volumeGain = (channel: Channel, volume: number) =>
   volume === 0
@@ -52,9 +138,13 @@ export function createToneEngine(): Engine {
       // 1/4 porque la entrada del WaveShaper se recorta a [−1, 1] y la suma de los canales puede pasar de 2
       const quarter = new Tone.Gain(0.25).connect(shaper)
       const output = new Tone.Gain(1).connect(quarter)
-      // el acorde pasa por un Reverb, que genera su respuesta antes de poder sonar
-      const reverb = new Tone.Reverb({ decay: 2.5, wet: 0.3 })
-      await reverb.ready
+      // las dos cadenas siempre armadas: cambiar de estilo es elegir un sintetizador por compás.
+      // Cada Reverb genera su respuesta antes de poder sonar
+      const styles = {
+        warm: createStyle(STYLES.warm),
+        pad: createStyle(STYLES.pad)
+      }
+      await Promise.all(Object.values(styles).map(({ reverb }) => reverb.ready))
       // la mezcla más reciente: un setMix pudo llegar mientras esperaba a Tone.start() o al reverb
       const initial = latestMix
       const channel = (name: Channel) => {
@@ -78,48 +168,17 @@ export function createToneEngine(): Engine {
       const click = makeClick().connect(channels.click.mute)
       // la cuenta de entrada no pasa por el silencio del metrónomo
       const countClick = makeClick().connect(channels.click.volume)
-      // bajo Analógico cálido (diseño, Anexo A)
-      const bass = new Tone.MonoSynth({
-        oscillator: { type: 'sawtooth' },
-        filter: { type: 'lowpass', Q: 3, rolloff: -24 },
-        envelope: { attack: 0.005, decay: 0.2, sustain: 0.8, release: 0.3 },
-        filterEnvelope: {
-          attack: 0.005,
-          decay: 0.3,
-          sustain: 0.3,
-          release: 0.3,
-          baseFrequency: 120,
-          octaves: 3.2
-        },
-        volume: -4
-      }).connect(channels.bass.mute)
-      // acorde Analógico cálido (diseño, Anexo A): sierras desafinadas → pasabajos → chorus → reverb
-      reverb.connect(channels.chord.mute)
-      const chorus = new Tone.Chorus({
-        frequency: 0.8,
-        delayTime: 3.5,
-        depth: 0.6,
-        wet: 0.5
-      })
-        .connect(reverb)
-        .start()
-      const filter = new Tone.Filter(1400, 'lowpass').connect(chorus)
-      const chord = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: 'fatsawtooth', count: 3, spread: 20 },
-        envelope: { attack: 0.04, decay: 0.6, sustain: 0.5, release: 1.5 },
-        volume: -18
-      }).connect(filter)
+      for (const { bass, reverb } of Object.values(styles)) {
+        bass.connect(channels.bass.mute)
+        reverb.connect(channels.chord.mute)
+      }
       nodes = [
         shaper,
         quarter,
         output,
         click,
         countClick,
-        bass,
-        chord,
-        filter,
-        chorus,
-        reverb,
+        ...Object.values(styles).flatMap(({ bass, nodes }) => [bass, ...nodes]),
         ...CHANNELS.flatMap((name) => [
           channels[name].mute,
           channels[name].volume
@@ -135,7 +194,8 @@ export function createToneEngine(): Engine {
         sound: Sound,
         time: number,
         perBeat: number,
-        countIn: boolean
+        countIn: boolean,
+        style: Style
       ) => {
         if (sound.kind === 'click') {
           const [frequency, velocity] = CLICKS[sound.accent]
@@ -147,6 +207,7 @@ export function createToneEngine(): Engine {
         const length = transport.toSeconds(
           `${Math.round(sound.length * perBeat * 0.9)}i`
         )
+        const { bass, chord } = styles[style]
         if (sound.kind === 'bass') {
           bass.triggerAttackRelease(sound.pitch, length, time)
         } else {
@@ -172,7 +233,15 @@ export function createToneEngine(): Engine {
                   `${tick + Math.round(beats * perBeat)}i`
                 )
           for (const event of plan.events) {
-            at(event.at, (t) => play(event.sound, t, perBeat, !!plan.countIn))
+            at(event.at, (t) =>
+              play(
+                event.sound,
+                t,
+                perBeat,
+                !!plan.countIn,
+                plan.style ?? 'warm'
+              )
+            )
           }
           for (let b = 0; b < plan.beats; b++) {
             at(b, (t) => draw.schedule(() => onBeat(bar, b), t))

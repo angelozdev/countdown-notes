@@ -276,7 +276,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 **Independent Test**: quickstart §2, filas 10–13. Con Pad, el acorde entra lento; al cambiar de estilo mientras suena, la cola del anterior termina sola.
 
-- [ ] T016 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar tres tests (fallan). Usan un helper `rms(buffer, from)`: el RMS del canal 0 en [from, from + 0,02 s].
+- [x] T016 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar tres tests (fallan). Usan un helper `rms(buffer, from)`: el RMS del canal 0 en [from, from + 0,02 s]. Done: antes del código solo falló el primero; el 2 y el 3 ya pasaban con un solo estilo y quedan como guardas.
   1. `'el bajo y el acorde de un compás suenan con su estilo'`. Cuenta (`clickEvents`, `countIn`) a 60 BPM y un compás 1 con `style` `'warm'` o `'pad'`. Cuatro renders: solo un `chord` `['C3', 'G3', 'E4']` de `length: 4`, o solo un `bass` `'C2'` de `length: 4`, en cada estilo. Con `t` el inicio del compás 1 (`found[0].time + 4`):
      - acorde: `rms(t + 0.05) / rms(t + 1.5)` es mayor que 0,8 en `'warm'` y menor que 0,3 en `'pad'`;
      - bajo: `rms(t + 0.01) / rms(t + 0.5)` es mayor que 0,8 en `'warm'` y menor que 0,3 en `'pad'`.
@@ -285,7 +285,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test --project audio` y **verlos fallar** (hoy `Bar` no tiene `style`).
 
-- [ ] T017 [US3] Estilos en el motor:
+- [x] T017 [US3] Estilos en el motor:
   - En `src/audio/engine.ts`, sumar `export type Style = 'warm' | 'pad'` y `Bar.style?: Style`, con el comentario de [contracts](./contracts/interfaces.md) §2.
   - En `src/audio/tone-engine.ts`:
     - armar el bajo y la cadena del acorde de cada estilo en un `Record<Style, { bass; chord }>`, con los parámetros de research §4 (Anexo A). El Pad usa `MonoSynth` triangle con `volume: -4`, y su cadena `Reverb({ decay: 6, wet: 0.5 })`, `Chorus({ frequency: 0.4, delayTime: 4, depth: 0.8, wet: 0.6 })`, `Filter(1100, 'lowpass')` y `PolySynth` `fattriangle` (`count: 3`, `spread: 30`, envolvente `{ attack: 0.8, decay: 1, sustain: 0.8, release: 3 }`, `volume: -10`);
@@ -294,7 +294,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
     - `play` recibe el estilo del compás (`plan.style ?? 'warm'`) y toca en el sintetizador de ese estilo;
     - todos los nodos nuevos van en `nodes`.
 
-  **Verde completo**. **Commit**: `feat: estilo Pad ambiental en el motor (#28)`.
+  **Verde completo**. **Commit**: `feat: estilo Pad ambiental en el motor (#28)`. Done: `maxPolyphony: 64` va en `new PolySynth({ voice, maxPolyphony, options })`, porque con la forma `(voice, options)` Tone lo ignora.
 
 - [ ] T018 [US3] Crear `src/styles.test.tsx` (falla):
   1. `'empieza en Analógico cálido'`: el `radiogroup` `Estilo` tiene `Analógico cálido` y `Pad ambiental`, con el primero marcado, y la línea de estado dice `Aleatorio · Analógico cálido · 60 BPM · 4/4`.

@@ -5,6 +5,8 @@ export type Sound =
   | { kind: 'bass'; pitch: string; length: number } // altura de Tone ('Bb2'); length en golpes
   | { kind: 'chord'; pitches: string[]; length: number } // alturas de Tone ('Gb3'); length en golpes
 
+export type Style = 'warm' | 'pad'
+
 export type Channel = 'click' | 'bass' | 'chord'
 
 /** volume de 0 a 100; 80 es la mezcla de la entrega 1 (y, en el acorde, el bus de −4 dB del Anexo A). */
@@ -17,6 +19,8 @@ export type Bar = {
   beatLength: number
   /** Cuenta de entrada: sus clicks suenan aunque el metrónomo esté silenciado. */
   countIn?: boolean
+  /** El estilo del bajo y del acorde de este compás; sin él, 'warm'. */
+  style?: Style
   /** Lo que suena; at va en golpes desde el inicio del compás (0, 0.5, 1, …). */
   events: { at: number; sound: Sound }[]
 }

@@ -130,7 +130,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 ### Bajo + acorde en la app
 
-- [ ] T008 [US1] Crear `src/chords.test.tsx` (falla). Helpers locales:
+- [x] T008 [US1] Crear `src/chords.test.tsx` (falla). Helpers locales:
   - `NAMES`, la misma tabla de `src/random-mode.test.tsx` (id → `[label, name]`);
   - `chordsOf(fake, bar)`, los `chord` de `fake.played` de ese compás;
   - `rootOf(fake, bar)`, el id de la raíz, sacado del `pitch` del primer `bass` de ese compás (`'Gb2'` → `'Gb'`);
@@ -170,7 +170,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T009 [US1] Implementar, según [data-model](./data-model.md):
+- [x] T009 [US1] Implementar, según [data-model](./data-model.md):
   - **`src/practice/settings.ts`**:
     - `Settings` suma `withChord: boolean` y `chordType: ChordTypeId`;
     - `DEFAULT_SETTINGS` suma `withChord: false` y `chordType: 'maj'`;

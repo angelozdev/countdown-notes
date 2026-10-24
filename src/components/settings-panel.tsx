@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
 import { NOT_ENOUGH_NOTES, usePractice } from '@/practice/store'
@@ -86,6 +87,7 @@ export function SettingsPanel() {
               increaseLabel="Subir compases por nota"
             />
           </Section>
+          <SoundPicker />
           <BassPicker />
           <Volumes />
           <NoteFilters />
@@ -118,6 +120,62 @@ function MeterPicker() {
         ))}
       </ToggleGroup>
     </div>
+  )
+}
+
+/** Las familias de los acordes, en el orden de la tabla. */
+const FAMILIES = [...new Set(CHORD_TYPES.map(({ family }) => family))]
+
+function SoundPicker() {
+  const withChord = usePractice((state) => state.withChord)
+  const setWithChord = usePractice((state) => state.setWithChord)
+  const chordType = usePractice((state) => state.chordType)
+  const setChordType = usePractice((state) => state.setChordType)
+  return (
+    <Section title="Sonido">
+      <p className={CAPTION}>Qué suena</p>
+      <ToggleGroup
+        type="single"
+        aria-label="Qué suena"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-2"
+        value={withChord ? 'chord' : 'bass'}
+        onValueChange={(value) => value && setWithChord(value === 'chord')}
+      >
+        <ToggleGroupItem value="bass" className={PICKED_ITEM}>
+          Solo bajo
+        </ToggleGroupItem>
+        <ToggleGroupItem value="chord" className={PICKED_ITEM}>
+          Bajo + acorde
+        </ToggleGroupItem>
+      </ToggleGroup>
+      {withChord && (
+        <>
+          <p className={CAPTION}>Tipo de acorde</p>
+          <select
+            aria-label="Tipo de acorde"
+            className="h-12 w-full rounded-md border border-input bg-background px-3 text-lg font-bold"
+            value={chordType}
+            onChange={(event) =>
+              setChordType(event.target.value as ChordTypeId)
+            }
+          >
+            {FAMILIES.map((family) => (
+              <optgroup key={family} label={family}>
+                {CHORD_TYPES.filter((type) => type.family === family).map(
+                  ({ id, name }) => (
+                    <option key={id} value={id}>
+                      {chordSymbol('C', id)} · {name}
+                    </option>
+                  )
+                )}
+              </optgroup>
+            ))}
+          </select>
+        </>
+      )}
+    </Section>
   )
 }
 
@@ -184,6 +242,12 @@ const CHANNELS: { id: Channel; label: string; slider: string; mute: string }[] =
       mute: 'Silenciar bajo'
     },
     {
+      id: 'chord',
+      label: 'Acorde',
+      slider: 'Volumen del acorde',
+      mute: 'Silenciar acorde'
+    },
+    {
       id: 'click',
       label: 'Metrónomo',
       slider: 'Volumen del metrónomo',
@@ -193,39 +257,42 @@ const CHANNELS: { id: Channel; label: string; slider: string; mute: string }[] =
 
 function Volumes() {
   const mix = usePractice((state) => state.mix)
+  const withChord = usePractice((state) => state.withChord)
   const setVolume = usePractice((state) => state.setVolume)
   const toggleMute = usePractice((state) => state.toggleMute)
   return (
     <Section title="Volumen">
-      {CHANNELS.map(({ id, label, slider, mute }) => (
-        <div key={id} className="flex flex-col gap-2">
-          <p className={CAPTION}>{label}</p>
-          <div className="flex items-center gap-4">
-            <Slider
-              aria-label={slider}
-              min={0}
-              max={100}
-              step={1}
-              value={[mix[id].volume]}
-              onValueChange={([volume]) => setVolume(id, volume)}
-            />
-            <Toggle
-              variant="outline"
-              size="lg"
-              className="size-12 shrink-0"
-              aria-label={mute}
-              pressed={mix[id].muted}
-              onPressedChange={() => toggleMute(id)}
-            >
-              {mix[id].muted ? (
-                <VolumeX aria-hidden />
-              ) : (
-                <Volume2 aria-hidden />
-              )}
-            </Toggle>
+      {CHANNELS.filter(({ id }) => withChord || id !== 'chord').map(
+        ({ id, label, slider, mute }) => (
+          <div key={id} className="flex flex-col gap-2">
+            <p className={CAPTION}>{label}</p>
+            <div className="flex items-center gap-4">
+              <Slider
+                aria-label={slider}
+                min={0}
+                max={100}
+                step={1}
+                value={[mix[id].volume]}
+                onValueChange={([volume]) => setVolume(id, volume)}
+              />
+              <Toggle
+                variant="outline"
+                size="lg"
+                className="size-12 shrink-0"
+                aria-label={mute}
+                pressed={mix[id].muted}
+                onPressedChange={() => toggleMute(id)}
+              >
+                {mix[id].muted ? (
+                  <VolumeX aria-hidden />
+                ) : (
+                  <Volume2 aria-hidden />
+                )}
+              </Toggle>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      )}
     </Section>
   )
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Mix } from '@/audio/engine'
+import { CHORD_TYPES, type ChordTypeId } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES, type NoteId } from '@/music/notes'
 
@@ -11,6 +12,9 @@ export type Settings = {
   meter: MeterId
   bassFigure: BassFigure
   bassOctave: 1 | 2 | 3
+  /** Sin acorde, solo el bajo. */
+  withChord: boolean
+  chordType: ChordTypeId
   mix: Mix
   /** Parar tras `count` vueltas, si `on`. */
   repeats: { on: boolean; count: number }
@@ -25,6 +29,8 @@ export const DEFAULT_SETTINGS: Settings = {
   meter: '4/4',
   bassFigure: 'whole',
   bassOctave: 2,
+  withChord: false,
+  chordType: 'maj',
   mix: {
     click: { volume: 80, muted: false },
     bass: { volume: 80, muted: false },
@@ -62,6 +68,8 @@ export const settingsSchema = z
     bassOctave: z
       .union([z.literal(1), z.literal(2), z.literal(3)])
       .catch(D.bassOctave),
+    withChord: z.boolean().catch(D.withChord),
+    chordType: z.enum(CHORD_TYPES.map((type) => type.id)).catch(D.chordType),
     mix: z
       .object({
         click: channel(D.mix.click),

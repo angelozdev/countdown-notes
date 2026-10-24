@@ -1,7 +1,8 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
+import { chordSymbol } from '@/music/chords'
 import { groupOf, METER_BY_ID, type Meter } from '@/music/meters'
-import { NOTE_BY_ID } from '@/music/notes'
+import { NOTE_BY_ID, type NoteId } from '@/music/notes'
 import { roundLength, usePractice } from '@/practice/store'
 
 /** El carril: la vuelta que suena como una partitura, en filas de 4 compases. */
@@ -11,6 +12,9 @@ export function Lane() {
   const bar = usePractice((state) => state.position?.bar)
   const beat = usePractice((state) => state.position?.beat ?? 0)
   const bpm = usePractice((state) => state.bpm)
+  const withChord = usePractice((state) => state.withChord)
+  const chordType = usePractice((state) => state.chordType)
+  const sounding = usePractice((state) => state.sounding?.chordType)
   const list = useRef<HTMLOListElement>(null)
 
   // en la cuenta de entrada (compás 0) todavía no hay compás actual
@@ -30,6 +34,11 @@ export function Lane() {
 
   if (!round) return null
   const meter = METER_BY_ID[round.meter]
+  // el compás que suena dice lo que suena; los demás, lo que hay en los ajustes
+  const labelOf = (id: NoteId, isCurrent: boolean) => {
+    const type = isCurrent ? sounding : withChord && chordType
+    return type ? chordSymbol(id, type) : NOTE_BY_ID[id].label
+  }
 
   return (
     <div className="max-h-[34dvh] shrink-0 overflow-y-auto px-2 pb-2">
@@ -39,8 +48,7 @@ export function Lane() {
         className="mx-auto grid max-w-3xl grid-cols-4 gap-y-3"
       >
         {Array.from({ length }, (_, i) => {
-          const note =
-            NOTE_BY_ID[round.notes[Math.floor(i / round.barsPerNote)]]
+          const note = round.notes[Math.floor(i / round.barsPerNote)]
           const state =
             i < currentIndex
               ? 'played'
@@ -64,7 +72,7 @@ export function Lane() {
               )}
             >
               <span className="note-label font-black [--note-size:1.875rem] sm:[--note-size:2.25rem]">
-                {note.label}
+                {labelOf(note, current)}
               </span>
               <BeatSlashes meter={meter} beat={current ? beat : undefined} />
               {current && (
@@ -87,7 +95,7 @@ export function Lane() {
       </ol>
       {next && (
         <p className="mx-auto mt-4 max-w-3xl text-center text-xl font-bold text-muted-foreground">
-          Vuelta {next.number}: {NOTE_BY_ID[next.notes[0]].label}
+          Vuelta {next.number}: {labelOf(next.notes[0], false)}
         </p>
       )}
     </div>

@@ -3,6 +3,7 @@ import { useStore } from 'zustand'
 import { shallow } from 'zustand/shallow'
 import { createStore } from 'zustand/vanilla'
 import type { Bar, Channel, Engine, Mix } from '@/audio/engine'
+import { type ChordTypeId, voicingOf } from '@/music/chords'
 import {
   accentAt,
   type BassFigure,
@@ -44,9 +45,13 @@ export type PracticeState = {
   meter: MeterId
   bassFigure: BassFigure
   bassOctave: 1 | 2 | 3
+  withChord: boolean
+  chordType: ChordTypeId
   mix: Mix
   /** Parar tras `count` vueltas, si `on`. */
   repeats: { on: boolean; count: number }
+  /** Lo armado para el compás que suena; sin acorde, `chordType` es null. */
+  sounding: { chordType: ChordTypeId | null } | null
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
   play: () => void
@@ -56,6 +61,8 @@ export type PracticeState = {
   setMeter: (meter: MeterId) => void
   setBassFigure: (figure: BassFigure) => void
   setBassOctave: (octave: 1 | 2 | 3) => void
+  setWithChord: (withChord: boolean) => void
+  setChordType: (type: ChordTypeId) => void
   setVolume: (channel: Channel, volume: number) => void
   toggleMute: (channel: Channel) => void
   setRepeats: (patch: Partial<PracticeState['repeats']>) => void
@@ -104,6 +111,8 @@ export function createPracticeStore(engine: Engine) {
   const store = createStore<PracticeState>()((set, get) => {
     // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
     let requested = 0
+    // lo armado en barAt para cada compás, hasta que suena su primer golpe (research §7)
+    const planned = new Map<number, { chordType: ChordTypeId | null }>()
 
     function nextRound(previous: Round): Round {
       const { notes, barsPerNote, meter } = get()
@@ -151,8 +160,8 @@ export function createPracticeStore(engine: Engine) {
       if (!round) return undefined
       const meter = METER_BY_ID[round.meter]
       const index = noteIndexAt(round, bar)
-      // figura y octava se leen aquí, al armar el compás: un cambio aplica desde el siguiente
-      const { bassFigure, bassOctave } = get()
+      // figura, octava y acorde se leen aquí, al armar el compás: un cambio aplica desde el siguiente
+      const { bassFigure, bassOctave, withChord, chordType } = get()
       const bass = bassAttacks(meter, bassFigure).map(
         ({ at, length }): Bar['events'][number] => ({
           at,
@@ -163,17 +172,35 @@ export function createPracticeStore(engine: Engine) {
           }
         })
       )
-      // el sort es estable: en el mismo at, el click queda antes que el bajo
+      const chord: Bar['events'] = withChord
+        ? [
+            {
+              at: 0,
+              sound: {
+                kind: 'chord',
+                pitches: voicingOf(round.notes[index], chordType),
+                length: meter.beats
+              }
+            }
+          ]
+        : []
+      planned.set(bar, { chordType: withChord ? chordType : null })
+      // el sort es estable: en el mismo at, el click queda antes que el bajo y el bajo antes que el acorde
       return {
         ...planOf(meter),
-        events: [...clicksOf(meter), ...bass].sort((a, b) => a.at - b.at)
+        events: [...clicksOf(meter), ...bass, ...chord].sort(
+          (a, b) => a.at - b.at
+        )
       }
     }
 
     function onBeat(bar: number, beat: number) {
       const { rounds } = get()
       const current = rounds.filter((r) => r.firstBar + roundLength(r) > bar)
+      const sounding = beat === 0 ? planned.get(bar) : undefined
+      if (sounding) planned.delete(bar)
       set({
+        ...(sounding && { sounding }),
         position: { bar, beat },
         status: bar === 0 ? 'countIn' : 'playing',
         rounds: current.length === rounds.length ? rounds : current
@@ -189,13 +216,16 @@ export function createPracticeStore(engine: Engine) {
       ...loadSettings(),
       status: 'stopped',
       position: null,
+      sounding: null,
       rounds: [],
       play() {
         const { status, notes, barsPerNote, meter, bpm, mix } = get()
         if (status !== 'stopped' || !canPlay(get())) return
+        planned.clear()
         set({
           status: 'countIn',
           position: null,
+          sounding: null,
           rounds: [
             {
               number: 1,
@@ -212,7 +242,8 @@ export function createPracticeStore(engine: Engine) {
       },
       stop() {
         engine.stop()
-        set({ status: 'stopped', position: null, rounds: [] })
+        planned.clear()
+        set({ status: 'stopped', position: null, sounding: null, rounds: [] })
       },
       setBpm(bpm) {
         const next = clamp(bpm, 30, 240)
@@ -230,6 +261,12 @@ export function createPracticeStore(engine: Engine) {
       },
       setBassOctave(bassOctave) {
         set({ bassOctave })
+      },
+      setWithChord(withChord) {
+        set({ withChord })
+      },
+      setChordType(chordType) {
+        set({ chordType })
       },
       setVolume(channel, volume) {
         const { mix } = get()

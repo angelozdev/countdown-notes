@@ -137,3 +137,13 @@
     -webkit-text-stroke: 0;
   }
 }
+
+/* Achica --note-max para que el cifrado quepa en el ancho del contenedor (cqw). Mide unas
+   (1,1 + 0,4 × caracteres) veces --note-size, hasta 4,2 (el más largo, A♭m(maj7), mide 3,8).
+   Una nota suelta (1 o 2 caracteres) conserva --note-max. */
+@utility note-fit {
+  --note-size: min(
+    var(--note-max),
+    100cqw / min(1.1 + 0.4 * var(--chars), 4.2)
+  );
+}

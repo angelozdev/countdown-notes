@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { chordName, chordSymbol } from '@/music/chords'
 import { NOTE_BY_ID } from '@/music/notes'
 import { groupOf } from '@/music/meters'
@@ -12,6 +13,11 @@ export function Now() {
   })
   const note = id && NOTE_BY_ID[id]
   const chordType = usePractice((state) => state.sounding?.chordType)
+  const symbol = note
+    ? chordType
+      ? chordSymbol(note.id, chordType)
+      : note.label
+    : ''
   const countdown = usePractice((state) => {
     if (state.status !== 'countIn') return undefined
     const meter = meterOf(state)
@@ -31,8 +37,11 @@ export function Now() {
       )}
       {note && (
         <>
-          <p className="note-label font-heading font-black tracking-tight [--note-size:min(66cqh,46cqw)]">
-            {chordType ? chordSymbol(note.id, chordType) : note.label}
+          <p
+            className="note-label note-fit font-heading font-black tracking-tight [--note-max:min(66cqh,46cqw)]"
+            style={{ '--chars': symbol.length } as CSSProperties}
+          >
+            {symbol}
           </p>
           <p className="text-[clamp(1.5rem,10cqh,3rem)] leading-none font-semibold text-muted-foreground">
             {chordType ? chordName(note.id, chordType) : note.name}

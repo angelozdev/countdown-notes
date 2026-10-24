@@ -58,21 +58,25 @@ export function Lane() {
                   ? 'near'
                   : 'far'
           const current = state === 'current'
+          const label = labelOf(note, current)
           return (
             <li
               key={i}
               aria-current={current ? 'true' : undefined}
               data-state={state}
               className={cn(
-                'relative flex flex-col items-center gap-2 overflow-hidden border-l-2 border-foreground/30 pt-3 pb-4 transition-opacity',
+                'relative flex flex-col items-center gap-2 overflow-hidden [container-type:inline-size] border-l-2 border-foreground/30 pt-3 pb-4 transition-opacity',
                 (i % 4 === 3 || i === length - 1) && 'border-r-2',
                 current && 'border-primary bg-primary text-primary-foreground',
                 state === 'played' && 'opacity-25',
                 state === 'far' && 'opacity-40'
               )}
             >
-              <span className="note-label font-black [--note-size:1.875rem] sm:[--note-size:2.25rem]">
-                {labelOf(note, current)}
+              <span
+                className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                style={{ '--chars': label.length } as CSSProperties}
+              >
+                {label}
               </span>
               <BeatSlashes meter={meter} beat={current ? beat : undefined} />
               {current && (

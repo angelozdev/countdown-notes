@@ -86,3 +86,45 @@ test('los ajustes siguen después de recargar', async ({ page }) => {
     page.getByText('Aleatorio · Analógico cálido · 90 BPM · 6/8')
   ).toBeVisible()
 })
+
+test.describe('en un celular angosto', () => {
+  test.use({ viewport: { width: 320, height: 640 } })
+
+  test('el cifrado más largo cabe a 320 px', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Ajustes' }).click()
+    const bpm = page.getByRole('spinbutton', { name: 'BPM' })
+    await bpm.fill('240')
+    await bpm.press('Enter')
+    await page.getByRole('button', { name: 'Excluir naturales' }).click()
+    for (const flat of ['D♭', 'E♭', 'A♭']) {
+      await page.getByRole('button', { name: flat, exact: true }).click()
+    }
+    await page.getByRole('radio', { name: 'Bajo + acorde' }).click()
+    await page
+      .getByRole('combobox', { name: 'Tipo de acorde' })
+      .selectOption({ label: 'Cm(maj7) · menor séptima mayor' })
+    await page.getByRole('button', { name: 'Cerrar' }).click()
+
+    await page.getByRole('button', { name: 'Play' }).click()
+    const ahora = page.getByRole('region', { name: 'Ahora' })
+    await expect(ahora).toContainText('m(maj7)')
+
+    const symbol = ahora.getByText('m(maj7)')
+    const box = await symbol.boundingBox()
+    expect(box?.x).toBeGreaterThanOrEqual(0)
+    expect(box ? box.x + box.width : Infinity).toBeLessThanOrEqual(320)
+    expect(await symbol.evaluate(fits)).toBe(true)
+
+    const bars = await page
+      .getByRole('list', { name: 'Carril' })
+      .getByRole('listitem')
+      .all()
+    expect(bars.length).toBeGreaterThan(0)
+    for (const bar of bars) expect(await bar.evaluate(fits)).toBe(true)
+  })
+})
+
+function fits(element: Element) {
+  return element.scrollWidth <= element.clientWidth
+}

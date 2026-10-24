@@ -250,7 +250,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   El `<select>` de T009 ya agrupa por familia. **Verde completo**. **Commit**: `feat: vocabulario completo de jazz con voicings (#27)`.
 
-- [ ] T013 [US2] En `e2e/practice.spec.ts`, agregar un `test.describe` con `test.use({ viewport: { width: 320, height: 640 } })` y el test `'el cifrado más largo cabe a 320 px'` (falla):
+- [x] T013 [US2] En `e2e/practice.spec.ts`, agregar un `test.describe` con `test.use({ viewport: { width: 320, height: 640 } })` y el test `'el cifrado más largo cabe a 320 px'` (falla):
   - en Ajustes: BPM 240, `Excluir naturales`, y apagar `D♭`, `E♭` y `A♭`, para que queden F♯ y B♭;
   - `Bajo + acorde` y la opción `Cm(maj7) · menor séptima mayor`; cerrar el panel y tocar Play;
   - esperar que la `region` `Ahora` contenga `m(maj7)`;
@@ -258,7 +258,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test:e2e` y **verlo fallar** (hoy el `note-label` del carril tiene un tamaño fijo).
 
-- [ ] T014 [US2] En `src/components/now.tsx` y `src/components/lane.tsx`, achicar `--note-size` según el largo del cifrado (research §6):
+- [x] T014 [US2] En `src/components/now.tsx` y `src/components/lane.tsx`, achicar `--note-size` según el largo del cifrado (research §6):
   - en "Ahora", con `cqw` del contenedor que ya existe;
   - en cada compás del carril, con un contenedor de ancho propio (`[container-type:inline-size]`) y `cqw`.
 

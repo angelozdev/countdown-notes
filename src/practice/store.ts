@@ -90,6 +90,9 @@ const clamp = (value: number, min: number, max: number) =>
 
 export function createPracticeStore(engine: Engine) {
   return createStore<PracticeState>()((set, get) => {
+    // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
+    let requested = 0
+
     function nextRound(previous: Round): Round {
       const { notes, barsPerNote, meter } = get()
       // con menos de 2 notas no se puede sortear: sigue con las de la vuelta anterior
@@ -113,6 +116,10 @@ export function createPracticeStore(engine: Engine) {
 
     function barAt(bar: number): Bar | undefined {
       const { rounds, repeats } = get()
+      const last = rounds.at(-1)
+      // sin vueltas no hay nada que tocar
+      if (!last) return undefined
+      requested = bar
       if (bar === 0) {
         const meter = METER_BY_ID[rounds[0].meter]
         return { ...planOf(meter), countIn: true, events: clicksOf(meter) }
@@ -120,7 +127,6 @@ export function createPracticeStore(engine: Engine) {
 
       // la siguiente vuelta se sortea al empezar la última nota, para mostrarla por adelantado.
       // Es >=, no ===: si N sube o se apaga durante la última nota, el compás pedido ya es el primero de ella
-      const last = rounds.at(-1)!
       const lastNoteBar =
         last.firstBar + (last.notes.length - 1) * last.barsPerNote
       if (bar >= lastNoteBar && (!repeats.on || last.number < repeats.count)) {
@@ -241,9 +247,13 @@ export function createPracticeStore(engine: Engine) {
         const { repeats, rounds } = get()
         const next = { ...repeats, ...patch }
         next.count = clamp(next.count, 1, 999)
-        // la vuelta en curso ya es la última: se descarta la vista previa de la siguiente
+        // la vuelta en curso ya es la última: se descarta la vista previa de la siguiente,
+        // salvo que el motor ya haya pedido su primer compás: esa se toca y el fin llega después
         const dropNext =
-          next.on && rounds.length > 1 && rounds[0].number >= next.count
+          next.on &&
+          rounds.length > 1 &&
+          rounds[0].number >= next.count &&
+          rounds[1].firstBar > requested
         set({ repeats: next, rounds: dropNext ? rounds.slice(0, 1) : rounds })
       },
       toggleNote(id) {

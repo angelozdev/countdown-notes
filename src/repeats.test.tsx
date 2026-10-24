@@ -114,3 +114,21 @@ test('bajar N descarta la vista previa de la vuelta siguiente', async () => {
 
   expect(screen.queryByText(/^Vuelta 2: /)).toBeNull()
 })
+
+test('bajar N cuando el motor ya pidió la vuelta siguiente no la pierde, y termina tras ella', async () => {
+  const app = await play(3)
+  // el compás 12 es la última nota de la vuelta 1: ahí se sortea la vuelta 2
+  app.fake.beat(4 + 11 * 4 + 1)
+  app.fake.beat(3)
+  // el motor real pide el compás 13 antes de que suene
+  app.fake.askAhead()
+
+  await setRepeats(app, 1)
+  app.fake.beat(1)
+
+  expect(screen.getByRole('button', { name: 'Stop' })).toBeDefined()
+  expect(app.fake.running).toBe(true)
+  app.fake.beat(12 * 4)
+  expect(app.fake.running).toBe(false)
+  expect(screen.getByRole('button', { name: 'Play' })).toBeDefined()
+})

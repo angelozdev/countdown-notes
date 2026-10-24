@@ -9,6 +9,8 @@ export function createFakeEngine() {
   let bar = 0
   let beat = 0
   let plan: Bar | undefined
+  // barAt ya se pidió para el compás que sigue (askAhead)
+  let planned = false
   const played: { bar: number; beat: number; sound: Sound }[] = []
   const bars: Bar[] = []
 
@@ -19,6 +21,7 @@ export function createFakeEngine() {
       mix = startOptions.mix
       bar = 0
       beat = 0
+      planned = false
     },
     stop: () => {
       options = undefined
@@ -30,6 +33,13 @@ export function createFakeEngine() {
       mix = newMix
     }
   } satisfies Engine
+
+  // pide el compás que sigue y lo deja en plan; undefined es el fin
+  function request() {
+    plan = options!.barAt(bar)
+    planned = true
+    if (plan) bars.push(plan)
+  }
 
   return {
     engine,
@@ -45,21 +55,25 @@ export function createFakeEngine() {
     get running() {
       return options !== undefined
     },
+    /** Pide ya el compás que sigue, como el motor real con su anticipación; el próximo beat() no lo vuelve a pedir. */
+    askAhead() {
+      act(() => {
+        if (options && beat === 0 && !planned) request()
+      })
+    },
     /** Avanza n golpes: pide el compás al empezarlo, registra lo que suena y avisa a la UI, como el motor real. */
     beat(n = 1) {
       act(() => {
         for (let i = 0; i < n && options; i++) {
           if (beat === 0) {
-            const next = options.barAt(bar)
-            if (!next) {
+            if (!planned) request()
+            if (!plan) {
               // como el motor real: avisa del fin y no avanza más
               const { onEnd } = options
               options = undefined
               onEnd()
               break
             }
-            plan = next
-            bars.push(plan)
           }
           for (const event of plan!.events) {
             if (event.at >= beat && event.at < beat + 1) {
@@ -71,6 +85,7 @@ export function createFakeEngine() {
           if (beat === plan!.beats) {
             bar++
             beat = 0
+            planned = false
           }
         }
       })

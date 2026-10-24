@@ -483,7 +483,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
   Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del panel y del tempo rápido (#3)`. Done: el panel queda en secciones con título y filete (Tiempo con BPM, compás y compases por nota; Bajo; Volumen; Notas; Repeticiones); la figura del bajo va en 2 columnas en pantallas angostas, así "Corcheas" y "Redondas" ya no se salen de su botón a 320 px; el `PICKED_ITEM` es una sola constante; el thumb del slider pasa de 12 a 28 px, el `Switch` de 32×18 a 56×32 y su texto también es área de toque; el pie queda con Play que se estira entre dos botones redondos de ±5 y Ajustes más discreto; las marcas del carril son más altas y la del grupo que suena se ve más grande que las ya sonadas. Ningún nombre accesible ni test cambió.
 
 - [x] T042 Correr quickstart §1 completo. Si algún hallazgo cambió una decisión, actualizar research.md. Sin commit si no hay cambios. Done: los 5 comandos en verde sobre el árbol del commit de T041 (161 tests, 12 E2E); el proyecto `audio` pasa SC-001, SC-002, el canal silenciado, la cuenta de entrada y SC-004 en Chromium y WebKit; ningún hallazgo cambió una decisión, así que research.md no cambia.
-- [ ] T043 El usuario hace quickstart §2–§5: la prueba de oído en cada compás, la pantalla encendida en el iPhone y la sesión con la guitarra. Si todo está bien, cierra #20–#25 y #3.
+- [ ] T043 El usuario hace quickstart §2–§5: la prueba de oído en cada compás, la pantalla encendida en el iPhone y la sesión con la guitarra. Si algo falla, se reabre el issue de esa tarea (los issues ya se cerraron al quedar en verde en `main`).
 
 ---
 

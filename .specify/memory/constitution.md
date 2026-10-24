@@ -97,7 +97,8 @@ beneficio.
 - `/speckit-taskstoissues` MUST NOT usarse, porque duplicaría las tareas que ya existen. Los pasos
   de implementación viven en `tasks.md`.
 - Los commits referencian el issue de su tarea (por ejemplo, `#15`). Un issue se cierra cuando su
-  conducta está en verde y el usuario la verificó.
+  conducta está en verde en `main`, con un comentario que dice qué verificación manual queda
+  pendiente. Esas verificaciones siguen en `tasks.md`, y si una falla, el issue se reabre.
 
 ## Governance
 
@@ -112,4 +113,4 @@ beneficio.
 - **Cumplimiento**: cada `plan.md` pasa el Constitution Check contra los cinco principios. Toda
   violación se justifica en la tabla de complejidad del plan o no se admite.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-24 | **Last Amended**: 2026-10-24
+**Version**: 1.2.0 | **Ratified**: 2026-10-24 | **Last Amended**: 2026-10-24

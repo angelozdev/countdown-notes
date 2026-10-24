@@ -27,7 +27,8 @@ export const DEFAULT_SETTINGS: Settings = {
   bassOctave: 2,
   mix: {
     click: { volume: 80, muted: false },
-    bass: { volume: 80, muted: false }
+    bass: { volume: 80, muted: false },
+    chord: { volume: 80, muted: false }
   },
   repeats: { on: false, count: 10 }
 }
@@ -64,7 +65,8 @@ export const settingsSchema = z
     mix: z
       .object({
         click: channel(D.mix.click),
-        bass: channel(D.mix.bass)
+        bass: channel(D.mix.bass),
+        chord: channel(D.mix.chord)
       })
       .catch(D.mix),
     repeats: z

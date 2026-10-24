@@ -28,7 +28,8 @@ test('Play arranca con la mezcla del panel', async () => {
 
   expect(app.fake.mix).toEqual({
     click: { volume: 80, muted: false },
-    bass: { volume: 80, muted: false }
+    bass: { volume: 80, muted: false },
+    chord: { volume: 80, muted: false }
   })
 })
 

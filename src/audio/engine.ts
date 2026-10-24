@@ -3,10 +3,11 @@ export type Accent = 'strong' | 'soft' | 'none'
 export type Sound =
   | { kind: 'click'; accent: Accent }
   | { kind: 'bass'; pitch: string; length: number } // altura de Tone ('Bb2'); length en golpes
+  | { kind: 'chord'; pitches: string[]; length: number } // alturas de Tone ('Gb3'); length en golpes
 
-export type Channel = 'click' | 'bass'
+export type Channel = 'click' | 'bass' | 'chord'
 
-/** volume de 0 a 100; 80 es la mezcla de la entrega 1. */
+/** volume de 0 a 100; 80 es la mezcla de la entrega 1 (y, en el acorde, el bus de −4 dB del Anexo A). */
 export type Mix = Record<Channel, { volume: number; muted: boolean }>
 
 export type Bar = {

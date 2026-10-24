@@ -13,10 +13,11 @@ import { createToneEngine } from './tone-engine'
 
 type During = (engine: Engine, context: Tone.OfflineContext) => void
 
-// la mezcla de la entrega 1: los dos canales en 80, sin silenciar
+// la mezcla por defecto: los tres canales en 80, sin silenciar
 const MIX: Mix = {
   click: { volume: 80, muted: false },
-  bass: { volume: 80, muted: false }
+  bass: { volume: 80, muted: false },
+  chord: { volume: 80, muted: false }
 }
 
 function renderPractice(
@@ -553,4 +554,98 @@ test('después del último compás no suena nada', async () => {
     .getChannelData(0)
     .slice(Math.round(8.5 * buffer.sampleRate))
   expect(after.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
+})
+
+// la cuenta (compás 0, a 60 BPM dura 4 s) y un compás con un acorde de C mayor en voicing abierto
+const chordBar =
+  (length: number): EngineStart['barAt'] =>
+  (bar): Bar | undefined => {
+    if (bar === 0) {
+      return { beats: 4, beatLength: 1, countIn: true, events: clickEvents }
+    }
+    if (bar > 1) return undefined
+    return {
+      beats: 4,
+      beatLength: 1,
+      events: [
+        {
+          at: 0,
+          sound: { kind: 'chord', pitches: ['C3', 'G3', 'E4'], length }
+        }
+      ]
+    }
+  }
+
+test('el acorde ataca a tiempo y dura lo que dice length', async () => {
+  // uno tras otro: Tone.Offline cambia el contexto global mientras renderiza
+  const long = await renderPractice(60, chordBar(4), 9)
+  const short = await renderPractice(60, chordBar(2), 9)
+  // la cuenta son 4 clicks; el primer onset después de 3,9 s es el acorde
+  const rms = (buffer: Tone.ToneAudioBuffer, from: number, to: number) => {
+    const part = buffer
+      .getChannelData(0)
+      .slice(
+        Math.round(from * buffer.sampleRate),
+        Math.round(to * buffer.sampleRate)
+      )
+    return Math.sqrt(part.reduce((sum, x) => sum + x * x, 0) / part.length)
+  }
+  for (const buffer of [long, short]) {
+    const found = onsets(buffer, 1e-4, 0.5)
+    const chord = found.find(({ time }) => time > 3.9)!
+    expect(Math.abs(chord.time - (found[0].time + 4))).toBeLessThan(0.001)
+  }
+  const attack = onsets(long, 1e-4, 0.5).find(({ time }) => time > 3.9)!.time
+  expect(rms(short, attack + 2.6, attack + 2.7)).toBeLessThan(
+    rms(long, attack + 2.6, attack + 2.7) / 2
+  )
+})
+
+test('el acorde silenciado no suena', async () => {
+  const buffer = await renderPractice(60, chordBar(4), 9, undefined, {
+    ...MIX,
+    chord: { volume: 80, muted: true }
+  })
+  const after = buffer
+    .getChannelData(0)
+    .slice(Math.round(3.9 * buffer.sampleRate))
+  expect(after.every((sample) => Math.abs(sample) <= 1e-4)).toBe(true)
+})
+
+// el escenario de la mezcla, más un acorde de 5 notas sostenido en los compases 1 y 2
+const loudBarsWithChord = (): EngineStart['barAt'] => {
+  const base = loudBars()
+  return (bar) => {
+    const plan = base(bar)
+    if (!plan || bar === 0) return plan
+    return {
+      ...plan,
+      events: [
+        ...plan.events,
+        {
+          at: 0,
+          sound: {
+            kind: 'chord',
+            pitches: ['E3', 'G3', 'B3', 'D4', 'Gb4'],
+            length: 4
+          }
+        }
+      ]
+    }
+  }
+}
+
+test('con el acorde, la mezcla tampoco pasa de 1', async () => {
+  const maxed: Mix = {
+    click: { volume: 100, muted: false },
+    bass: { volume: 100, muted: false },
+    chord: { volume: 100, muted: false }
+  }
+  for (const mix of [MIX, maxed]) {
+    const data = (
+      await renderPractice(120, loudBarsWithChord(), 6.5, undefined, mix)
+    ).getChannelData(0)
+    expect(data.some((sample) => Math.abs(sample) > 0.5)).toBe(true)
+    expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)
+  }
 })

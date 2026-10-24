@@ -98,7 +98,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 ### El acorde en el motor
 
-- [ ] T006 [US1] En `src/audio/tone-engine.browser.test.ts`:
+- [x] T006 [US1] En `src/audio/tone-engine.browser.test.ts`:
   - **Traducción (research §3)**: la constante `MIX` suma `chord: { volume: 80, muted: false }`.
   - Agregar tres tests. En todos, el compás 0 es la cuenta (`countIn: true`, `clickEvents`) a 60 BPM:
     1. `'el acorde ataca a tiempo y dura lo que dice length'`. El compás 1 tiene `{ at: 0, sound: { kind: 'chord', pitches: ['C3', 'G3', 'E4'], length } }`, y desde el 2 es `undefined`. Render de 9 s, con `length` 4 y con `length` 2.
@@ -109,7 +109,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test --project audio` y **verlos fallar**: el motor todavía no conoce `kind: 'chord'`.
 
-- [ ] T007 [US1] Canal y cadena del acorde (Analógico cálido):
+- [x] T007 [US1] Canal y cadena del acorde (Analógico cálido):
   - En `src/audio/engine.ts`, según [contracts](./contracts/interfaces.md) §2:
     - `Sound` suma `{ kind: 'chord'; pitches: string[]; length: number }`, con el comentario de las alturas;
     - `Channel` pasa a `'click' | 'bass' | 'chord'`;

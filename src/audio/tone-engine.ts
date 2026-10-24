@@ -11,9 +11,10 @@ const CLICKS: Record<Accent, [number, number]> = {
   none: [1175, 0.55]
 }
 
-// el volumen 80 es la mezcla de la entrega 1: clicks a −8 dB y bajo a 0 dB (research.md §6)
-const BASE_DB: Record<Channel, number> = { click: -8, bass: 0 }
-const CHANNELS: Channel[] = ['click', 'bass']
+// el volumen 80 es la mezcla de la entrega 1: clicks a −8 dB y bajo a 0 dB (research.md §6);
+// el acorde, a −4 dB (Anexo A)
+const BASE_DB: Record<Channel, number> = { click: -8, bass: 0, chord: -4 }
+const CHANNELS: Channel[] = ['click', 'bass', 'chord']
 
 const volumeGain = (channel: Channel, volume: number) =>
   volume === 0
@@ -51,7 +52,10 @@ export function createToneEngine(): Engine {
       // 1/4 porque la entrada del WaveShaper se recorta a [−1, 1] y la suma de los canales puede pasar de 2
       const quarter = new Tone.Gain(0.25).connect(shaper)
       const output = new Tone.Gain(1).connect(quarter)
-      // la mezcla más reciente: un setMix pudo llegar mientras esperaba a Tone.start()
+      // el acorde pasa por un Reverb, que genera su respuesta antes de poder sonar
+      const reverb = new Tone.Reverb({ decay: 2.5, wet: 0.3 })
+      await reverb.ready
+      // la mezcla más reciente: un setMix pudo llegar mientras esperaba a Tone.start() o al reverb
       const initial = latestMix
       const channel = (name: Channel) => {
         const { volume, muted } = initial[name]
@@ -61,7 +65,11 @@ export function createToneEngine(): Engine {
         const mute = new Tone.Gain(muted ? 0 : 1).connect(volumeNode)
         return { mute, volume: volumeNode }
       }
-      const channels = { click: channel('click'), bass: channel('bass') }
+      const channels = {
+        click: channel('click'),
+        bass: channel('bass'),
+        chord: channel('chord')
+      }
       const makeClick = () =>
         new Tone.Synth({
           oscillator: { type: 'sine' },
@@ -85,6 +93,22 @@ export function createToneEngine(): Engine {
         },
         volume: -4
       }).connect(channels.bass.mute)
+      // acorde Analógico cálido (diseño, Anexo A): sierras desafinadas → pasabajos → chorus → reverb
+      reverb.connect(channels.chord.mute)
+      const chorus = new Tone.Chorus({
+        frequency: 0.8,
+        delayTime: 3.5,
+        depth: 0.6,
+        wet: 0.5
+      })
+        .connect(reverb)
+        .start()
+      const filter = new Tone.Filter(1400, 'lowpass').connect(chorus)
+      const chord = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: 'fatsawtooth', count: 3, spread: 20 },
+        envelope: { attack: 0.04, decay: 0.6, sustain: 0.5, release: 1.5 },
+        volume: -18
+      }).connect(filter)
       nodes = [
         shaper,
         quarter,
@@ -92,6 +116,10 @@ export function createToneEngine(): Engine {
         click,
         countClick,
         bass,
+        chord,
+        filter,
+        chorus,
+        reverb,
         ...CHANNELS.flatMap((name) => [
           channels[name].mute,
           channels[name].volume
@@ -113,14 +141,16 @@ export function createToneEngine(): Engine {
           const [frequency, velocity] = CLICKS[sound.accent]
           const synth = countIn ? countClick : click
           synth.triggerAttackRelease(frequency, 0.05, time, velocity)
+          return
+        }
+        // 90 % de su largo, para que cada ataque se distinga
+        const length = transport.toSeconds(
+          `${Math.round(sound.length * perBeat * 0.9)}i`
+        )
+        if (sound.kind === 'bass') {
+          bass.triggerAttackRelease(sound.pitch, length, time)
         } else {
-          // 90 % de su largo, para que cada ataque se distinga
-          const ticks = Math.round(sound.length * perBeat * 0.9)
-          bass.triggerAttackRelease(
-            sound.pitch,
-            transport.toSeconds(`${ticks}i`),
-            time
-          )
+          chord.triggerAttackRelease(sound.pitches, length, time)
         }
       }
       function scheduleBar(bar: number, tick: number) {

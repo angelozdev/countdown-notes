@@ -13,3 +13,18 @@ test('abre la pantalla base', async ({ page }) => {
   )
   expect(hasHorizontalScroll).toBe(false)
 })
+
+test('se ve en oscuro con acento ámbar aunque el sistema esté en claro', async ({
+  page
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' })
+  await page.goto('/')
+  await expect(page.locator('body')).toHaveCSS(
+    'background-color',
+    'rgb(10, 10, 10)'
+  )
+  await expect(page.getByText('En construcción')).toHaveCSS(
+    'background-color',
+    'rgb(245, 165, 36)'
+  )
+})

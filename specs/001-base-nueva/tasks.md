@@ -195,8 +195,8 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T021 [P] [US4] En `src/App.test.tsx`, agregar al test existente `screen.getByText('En construcción')`. Correr `pnpm test` y **verlo fallar**.
-- [ ] T022 [P] [US4] En `e2e/base-screen.spec.ts`, agregar el test `'se ve en oscuro con acento ámbar aunque el sistema esté en claro'`:
+- [x] T021 [P] [US4] En `src/App.test.tsx`, agregar al test existente `screen.getByText('En construcción')`. Correr `pnpm test` y **verlo fallar**.
+- [x] T022 [P] [US4] En `e2e/base-screen.spec.ts`, agregar el test `'se ve en oscuro con acento ámbar aunque el sistema esté en claro'`:
   - hace `await page.emulateMedia({ colorScheme: 'light' })` y `page.goto('/')`;
   - espera `page.locator('body')` con `toHaveCSS('background-color', 'rgb(10, 10, 10)')`;
   - espera `page.getByText('En construcción')` con `toHaveCSS('background-color', 'rgb(245, 165, 36)')`.
@@ -205,31 +205,31 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Configurar el alias `@` que exige shadcn (research.md §2):
+- [x] T023 [US4] Configurar el alias `@` que exige shadcn (research.md §2):
   - en `vite.config.ts`, `import path from 'node:path'` y `resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } }`;
   - en `tsconfig.json` y en `tsconfig.app.json`, `compilerOptions.paths: { "@/*": ["./src/*"] }`, **sin `baseUrl`** (TS 7 lo eliminó).
 
   `pnpm build` debe seguir en verde.
 
-- [ ] T024 [US4] Correr `pnpm dlx shadcn@4.22.1 init -t vite -b radix -p nova --no-monorepo -y`. Crea `components.json`, `src/lib/utils.ts` y `src/components/ui/button.tsx`, reescribe `src/index.css` e instala `shadcn`, `radix-ui`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css` y `@fontsource-variable/geist`.
+- [x] T024 [US4] Correr `pnpm dlx shadcn@4.22.1 init -t vite -b radix -p nova --no-monorepo -y`. Crea `components.json`, `src/lib/utils.ts` y `src/components/ui/button.tsx`, reescribe `src/index.css` e instala `shadcn`, `radix-ui`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css` y `@fontsource-variable/geist`.
   - Comprobar que en `package.json` todas las versiones quedaron exactas, sin `^`.
   - Borrar `src/components/ui/button.tsx` (YAGNI: vuelve en la entrega 1).
   - Correr `pnpm dlx shadcn@4.22.1 add badge`, que crea `src/components/ui/badge.tsx`.
-- [ ] T025 [US4] Tema solo oscuro (research.md §8):
+- [x] T025 [US4] Tema solo oscuro (research.md §8):
   - en `src/index.css`:
     - borrar el bloque claro `:root { … }` y mover `--radius: 0.625rem;` a `.dark`;
     - en `.dark`, poner `--background: #0a0a0a`, `--foreground: #fafafa`, `--primary: #f5a524`, `--primary-foreground: #0a0a0a` y `--ring: #f5a524`, y dejar los demás tokens como los escribió shadcn;
     - en `@layer base`, agregar `html { color-scheme: dark; }`;
     - mantener `@import "@fontsource-variable/geist";` y `@theme inline`;
   - en `index.html`: `<html lang="es" class="dark">` y `<meta name="theme-color" content="#0a0a0a" />`.
-- [ ] T026 [US4] Actualizar `src/App.tsx`:
+- [x] T026 [US4] Actualizar `src/App.tsx`:
   - el `<h1>` con `font-heading font-black tracking-tight text-6xl sm:text-8xl`;
   - el `<p>` con `text-muted-foreground text-lg`;
   - agregar `<Badge>En construcción</Badge>`, importado de `@/components/ui/badge`.
 
   Correr `pnpm test` y `pnpm test:e2e`: deben quedar **en verde**.
 
-- [ ] T027 [US4] Correr `pnpm format`, porque los archivos de shadcn vienen con comillas dobles. Después deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. Hacer la revisión visual de quickstart §5 con `pnpm dev`: título en Geist grande y en peso 900, badge ámbar, y la app sigue en oscuro con el sistema en modo claro. **Commit**: `feat: tema oscuro con acento ámbar y shadcn/ui (#13)`.
+- [x] T027 [US4] Correr `pnpm format`, porque los archivos de shadcn vienen con comillas dobles. Después deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. Hacer la revisión visual de quickstart §5 con `pnpm dev`: título en Geist grande y en peso 900, badge ámbar, y la app sigue en oscuro con el sistema en modo claro. **Commit**: `feat: tema oscuro con acento ámbar y shadcn/ui (#13)`.
 
 **Checkpoint**: US1–US4 en verde.
 

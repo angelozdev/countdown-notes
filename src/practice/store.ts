@@ -2,7 +2,14 @@ import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
 import type { Bar, Engine } from '@/audio/engine'
-import { accentAt, METER_BY_ID, type Meter, type MeterId } from '@/music/meters'
+import {
+  accentAt,
+  type BassFigure,
+  bassAttacks,
+  METER_BY_ID,
+  type Meter,
+  type MeterId
+} from '@/music/meters'
 import { NOTES, type Note, type NoteId } from '@/music/notes'
 import { drawRound } from './round'
 
@@ -28,6 +35,8 @@ export type PracticeState = {
   barsPerNote: number
   notes: NoteId[]
   meter: MeterId
+  bassFigure: BassFigure
+  bassOctave: 1 | 2 | 3
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
   play: () => void
@@ -35,6 +44,8 @@ export type PracticeState = {
   setBpm: (bpm: number) => void
   setBarsPerNote: (barsPerNote: number) => void
   setMeter: (meter: MeterId) => void
+  setBassFigure: (figure: BassFigure) => void
+  setBassOctave: (octave: 1 | 2 | 3) => void
   toggleNote: (id: NoteId) => void
   setGroup: (natural: boolean, included: boolean) => void
 }
@@ -112,14 +123,18 @@ export function createPracticeStore(engine: Engine) {
       if (bar === lastNoteBar && round === rounds.at(-1)) {
         set({ rounds: [...rounds, nextRound(round)] })
       }
-      const bass: Bar['events'][number] = {
-        at: 0,
-        sound: { kind: 'bass', pitch: `${round.notes[index]}2` }
-      }
+      // figura y octava se leen aquí, al armar el compás: un cambio aplica desde el siguiente
+      const { bassFigure, bassOctave } = get()
+      const bass = bassAttacks(meter, bassFigure).map(
+        ({ at }): Bar['events'][number] => ({
+          at,
+          sound: { kind: 'bass', pitch: `${round.notes[index]}${bassOctave}` }
+        })
+      )
       // el sort es estable: en el mismo at, el click queda antes que el bajo
       return {
         ...planOf(meter),
-        events: [...clicksOf(meter), bass].sort((a, b) => a.at - b.at)
+        events: [...clicksOf(meter), ...bass].sort((a, b) => a.at - b.at)
       }
     }
 
@@ -139,6 +154,8 @@ export function createPracticeStore(engine: Engine) {
       bpm: 60,
       barsPerNote: 2,
       meter: '4/4',
+      bassFigure: 'whole',
+      bassOctave: 2,
       notes: NOTES.map((note) => note.id),
       rounds: [],
       play() {
@@ -173,6 +190,12 @@ export function createPracticeStore(engine: Engine) {
       },
       setMeter(meter) {
         set({ meter })
+      },
+      setBassFigure(bassFigure) {
+        set({ bassFigure })
+      },
+      setBassOctave(bassOctave) {
+        set({ bassOctave })
       },
       toggleNote(id) {
         const { notes } = get()

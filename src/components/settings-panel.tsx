@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { METERS, type MeterId } from '@/music/meters'
+import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
 import { NOT_ENOUGH_NOTES, usePractice } from '@/practice/store'
 
@@ -63,6 +63,7 @@ export function SettingsPanel() {
             increaseLabel="Subir compases por nota"
           />
           <MeterPicker />
+          <BassPicker />
           <NoteFilters />
         </div>
       </SheetContent>
@@ -91,6 +92,68 @@ function MeterPicker() {
             value={id}
             className="h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
           >
+            {id}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </section>
+  )
+}
+
+const FIGURES: { id: BassFigure; label: string }[] = [
+  { id: 'eighth', label: 'Corcheas' },
+  { id: 'quarter', label: 'Negras' },
+  { id: 'half', label: 'Blancas' },
+  { id: 'whole', label: 'Redondas' }
+]
+
+const OCTAVES = [1, 2, 3] as const
+
+const PICKED_ITEM =
+  'h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground'
+
+function BassPicker() {
+  const figure = usePractice((state) => state.bassFigure)
+  const setFigure = usePractice((state) => state.setBassFigure)
+  const octave = usePractice((state) => state.bassOctave)
+  const setOctave = usePractice((state) => state.setBassOctave)
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="text-base font-semibold">Bajo</h3>
+      <p className="text-sm text-muted-foreground">Figura</p>
+      <ToggleGroup
+        type="single"
+        aria-label="Figura del bajo"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-4"
+        value={figure}
+        onValueChange={(value) => value && setFigure(value as BassFigure)}
+      >
+        {FIGURES.map(({ id, label }) => (
+          <ToggleGroupItem
+            key={id}
+            value={id}
+            className={`${PICKED_ITEM} px-1 text-base`}
+          >
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      <p className="text-sm text-muted-foreground">Octava</p>
+      <ToggleGroup
+        type="single"
+        aria-label="Octava del bajo"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-3"
+        value={String(octave)}
+        onValueChange={(value) =>
+          value && setOctave(Number(value) as (typeof OCTAVES)[number])
+        }
+      >
+        {OCTAVES.map((id) => (
+          <ToggleGroupItem key={id} value={String(id)} className={PICKED_ITEM}>
             {id}
           </ToggleGroupItem>
         ))}

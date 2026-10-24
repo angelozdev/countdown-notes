@@ -228,7 +228,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `pnpm test --project ui` **en verde**. **Commit**: `feat: ataques del bajo por figura y compás (#21)`.
 
-- [ ] T016 [US2] Escribir `src/bass.test.tsx`. Para elegir: abrir el panel y hacer clic en el `radio` dentro del `radiogroup` `Figura del bajo` u `Octava del bajo`. Helper: `bassOf(fake, bar)` = los `{ beat, pitch }` de los `bass` de ese compás. Tests:
+- [x] T016 [US2] Escribir `src/bass.test.tsx`. Para elegir: abrir el panel y hacer clic en el `radio` dentro del `radiogroup` `Figura del bajo` u `Octava del bajo`. Helper: `bassOf(fake, bar)` = los `{ beat, pitch }` de los `bass` de ese compás. Tests:
   - `'la figura empieza en redondas y la octava en 2'`: `Redondas` y `2` tienen `aria-checked="true"`; los radios de figura son `Corcheas, Negras, Blancas, Redondas` y los de octava `1, 2, 3`.
   - `test.each([['Corcheas', 8], ['Negras', 4], ['Blancas', 2], ['Redondas', 1]])('en 4/4 con %s el bajo ataca %i veces por compás')`: elegir la figura, Play, `fake.beat(4 + 4)`; `bassOf(fake, 1)` tiene ese largo, el primero en `beat: 0`, y todos con la misma altura.
   - `'la octava cambia la altura del bajo'`: octava `3`, Play, `fake.beat(5)`; el `pitch` del compás 1 termina en `3`. Lo mismo con `1`.
@@ -239,7 +239,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T017 [US2] Implementar:
+- [x] T017 [US2] Implementar:
   - **`store.ts`**:
     - `bassFigure: BassFigure` (inicial `'whole'`), `bassOctave: 1 | 2 | 3` (inicial `2`), `setBassFigure` y `setBassOctave`;
     - en `barAt`, los `bass` salen de `bassAttacks(meter, bassFigure)`, con `pitch: `${nota}${bassOctave}``, leídos al armar el compás (FR-015).

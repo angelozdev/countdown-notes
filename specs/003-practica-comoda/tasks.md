@@ -371,7 +371,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 - [x] T030 [US4] En `tone-engine.browser.test.ts`, `renderPractice` pasa `onEnd: () => {}`. Agregar `'después del último compás no suena nada'`: 4/4 a 60 BPM con clicks y un `bass` `'Bb2'` (`length: 4`) en los compases 0 y 1, y `undefined` desde el 2, en 10 s. `onsets(buffer, 1e-3, 0.1)` da 8 inicios, y desde 8,5 s ninguna muestra supera 1e-3. Done: el test afirma 2 inicios y no 8 (uno por compás de bajo; el bajo sostenido tapa los clicks), por decisión del usuario; el silencio desde 8,5 s se mantiene.
   - Es un **test de regresión**: T029 ya corta la programación al recibir `undefined`, así que se espera que pase al primer intento. Si falla, corregir el fin en `tone-engine.ts`.
-  - El aviso a la UI (`onEnd`) ya se prueba con el motor falso en T028: en `Tone.Offline`, `Draw` no corre al ritmo del render.
+  - El aviso a la UI (`onEnd`) ya se prueba con el motor falso en T028. Con el motor real no sirve `Tone.Offline`, porque `Draw` no corre al ritmo del render; se prueba en tiempo real, como el de `stop`. Done (revisión final, I2): `'onBeat llega golpe por golpe, en orden, y onEnd una sola vez al terminar'`, en tiempo real, a 240 BPM en 4/4 con 2 compases.
 
   `pnpm test` **en verde en los dos proyectos**. **Commit**: `test: sin sonido después de la última vuelta (#23)`.
 

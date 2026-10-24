@@ -196,6 +196,48 @@ test('después de stop no se llama a ningún onBeat', async () => {
   expect(late).toEqual([0, 0, 0, 0, 0])
 })
 
+// tiempo real: Draw es el único enlace entre el reloj del audio y la pantalla. Los timers de aquí
+// solo esperan, no marcan tiempo musical
+test('onBeat llega golpe por golpe, en orden, y onEnd una sola vez al terminar', async () => {
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+  const unlock = document.body.appendChild(document.createElement('button'))
+  unlock.addEventListener('click', () => void Tone.start())
+  await userEvent.click(unlock)
+  unlock.remove()
+
+  const engine = createToneEngine()
+  const twoBars: EngineStart['barAt'] = (bar) =>
+    bar < 2 ? { beats: 4, beatLength: 1, events: clickEvents } : undefined
+  const expected = [0, 1].flatMap((bar) =>
+    [0, 1, 2, 3].map((beat) => [bar, beat])
+  )
+  // la segunda vuelta empieza después del fin natural de la primera
+  for (const run of [1, 2]) {
+    const beats: number[][] = []
+    let ends = 0
+    let beatsAtEnd = -1
+    await engine.start({
+      bpm: 240,
+      mix: MIX,
+      barAt: twoBars,
+      onBeat: (bar, beat) => beats.push([bar, beat]),
+      onEnd: () => {
+        ends++
+        beatsAtEnd = beats.length
+        // la app para aquí (onEnd es stop); volver a llamar a start sin parar no programa nada
+        engine.stop()
+      }
+    })
+    // 2 s de música; el tope solo evita colgarse si onEnd nunca llega
+    for (let i = 0; ends === 0 && i < 400; i++) await wait(10)
+    // el margen deja caer cualquier aviso de más
+    await wait(500)
+    expect(beats, `vuelta ${run}`).toEqual(expected)
+    expect(ends, `vuelta ${run}`).toBe(1)
+    expect(beatsAtEnd, `vuelta ${run}`).toBe(expected.length)
+  }
+}, 15_000)
+
 test('un cambio de BPM no duplica ni salta golpes', async () => {
   const buffer = await renderPractice(60, clicks, 10, (engine, context) => {
     context.setTimeout(() => engine.setBpm(120), 3.5)

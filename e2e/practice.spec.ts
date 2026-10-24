@@ -58,3 +58,16 @@ test('Play cuenta, muestra una nota con su nombre y Stop la detiene', async ({
   await page.getByRole('button', { name: 'Stop' }).click()
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
 })
+
+test('la barra espaciadora hace Play y Stop una vez por pulsación', async ({
+  page
+}) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Play' }).focus()
+
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
+  expect(await page.evaluate(() => window.scrollY)).toBe(0)
+})

@@ -1,10 +1,11 @@
-import { Play, Square } from 'lucide-react'
-import { useState } from 'react'
+import { Minus, Play, Plus, Square } from 'lucide-react'
+import { useCallback, useContext, useState } from 'react'
 import type { Engine } from '@/audio/engine'
 import { Lane } from '@/components/lane'
 import { Now } from '@/components/now'
 import { SettingsPanel } from '@/components/settings-panel'
 import { Button } from '@/components/ui/button'
+import { useSpaceToggle, useWakeLock } from '@/lib/hands-free'
 import {
   canPlay,
   createPracticeStore,
@@ -19,6 +20,7 @@ export default function App({ engine }: { engine: Engine }) {
   const [store] = useState(() => createPracticeStore(engine))
   return (
     <PracticeContext value={store}>
+      <HandsFree />
       <main className="flex h-dvh flex-col p-safe">
         <h1 className="sr-only">Countdown Notes</h1>
         <StatusLine />
@@ -28,13 +30,29 @@ export default function App({ engine }: { engine: Engine }) {
           <Counter />
           <NotEnoughNotes />
           <div className="flex items-center justify-center gap-4">
+            <QuickTempo delta={-5} />
             <PlayButton />
-            <SettingsPanel />
+            <QuickTempo delta={5} />
           </div>
+          <SettingsPanel />
         </footer>
       </main>
     </PracticeContext>
   )
+}
+
+/** Pantalla encendida y barra espaciadora; no dibuja nada. */
+function HandsFree() {
+  const store = useContext(PracticeContext)!
+  useWakeLock(usePractice((state) => state.status !== 'stopped'))
+  useSpaceToggle(
+    useCallback(() => {
+      const { status, play, stop } = store.getState()
+      if (status === 'stopped') play()
+      else stop()
+    }, [store])
+  )
+  return null
 }
 
 function StatusLine() {
@@ -86,6 +104,24 @@ function PlayButton() {
     >
       {stopped ? <Play aria-hidden /> : <Square aria-hidden />}
       {stopped ? 'Play' : 'Stop'}
+    </Button>
+  )
+}
+
+/** Un botón de tempo rápido: ±5 BPM, el ajuste fino de a 1 vive en el panel. */
+function QuickTempo({ delta }: { delta: -5 | 5 }) {
+  const setBpm = usePractice((state) => state.setBpm)
+  const bpm = usePractice((state) => state.bpm)
+  const Icon = delta < 0 ? Minus : Plus
+  return (
+    <Button
+      variant="secondary"
+      size="icon-lg"
+      className="size-14"
+      aria-label={`${delta < 0 ? 'Bajar' : 'Subir'} 5 BPM`}
+      onClick={() => setBpm(bpm + delta)}
+    >
+      <Icon aria-hidden />
     </Button>
   )
 }

@@ -387,7 +387,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` y `pnpm test:e2e` en verde; con `pnpm dev`, quickstart §2, filas 11–13; en el iPhone, quickstart §3.1–3.2.
 
-- [ ] T032 [P] [US5] Escribir `src/hands-free.test.tsx`:
+- [x] T032 [P] [US5] Escribir `src/hands-free.test.tsx`:
   - helper `fakeWakeLock()`: define `navigator.wakeLock` con `Object.defineProperty(navigator, 'wakeLock', { value: { request }, configurable: true })`. `request = vi.fn(async () => sentinel)` crea y guarda un `sentinel = { released: false, release: vi.fn(async () => { sentinel.released = true }) }`. Un `afterEach` lo borra con `Reflect.deleteProperty(navigator, 'wakeLock')`.
   - Tests de la pantalla encendida:
     - `'Play mantiene la pantalla encendida y Stop la libera'`: Play → `await waitFor` hasta que `request` se llamó con `'screen'`; Stop → el `release` del sentinel se llamó.
@@ -403,10 +403,10 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
     - `'el tempo rápido sube y baja de a 5 sin abrir ajustes'`: Play, `Subir 5 BPM` → `fake.bpm` es 65 y se ve `Aleatorio · Analógico cálido · 65 BPM · 4/4`; `Bajar 5 BPM` dos veces → 55.
     - `'el tempo rápido se limita a 30–240'`: BPM 238 en el panel, `Subir 5 BPM` → 240; BPM 32, `Bajar 5 BPM` → 30.
 
-  Correr `pnpm test --project ui` y **verlo fallar**.
+  Correr `pnpm test --project ui` y **verlo fallar**. Done: fallaron 6 de 10 (Wake Lock sin `request`, espacio sin Play y `Subir 5 BPM` inexistente); los otros 4 ya pasaban porque cubren conducta que existe (sin Wake Lock, el foco en Play, el panel abierto y menos de 2 notas) y protegen contra un toggle doble.
 
-- [ ] T033 [P] [US5] En `e2e/practice.spec.ts`, agregar `'la barra espaciadora hace Play y Stop una vez por pulsación'`: `page.getByRole('button', { name: 'Play' }).focus()`, `page.keyboard.press('Space')` → `Stop` visible; otra vez → `Play` visible. Al final, `window.scrollY` es 0. Correr `pnpm test:e2e` y **verlo fallar**.
-- [ ] T034 [US5] Implementar (research.md §8, §10 y §11):
+- [x] T033 [P] [US5] En `e2e/practice.spec.ts`, agregar `'la barra espaciadora hace Play y Stop una vez por pulsación'`: `page.getByRole('button', { name: 'Play' }).focus()`, `page.keyboard.press('Space')` → `Stop` visible; otra vez → `Play` visible. Al final, `window.scrollY` es 0. Correr `pnpm test:e2e` y **verlo fallar**. Done: no falla antes de implementar, porque con el foco en Play el navegador ya activa el botón con el espacio; sí falla (en `chromium` y `iphone`) con un `toggle` en `keydown` sin `preventDefault`, que es el doble toggle que evita T034.
+- [x] T034 [US5] Implementar (research.md §8, §10 y §11):
   - **`src/lib/hands-free.ts`**:
     - `useWakeLock(active: boolean)`: un efecto que, si `active` y existe `navigator.wakeLock`, pide `request('screen')` y guarda el sentinel. Si el efecto se limpió antes de que llegue, lo libera. Escucha `visibilitychange`: si la página está visible y el sentinel falta o está `released`, lo pide de nuevo. Al limpiar, quita el listener y libera el sentinel. Todo error se ignora (`.catch(() => {})`);
     - `useSpaceToggle(toggle: () => void)`: listeners de `keydown` y `keyup` en `window`. Una tecla es "nuestra" si `code === 'Space'`, sin `alt`, `ctrl`, `meta` ni `shift`, y el `target` no está dentro de `[role="dialog"]`. En `keydown` nuestro: `preventDefault()` y, si no es `repeat`, `toggle()`. En `keyup` nuestro: `preventDefault()`.
@@ -414,7 +414,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
     - un componente `HandsFree` (dentro del `PracticeContext`, renderiza `null`) que llama a `useWakeLock(status !== 'stopped')` y a `useSpaceToggle`, con un `toggle` estable que lee el store (`play` si está detenida, `stop` si no; `play` ya respeta `canPlay`);
     - un componente `QuickTempo` en el pie, junto a Play: dos `Button` con ícono (`Minus` y `Plus`) y `aria-label` `Bajar 5 BPM` y `Subir 5 BPM`, que llaman a `setBpm(bpm ∓ 5)`. No tiene campo editable.
 
-  `pnpm test` y `pnpm test:e2e` **en verde**. **Commit**: `feat: pantalla encendida, barra espaciadora y tempo rápido (#24)`.
+  `pnpm test` y `pnpm test:e2e` **en verde**. **Commit**: `feat: pantalla encendida, barra espaciadora y tempo rápido (#24)`. Done: `QuickTempo` es un botón con `delta` (-5 o 5), con una instancia a cada lado de Play, y Ajustes pasa a una fila propia: en 393 px de ancho, 4 botones en una fila desbordan. El pedido del Wake Lock en vuelo no se repite si llega un `visibilitychange`, para no dejar un sentinel sin liberar.
 
 - [ ] T035 [US5] Verificación manual: quickstart §2, filas 11–13, con `pnpm dev`. Pedirle al usuario la prueba en el iPhone (quickstart §3.1–3.2). Si la pantalla se apaga, registrar el plan B en research.md §10 antes de implementarlo.
 

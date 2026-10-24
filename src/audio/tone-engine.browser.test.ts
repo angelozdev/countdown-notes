@@ -1,7 +1,13 @@
 import * as Tone from 'tone'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
-import { accentAt, METERS, type Meter } from '@/music/meters'
+import {
+  accentAt,
+  bassAttacks,
+  type BassFigure,
+  METERS,
+  type Meter
+} from '@/music/meters'
 import type { Bar, Engine, EngineStart, Mix } from './engine'
 import { createToneEngine } from './tone-engine'
 
@@ -300,6 +306,107 @@ test('el bajo ataca a mitad de golpe y dura lo que dice length', async () => {
     .getChannelData(0)
     .slice(Math.round(silentFrom * buffer.sampleRate))
   expect(after.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
+})
+
+const FIGURES: BassFigure[] = ['eighth', 'quarter', 'half', 'whole']
+
+// SC-002: con cada compás y cada figura, el motor real ataca el bajo donde dice la teoría.
+// Se mide en las llamadas al sintetizador, porque con notas ligadas el release de una tapa el
+// inicio de la siguiente y no se distingue en el audio
+test.each(
+  METERS.flatMap((meter) => FIGURES.map((figure) => ({ meter, figure })))
+)(
+  'en $meter.id con la figura $figure, cada ataque del bajo cae en su tiempo',
+  async ({ meter, figure }) => {
+    const bpm = 240
+    const beat = (meter.beatLength * 60) / bpm
+    const attacks = bassAttacks(meter, figure)
+    const pitchOf = (bar: number) => (bar === 0 ? 'C3' : 'D3')
+    const spy = vi.spyOn(Tone.MonoSynth.prototype, 'triggerAttackRelease')
+    try {
+      await renderPractice(
+        bpm,
+        (bar): Bar | undefined =>
+          bar < 2
+            ? {
+                beats: meter.beats,
+                beatLength: meter.beatLength,
+                events: attacks.map(({ at, length }) => ({
+                  at,
+                  sound: { kind: 'bass', pitch: pitchOf(bar), length }
+                }))
+              }
+            : undefined,
+        2 * meter.beats * beat + 0.2
+      )
+      const calls = spy.mock.calls
+      expect(calls).toHaveLength(2 * attacks.length)
+      // el primer ataque cae en el tiempo 1; los demás se miden desde él
+      const start = calls[0][2] as number
+      for (const [k, [note, duration, time]] of calls.entries()) {
+        const bar = Math.floor(k / attacks.length)
+        const { at, length } = attacks[k % attacks.length]
+        expect(note).toBe(pitchOf(bar))
+        expect(
+          Math.abs((time as number) - (start + (bar * meter.beats + at) * beat))
+        ).toBeLessThan(0.001)
+        // 90 % de su largo, con la redondeada a un tick (1,3 ms a 240 BPM)
+        expect(
+          Math.abs((duration as number) - 0.9 * length * beat)
+        ).toBeLessThan(0.002)
+      }
+    } finally {
+      spy.mockRestore()
+    }
+  }
+)
+
+// la frecuencia fundamental, por autocorrelación: el período es el primer retraso que repite la onda
+function fundamental(data: Float32Array, rate: number) {
+  const correlation = (lag: number) => {
+    let sum = 0
+    for (let i = 0; i + lag < data.length; i++) sum += data[i] * data[i + lag]
+    return sum
+  }
+  const lags = Array.from(
+    { length: Math.round(rate / 80) - Math.round(rate / 600) },
+    (_, k) => Math.round(rate / 600) + k
+  )
+  const scores = lags.map(correlation)
+  const best = Math.max(...scores)
+  return rate / lags[scores.findIndex((score) => score >= 0.95 * best)]
+}
+
+test('la octava llega al motor como altura: una más arriba suena al doble de frecuencia', async () => {
+  const hz = async (pitch: string) => {
+    // una redonda a 240 BPM en 4/4 dura 1 s; se mide entre 0,3 y 0,5 s después del ataque
+    const buffer = await renderPractice(
+      240,
+      (bar): Bar | undefined =>
+        bar === 0
+          ? {
+              beats: 4,
+              beatLength: 1,
+              events: [{ at: 0, sound: { kind: 'bass', pitch, length: 4 } }]
+            }
+          : undefined,
+      1.5
+    )
+    const [{ time }] = onsets(buffer, 1e-5, 1)
+    const { sampleRate } = buffer
+    return fundamental(
+      buffer
+        .getChannelData(0)
+        .slice(
+          Math.round((time + 0.3) * sampleRate),
+          Math.round((time + 0.5) * sampleRate)
+        ),
+      sampleRate
+    )
+  }
+  const [c3, c4] = [await hz('C3'), await hz('C4')]
+  expect(c3 / 130.81).toBeCloseTo(1, 1)
+  expect(c4 / c3).toBeCloseTo(2, 1)
 })
 
 test('un canal silenciado no suena', async () => {

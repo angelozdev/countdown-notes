@@ -215,8 +215,8 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, filas 3–5.
 
-- [ ] T011 [US2] Correr `pnpm dlx shadcn@4.22.1 add sheet`, que crea `src/components/ui/sheet.tsx`, y después `pnpm format`. En `sheet.tsx`, cambiar el texto oculto del botón de cierre de `Close` a `Cerrar`.
-- [ ] T012 [US2] Escribir `src/bpm.test.tsx`. Cada test monta `<App engine={fake.engine} />`; para abrir el panel, clic en `Ajustes` y `within(screen.getByRole('dialog', { name: 'Ajustes' }))`. Tests:
+- [x] T011 [US2] Correr `pnpm dlx shadcn@4.22.1 add sheet`, que crea `src/components/ui/sheet.tsx`, y después `pnpm format`. En `sheet.tsx`, cambiar el texto oculto del botón de cierre de `Close` a `Cerrar`.
+- [x] T012 [US2] Escribir `src/bpm.test.tsx`. Cada test monta `<App engine={fake.engine} />`; para abrir el panel, clic en `Ajustes` y `within(screen.getByRole('dialog', { name: 'Ajustes' }))`. Tests:
   - `'la pantalla de práctica muestra el tempo arriba y no tiene controles de ajuste'`:
     - `screen.getByText('Aleatorio · Analógico cálido · 60 BPM · 4/4')`;
     - `queryAllByRole('spinbutton')`, `queryAllByRole('slider')` y `queryAllByRole('textbox')` tienen largo 0;
@@ -236,14 +236,14 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T013 [P] [US2] Crear `src/components/stepper.tsx`:
+- [x] T013 [P] [US2] Crear `src/components/stepper.tsx`:
   - props: `{ label, min, max, value, onChange, decreaseLabel, increaseLabel }`;
   - renderiza un `<label>` visible con `label`, un `Button` − (con `aria-label={decreaseLabel}`), un `<input type="number" inputMode="numeric">` con `min`, `max` y `aria-label={label}`, y un `Button` + (con `aria-label={increaseLabel}`);
   - el input edita un borrador local. Al confirmar (Enter o `blur`), hace `Number.parseInt`: si no es número, el borrador vuelve a `value`; si lo es, se llama a `onChange` con el valor limitado a `[min, max]`;
   - − y + llaman a `onChange(value ∓ 1)` limitado, y se deshabilitan en los extremos;
   - el borrador se sincroniza cuando cambia `value`;
   - botones grandes (≥ 48 px).
-- [ ] T014 [US2] Implementar:
+- [x] T014 [US2] Implementar:
   - **`store.ts`**:
     - `bpm: 60`;
     - `setBpm(n)`: entero, se limita a 30–240 (FR-010), y si `status !== 'stopped'` llama a `engine.setBpm`;

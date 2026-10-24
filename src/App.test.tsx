@@ -1,29 +1,20 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
 import { expect, test } from 'vitest'
-import { createFakeEngine } from '@/test/fake-engine'
-import App from './App'
+import { renderApp, type FakeEngine } from '@/test/app'
 
-function setup() {
-  const fake = createFakeEngine()
-  const user = userEvent.setup()
-  render(<App engine={fake.engine} />)
-  return { fake, user }
-}
-
-function clicks(fake: ReturnType<typeof createFakeEngine>) {
+function clicks(fake: FakeEngine) {
   return fake.played.flatMap(({ bar, beat, sound }) =>
     sound.kind === 'click' ? [{ bar, beat, accent: sound.accent }] : []
   )
 }
 
 test('tiene el título de la app para lectores de pantalla', () => {
-  setup()
+  renderApp()
   screen.getByRole('heading', { level: 1, name: 'Countdown Notes' })
 })
 
 test('Play arranca el metrónomo en 4/4 a 60 BPM con la cuenta de entrada', async () => {
-  const { fake, user } = setup()
+  const { fake, user } = renderApp()
   await user.click(screen.getByRole('button', { name: 'Play' }))
   expect(fake.running).toBe(true)
   expect(fake.bpm).toBe(60)
@@ -40,7 +31,7 @@ test('Play arranca el metrónomo en 4/4 a 60 BPM con la cuenta de entrada', asyn
 })
 
 test('Stop detiene el motor y vuelve a ofrecer Play', async () => {
-  const { fake, user } = setup()
+  const { fake, user } = renderApp()
   await user.click(screen.getByRole('button', { name: 'Play' }))
   fake.beat(2)
   await user.click(screen.getByRole('button', { name: 'Stop' }))
@@ -49,7 +40,7 @@ test('Stop detiene el motor y vuelve a ofrecer Play', async () => {
 })
 
 test('Play después de Stop empieza de nuevo con la cuenta de entrada', async () => {
-  const { fake, user } = setup()
+  const { fake, user } = renderApp()
   await user.click(screen.getByRole('button', { name: 'Play' }))
   fake.beat(6)
   await user.click(screen.getByRole('button', { name: 'Stop' }))

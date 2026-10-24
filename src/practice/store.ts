@@ -9,8 +9,10 @@ export type PracticeState = {
   status: Status
   /** Lo que está sonando: el compás 0 es la cuenta de entrada. */
   position: { bar: number; beat: number } | null
+  bpm: number
   play: () => void
   stop: () => void
+  setBpm: (bpm: number) => void
 }
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
@@ -31,16 +33,22 @@ export function createPracticeStore(engine: Engine) {
     return {
       status: 'stopped',
       position: null,
+      bpm: 60,
       play() {
         if (get().status !== 'stopped') return
         set({ status: 'countIn', position: null })
         engine
-          .start({ bpm: 60, beatsPerBar: 4, soundsAt, onBeat })
+          .start({ bpm: get().bpm, beatsPerBar: 4, soundsAt, onBeat })
           .catch(() => get().stop())
       },
       stop() {
         engine.stop()
         set({ status: 'stopped', position: null })
+      },
+      setBpm(bpm) {
+        const next = Math.min(240, Math.max(30, Math.round(bpm)))
+        set({ bpm: next })
+        if (get().status !== 'stopped') engine.setBpm(next)
       }
     }
   })

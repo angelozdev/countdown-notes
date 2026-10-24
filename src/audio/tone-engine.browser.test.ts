@@ -7,7 +7,7 @@ import { createToneEngine } from './tone-engine'
 
 type During = (engine: Engine, context: Tone.OfflineContext) => void
 
-// la mezcla de la entrega 1; el motor real todavía no la usa (T025)
+// la mezcla de la entrega 1: los dos canales en 80, sin silenciar
 const MIX: Mix = {
   click: { volume: 80, muted: false },
   bass: { volume: 80, muted: false }
@@ -17,13 +17,14 @@ function renderPractice(
   bpm: number,
   barAt: EngineStart['barAt'],
   seconds: number,
-  during?: During
+  during?: During,
+  mix: Mix = MIX
 ) {
   return Tone.Offline(async (context) => {
     // sin anticipación, Offline cuantiza los eventos a bloques de 128 muestras
     context.lookAhead = 0.1
     const engine = createToneEngine()
-    await engine.start({ bpm, mix: MIX, barAt, onBeat: () => {} })
+    await engine.start({ bpm, mix, barAt, onBeat: () => {} })
     during?.(engine, context)
   }, seconds)
 }
@@ -256,4 +257,84 @@ test('el bajo ataca a mitad de golpe y dura lo que dice length', async () => {
     .getChannelData(0)
     .slice(Math.round(silentFrom * buffer.sampleRate))
   expect(after.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
+})
+
+test('un canal silenciado no suena', async () => {
+  // la cuenta (compás 0) suena; desde el compás 1 solo hay un bajo, silenciado
+  const buffer = await renderPractice(
+    60,
+    (bar): Bar =>
+      bar === 0
+        ? { beats: 4, beatLength: 1, countIn: true, events: clickEvents }
+        : {
+            beats: 4,
+            beatLength: 1,
+            events: [
+              { at: 0, sound: { kind: 'bass', pitch: 'Bb2', length: 4 } }
+            ]
+          },
+    8,
+    undefined,
+    { ...MIX, bass: { volume: 80, muted: true } }
+  )
+  expect(onsets(buffer, 1e-3, 0.1)).toHaveLength(4)
+  const after = buffer
+    .getChannelData(0)
+    .slice(Math.round(3.9 * buffer.sampleRate))
+  expect(after.every((sample) => Math.abs(sample) <= 1e-4)).toBe(true)
+})
+
+test('la cuenta de entrada suena con el metrónomo silenciado, y después no', async () => {
+  const buffer = await renderPractice(
+    60,
+    (bar): Bar => ({
+      beats: 4,
+      beatLength: 1,
+      countIn: bar === 0,
+      events: clickEvents
+    }),
+    8,
+    undefined,
+    { ...MIX, click: { volume: 80, muted: true } }
+  )
+  const found = onsets(buffer, 1e-3, 0.1)
+  expect(found).toHaveLength(4)
+  expect(found.every(({ time }) => time < 4)).toBe(true)
+})
+
+test('el volumen cambia de inmediato', async () => {
+  // todos con el mismo acento, para que solo cambie el volumen
+  const even: EngineStart['barAt'] = () => ({
+    beats: 4,
+    beatLength: 1,
+    events: clickEvents.map((event) => ({
+      ...event,
+      sound: { kind: 'click', accent: 'soft' } as const
+    }))
+  })
+  const buffer = await renderPractice(60, even, 6, (engine, context) => {
+    context.setTimeout(
+      () => engine.setMix({ ...MIX, click: { volume: 40, muted: false } }),
+      2.5
+    )
+  })
+  const peaks = onsets(buffer, 1e-3, 0.1).map((onset) => onset.peak)
+  expect(peaks).toHaveLength(6)
+  for (const k of [0, 1, 2]) expect(peaks[k + 3]).toBeLessThan(peaks[k] / 2)
+})
+
+test('un setMix que llega antes de que exista la cadena no se pierde', async () => {
+  const buffer = await Tone.Offline(async (context) => {
+    context.lookAhead = 0.1
+    const engine = createToneEngine()
+    const started = engine.start({
+      bpm: 60,
+      mix: MIX,
+      barAt: clicks,
+      onBeat: () => {}
+    })
+    engine.setMix({ ...MIX, click: { volume: 80, muted: true } })
+    await started
+  }, 3)
+  expect(onsets(buffer, 1e-3, 0.1)).toHaveLength(0)
 })

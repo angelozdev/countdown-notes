@@ -304,7 +304,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `pnpm test --project ui` **en verde**. **Commit**: `feat: volumen y silencio por canal en ajustes (#22)`.
 
-- [ ] T024 [US3] En `tone-engine.browser.test.ts`, `renderPractice` recibe `mix` (por defecto, los dos canales en 80 sin silenciar) y lo pasa a `start`. Agregar:
+- [x] T024 [US3] En `tone-engine.browser.test.ts`, `renderPractice` recibe `mix` (por defecto, los dos canales en 80 sin silenciar) y lo pasa a `start`. Agregar:
   - `'un canal silenciado no suena'`:
     - a 60 BPM, con el bajo silenciado;
     - compás 0, la cuenta (4 clicks, `countIn: true`); desde el compás 1, solo un `bass` en `at: 0`;
@@ -317,7 +317,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project audio` y **verlo fallar**.
 
-- [ ] T025 [US3] En `tone-engine.ts` (research.md §6):
+- [x] T025 [US3] En `tone-engine.ts` (research.md §6):
   - una salida común `out = new Tone.Gain(1).toDestination()`. `stop` silencia `out` en `now − lookAhead`, en lugar de los buses;
   - por canal: sintetizador → `mute` (`Tone.Gain`, 1 o 0) → `volume` (`Tone.Gain`) → `out`;
     - `volume` vale `v === 0 ? 0 : Tone.dbToGain(base + 40 * Math.log10(v / 80))`, con `base` −8 dB para el click y 0 dB para el bajo;

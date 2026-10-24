@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { expect, test } from 'vitest'
 import { renderApp, type FakeEngine } from '@/test/app'
 
@@ -51,4 +51,17 @@ test('Play después de Stop empieza de nuevo con la cuenta de entrada', async ()
     beat: 0,
     sound: { kind: 'click', accent: 'strong' }
   })
+})
+
+test('Stop mientras el audio se desbloquea no tumba la app cuando el motor pide el compás 0', async () => {
+  const { fake, user } = renderApp()
+  await user.click(screen.getByRole('button', { name: 'Play' }))
+  // el motor real aún espera a Tone.start() y ya tiene en la mano el barAt y el onEnd del store
+  const { barAt, onEnd } = fake.lastStart!
+  await user.click(screen.getByRole('button', { name: 'Stop' }))
+
+  // al terminar el desbloqueo pide el compás 0: ya no hay práctica, así que es el fin
+  expect(barAt(0)).toBeUndefined()
+  act(() => onEnd())
+  screen.getByRole('button', { name: 'Play' })
 })

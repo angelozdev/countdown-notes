@@ -4,6 +4,8 @@ import type { Bar, Engine, EngineStart, Mix, Sound } from '@/audio/engine'
 /** Motor para los tests de UI: avanza golpe por golpe y registra lo que se le pide tocar. */
 export function createFakeEngine() {
   let options: EngineStart | undefined
+  // lo que recibió el último start, aunque ya haya habido stop: el motor real lo conserva mientras espera a Tone.start()
+  let lastStart: EngineStart | undefined
   let bpm: number | undefined
   let mix: Mix | undefined
   let bar = 0
@@ -17,6 +19,7 @@ export function createFakeEngine() {
   const engine = {
     start: async (startOptions) => {
       options = startOptions
+      lastStart = startOptions
       bpm = startOptions.bpm
       mix = startOptions.mix
       bar = 0
@@ -46,6 +49,9 @@ export function createFakeEngine() {
     played,
     /** Los compases que devolvió barAt, en orden: bars[0] es la cuenta de entrada. */
     bars,
+    get lastStart() {
+      return lastStart
+    },
     get bpm() {
       return bpm
     },

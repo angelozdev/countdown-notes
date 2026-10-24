@@ -1,18 +1,21 @@
 import { act } from '@testing-library/react'
-import type { Engine, EngineStart, Sound } from '@/audio/engine'
+import type { Bar, Engine, EngineStart, Sound } from '@/audio/engine'
 
-/** Motor para los tests de UI: avanza tiempo por tiempo y registra lo que se le pide tocar. */
+/** Motor para los tests de UI: avanza golpe por golpe y registra lo que se le pide tocar. */
 export function createFakeEngine() {
   let options: EngineStart | undefined
   let bpm: number | undefined
-  let next = 0
+  let bar = 0
+  let beat = 0
+  let plan: Bar | undefined
   const played: { bar: number; beat: number; sound: Sound }[] = []
 
   const engine = {
     start: async (startOptions) => {
       options = startOptions
       bpm = startOptions.bpm
-      next = 0
+      bar = 0
+      beat = 0
     },
     stop: () => {
       options = undefined
@@ -31,17 +34,22 @@ export function createFakeEngine() {
     get running() {
       return options !== undefined
     },
-    /** Avanza n tiempos: para cada uno pide lo que suena y avisa a la UI, como el motor real. */
+    /** Avanza n golpes: pide el compás al empezarlo, registra lo que suena y avisa a la UI, como el motor real. */
     beat(n = 1) {
       act(() => {
         for (let i = 0; i < n && options; i++) {
-          const bar = Math.floor(next / options.beatsPerBar)
-          const beat = next % options.beatsPerBar
-          next++
-          for (const sound of options.soundsAt(bar, beat)) {
-            played.push({ bar, beat, sound })
+          if (beat === 0) plan = options.barAt(bar)
+          for (const event of plan!.events) {
+            if (event.at >= beat && event.at < beat + 1) {
+              played.push({ bar, beat: event.at, sound: event.sound })
+            }
           }
           options.onBeat(bar, beat)
+          beat++
+          if (beat === plan!.beats) {
+            bar++
+            beat = 0
+          }
         }
       })
     }

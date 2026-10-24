@@ -22,10 +22,10 @@ test('Play arranca el metrónomo en 4/4 a 60 BPM con la cuenta de entrada', asyn
   fake.beat(8)
   expect(clicks(fake)).toEqual(
     [0, 1].flatMap((bar) => [
-      { bar, beat: 0, accent: true },
-      { bar, beat: 1, accent: false },
-      { bar, beat: 2, accent: false },
-      { bar, beat: 3, accent: false }
+      { bar, beat: 0, accent: 'strong' },
+      { bar, beat: 1, accent: 'none' },
+      { bar, beat: 2, accent: 'none' },
+      { bar, beat: 3, accent: 'none' }
     ])
   )
 })
@@ -49,6 +49,6 @@ test('Play después de Stop empieza de nuevo con la cuenta de entrada', async ()
   expect(fake.played.at(-1)).toEqual({
     bar: 0,
     beat: 0,
-    sound: { kind: 'click', accent: true }
+    sound: { kind: 'click', accent: 'strong' }
   })
 })

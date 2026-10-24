@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
-import type { Engine, Sound } from '@/audio/engine'
+import type { Bar, Engine } from '@/audio/engine'
 import { NOTES, type Note, type NoteId } from '@/music/notes'
 import { drawRound } from './round'
 
@@ -76,9 +76,14 @@ export function createPracticeStore(engine: Engine) {
       }
     }
 
-    function soundsAt(bar: number, beat: number): Sound[] {
-      const sounds: Sound[] = [{ kind: 'click', accent: beat === 0 }]
-      if (bar === 0 || beat !== 0) return sounds
+    const clicks = [0, 1, 2, 3].map((at): Bar['events'][number] => ({
+      at,
+      sound: { kind: 'click', accent: at === 0 ? 'strong' : 'none' }
+    }))
+
+    function barAt(bar: number): Bar {
+      const plan = { beats: 4, beatLength: 1 }
+      if (bar === 0) return { ...plan, events: clicks }
 
       const { rounds } = get()
       const round = rounds.find(
@@ -91,8 +96,12 @@ export function createPracticeStore(engine: Engine) {
       if (bar === lastNoteBar && round === rounds.at(-1)) {
         set({ rounds: [...rounds, nextRound(round)] })
       }
-      sounds.push({ kind: 'bass', pitch: `${round.notes[index]}2` })
-      return sounds
+      const bass: Bar['events'][number] = {
+        at: 0,
+        sound: { kind: 'bass', pitch: `${round.notes[index]}2` }
+      }
+      // el sort es estable: en el mismo at, el click queda antes que el bajo
+      return { ...plan, events: [...clicks, bass].sort((a, b) => a.at - b.at) }
     }
 
     function onBeat(bar: number, beat: number) {
@@ -122,9 +131,7 @@ export function createPracticeStore(engine: Engine) {
             { number: 1, notes: drawRound(notes), barsPerNote, firstBar: 1 }
           ]
         })
-        engine
-          .start({ bpm, beatsPerBar: 4, soundsAt, onBeat })
-          .catch(() => get().stop())
+        engine.start({ bpm, barAt, onBeat }).catch(() => get().stop())
       },
       stop() {
         engine.stop()

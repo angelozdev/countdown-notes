@@ -7,7 +7,7 @@ type During = (engine: Engine, context: Tone.OfflineContext) => void
 
 function renderPractice(
   bpm: number,
-  soundsAt: EngineStart['soundsAt'],
+  barAt: EngineStart['barAt'],
   seconds: number,
   during?: During
 ) {
@@ -15,7 +15,7 @@ function renderPractice(
     // sin anticipación, Offline cuantiza los eventos a bloques de 128 muestras
     context.lookAhead = 0.1
     const engine = createToneEngine()
-    await engine.start({ bpm, beatsPerBar: 4, soundsAt, onBeat: () => {} })
+    await engine.start({ bpm, barAt, onBeat: () => {} })
     during?.(engine, context)
   }, seconds)
 }
@@ -42,9 +42,16 @@ function onsets(
   return found
 }
 
-const clicks: EngineStart['soundsAt'] = (_bar, beat) => [
-  { kind: 'click', accent: beat === 0 }
-]
+const clickEvents = [0, 1, 2, 3].map((at) => ({
+  at,
+  sound: { kind: 'click', accent: at === 0 ? 'strong' : 'none' } as const
+}))
+
+const clicks: EngineStart['barAt'] = () => ({
+  beats: 4,
+  beatLength: 1,
+  events: clickEvents
+})
 
 test.each([30, 60, 200, 240])(
   'a %i BPM, cada golpe cae en su tiempo',
@@ -105,14 +112,16 @@ test('el bajo ataca en el tiempo 1 de su compás', async () => {
   // un compás sí y otro no, para que haya silencio antes de cada ataque
   const buffer = await renderPractice(
     60,
-    (bar, beat) => [
-      ...(bar === 0 && beat === 0
-        ? [{ kind: 'click', accent: true } as const]
-        : []),
-      ...(beat === 0 && bar % 2 === 1
-        ? [{ kind: 'bass', pitch: 'Bb2' } as const]
-        : [])
-    ],
+    (bar) => ({
+      beats: 4,
+      beatLength: 1,
+      events:
+        bar === 0
+          ? [{ at: 0, sound: { kind: 'click', accent: 'strong' } }]
+          : bar % 2 === 1
+            ? [{ at: 0, sound: { kind: 'bass', pitch: 'Bb2' } }]
+            : []
+    }),
     14
   )
   const times = onsets(buffer, 1e-5, 1).map((onset) => onset.time)

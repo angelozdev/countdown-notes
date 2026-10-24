@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import type { Engine } from './engine'
+import type { Engine, Sound } from './engine'
 
 // audioSession existe en Safari 17+, pero no está en los tipos del DOM
 type AudioSessionNavigator = Navigator & { audioSession?: { type: string } }
@@ -11,7 +11,7 @@ export function createToneEngine(): Engine {
   let buses: Tone.Volume[] = []
 
   return {
-    async start({ bpm, beatsPerBar, soundsAt, onBeat }) {
+    async start({ bpm, barAt, onBeat }) {
       // iOS trata Web Audio como "ambient" y lo calla con el interruptor de silencio
       const { audioSession } = navigator as AudioSessionNavigator
       if (audioSession) audioSession.type = 'playback'
@@ -47,32 +47,48 @@ export function createToneEngine(): Engine {
       // bpm.value aplicaría el tempo recién en now + lookAhead y el primer tiempo saldría corto
       const startAt = context.now()
       transport.bpm.setValueAtTime(bpm, startAt)
-      transport.timeSignature = beatsPerBar
-      let k = 0
-      transport.scheduleRepeat(
-        (time) => {
-          const bar = Math.floor(k / beatsPerBar)
-          const beat = k % beatsPerBar
-          k++
-          for (const sound of soundsAt(bar, beat)) {
-            if (sound.kind === 'click') {
-              click.triggerAttackRelease(
-                sound.accent ? 1760 : 1175,
-                0.05,
-                time,
-                sound.accent ? 1 : 0.55
-              )
-            } else {
-              // 90 % del compás, para que cada ataque se distinga
-              const duration = transport.toSeconds('1m') * 0.9
-              bass.triggerAttackRelease(sound.pitch, duration, time)
-            }
+      const play = (sound: Sound, time: number, barTicks: number) => {
+        if (sound.kind === 'click') {
+          const strong = sound.accent === 'strong'
+          click.triggerAttackRelease(
+            strong ? 1760 : 1175,
+            0.05,
+            time,
+            strong ? 1 : 0.55
+          )
+        } else {
+          // 90 % del compás, para que cada ataque se distinga
+          const ticks = Math.round(barTicks * 0.9)
+          bass.triggerAttackRelease(
+            sound.pitch,
+            transport.toSeconds(`${ticks}i`),
+            time
+          )
+        }
+      }
+      function scheduleBar(bar: number, tick: number) {
+        transport.scheduleOnce((time) => {
+          const plan = barAt(bar)
+          const perBeat = Math.round(transport.PPQ * plan.beatLength)
+          const barTicks = plan.beats * perBeat
+          // los eventos de at = 0 suenan ya, en time; el resto se programa en su tick
+          const at = (beats: number, fn: (time: number) => void) =>
+            beats === 0
+              ? fn(time)
+              : transport.scheduleOnce(
+                  fn,
+                  `${tick + Math.round(beats * perBeat)}i`
+                )
+          for (const event of plan.events) {
+            at(event.at, (t) => play(event.sound, t, barTicks))
           }
-          draw.schedule(() => onBeat(bar, beat), time)
-        },
-        '4n',
-        0
-      )
+          for (let b = 0; b < plan.beats; b++) {
+            at(b, (t) => draw.schedule(() => onBeat(bar, b), t))
+          }
+          scheduleBar(bar + 1, tick + barTicks)
+        }, `${tick}i`)
+      }
+      scheduleBar(0, 0)
       transport.start(startAt)
     },
     stop() {

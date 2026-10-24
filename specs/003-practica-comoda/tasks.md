@@ -39,7 +39,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Purpose**: comprobar que la rama parte en verde. Las dependencias nuevas entran en la historia que las usa (plan, Constitution Check II).
 
-- [ ] T001 En la rama `003-practica-comoda`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
+- [x] T001 En la rama `003-practica-comoda`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
 
 ---
 
@@ -49,7 +49,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: todos los tests de la entrega 1 en verde (los traducidos y los que no cambian); con `pnpm dev`, la app suena igual que antes.
 
-- [ ] T002 Reescribir los tipos de `src/audio/engine.ts` (solo tipos, sin código), con un comentario por campo como en [contracts](./contracts/interfaces.md) §2:
+- [x] T002 Reescribir los tipos de `src/audio/engine.ts` (solo tipos, sin código), con un comentario por campo como en [contracts](./contracts/interfaces.md) §2:
 
   ```ts
   export type Accent = 'strong' | 'none'
@@ -73,14 +73,14 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `Engine` (`start`, `stop`, `setBpm`) no cambia. Lo demás del contrato llega en su historia: `'soft'` en T009, `length` en T018, `Mix`/`setMix`/`countIn` en T023 y `undefined`/`onEnd` en T029.
 
-- [ ] T003 Traducir `src/audio/tone-engine.browser.test.ts` al contrato nuevo (research.md §3), sin cambiar lo que comprueba:
+- [x] T003 Traducir `src/audio/tone-engine.browser.test.ts` al contrato nuevo (research.md §3), sin cambiar lo que comprueba:
   - `renderPractice(bpm, barAt, seconds, during?)` arranca con `engine.start({ bpm, barAt, onBeat: () => {} })`.
   - `clicks` pasa a ser un `barAt` de 4/4: `() => ({ beats: 4, beatLength: 1, events: [0, 1, 2, 3].map((at) => ({ at, sound: { kind: 'click', accent: at === 0 ? 'strong' : 'none' } })) })`.
   - El test del bajo arma, con un `barAt`, lo mismo que hoy: compás 0, un click `'strong'` en `at: 0`; compases impares, un `bass` `'Bb2'` en `at: 0`; compases pares desde el 2, sin eventos.
 
   Correr `pnpm test --project audio` y **verlo fallar**, porque el motor todavía llama a `soundsAt`.
 
-- [ ] T004 Reescribir la programación de `src/audio/tone-engine.ts` (research.md §2). La creación de sintetizadores y buses, `stop` y `setBpm` no cambian.
+- [x] T004 Reescribir la programación de `src/audio/tone-engine.ts` (research.md §2). La creación de sintetizadores y buses, `stop` y `setBpm` no cambian.
   - Borrar `scheduleRepeat` y `transport.timeSignature`. Mantener `transport.bpm.setValueAtTime(bpm, startAt)` y `transport.start(startAt)`.
   - `scheduleBar(bar, tick)` hace `transport.scheduleOnce((time) => { … }, `${tick}i`)`. Adentro:
     - `const plan = barAt(bar)` y `const perBeat = Math.round(transport.PPQ * plan.beatLength)`;
@@ -93,7 +93,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project audio`: debe quedar **en verde en Chromium y WebKit**.
 
-- [ ] T005 Traducir los acentos de `src/App.test.tsx`: `accent: true` → `'strong'` y `accent: false` → `'none'`, en `'Play arranca el metrónomo…'` y en `'Play después de Stop…'` (research.md §3). Reescribir `src/test/fake-engine.ts` para el contrato nuevo ([contracts](./contracts/interfaces.md) §2, motor falso):
+- [x] T005 Traducir los acentos de `src/App.test.tsx`: `accent: true` → `'strong'` y `accent: false` → `'none'`, en `'Play arranca el metrónomo…'` y en `'Play después de Stop…'` (research.md §3). Reescribir `src/test/fake-engine.ts` para el contrato nuevo ([contracts](./contracts/interfaces.md) §2, motor falso):
   - el estado es `options`, `bpm`, el compás y golpe siguientes (`bar`, `beat`) y el `plan` del compás actual. `start` los reinicia en 0;
   - `beat(n = 1)`, dentro de `act` y mientras haya `options`, para cada golpe:
     - si `beat === 0`, `plan = options.barAt(bar)`;
@@ -103,13 +103,13 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project ui` y **verlo fallar**, porque el store todavía entrega `soundsAt`.
 
-- [ ] T006 En `src/practice/store.ts`, reemplazar `soundsAt` por `barAt(bar): Bar`:
+- [x] T006 En `src/practice/store.ts`, reemplazar `soundsAt` por `barAt(bar): Bar`:
   - los clicks de un compás de 4/4: `[0, 1, 2, 3]`, con `accent: at === 0 ? 'strong' : 'none'`;
   - compás 0: `{ beats: 4, beatLength: 1, events: clicks }`;
   - compás ≥ 1: la misma búsqueda de la vuelta y el mismo sorteo de la siguiente que hoy. Los eventos son los clicks más `{ at: 0, sound: { kind: 'bass', pitch: `${nota}2` } }`, ordenados por `at`, con el click antes que el bajo en el mismo `at` (el orden de la entrega 1);
   - `play` arranca con `engine.start({ bpm, barAt, onBeat })`.
 
-  **Verde completo** (`pnpm test` en los dos proyectos, `pnpm test:e2e`, lint, formato y build). Escuchar con `pnpm dev`: suena igual que la entrega 1. **Commit**: `refactor: motor con plan por compás (#20)`.
+  **Verde completo** (`pnpm test` en los dos proyectos, `pnpm test:e2e`, lint, formato y build). Escuchar con `pnpm dev`: suena igual que la entrega 1. **Commit**: `refactor: motor con plan por compás (#20)`. Done: la escucha con `pnpm dev` queda para el usuario; se comprobó con los tests de audio en Chromium y WebKit.
 
 **Checkpoint**: el contrato nuevo está en uso y la conducta de la entrega 1 está intacta.
 

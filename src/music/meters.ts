@@ -49,3 +49,18 @@ export function accentAt(meter: Meter, beat: number): Accent {
   if (beat === 0) return 'strong'
   return meter.soft && groupStarts(meter).includes(beat) ? 'soft' : 'none'
 }
+
+export type BassFigure = 'eighth' | 'quarter' | 'half' | 'whole'
+
+/** Los ataques del bajo en el compás, en golpes; cada uno dura hasta el siguiente. */
+export function bassAttacks(meter: Meter, figure: BassFigure) {
+  const starts = groupStarts(meter)
+  const eighth = meter.groups.every((size) => size === 1) ? 0.5 : 1
+  const ats = {
+    eighth: Array.from({ length: meter.beats / eighth }, (_, i) => i * eighth),
+    quarter: starts,
+    half: starts.filter((_, i) => i % 2 === 0),
+    whole: [0]
+  }[figure]
+  return ats.map((at, i) => ({ at, length: (ats[i + 1] ?? meter.beats) - at }))
+}

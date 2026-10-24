@@ -204,7 +204,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, filas 5–7.
 
-- [ ] T014 [US2] Escribir `src/music/meters.test.ts`, que importa `METER_BY_ID` y `bassAttacks` de `./meters`. Un `test.each` con los 32 casos: para cada compás y figura, los `at` de `bassAttacks(METER_BY_ID[id], figure)` son:
+- [x] T014 [US2] Escribir `src/music/meters.test.ts`, que importa `METER_BY_ID` y `bassAttacks` de `./meters`. Un `test.each` con los 32 casos: para cada compás y figura, los `at` de `bassAttacks(METER_BY_ID[id], figure)` son:
 
   | Compás | `eighth`            | `quarter`     | `half`  | `whole` |
   | ------ | ------------------- | ------------- | ------- | ------- |
@@ -221,7 +221,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T015 [US2] En `src/music/meters.ts`, agregar `export type BassFigure = 'eighth' | 'quarter' | 'half' | 'whole'` y `bassAttacks(meter, figure): { at: number; length: number }[]` (research.md §5):
+- [x] T015 [US2] En `src/music/meters.ts`, agregar `export type BassFigure = 'eighth' | 'quarter' | 'half' | 'whole'` y `bassAttacks(meter, figure): { at: number; length: number }[]` (research.md §5):
   - la corchea dura `0.5` golpe si todos los `groups` valen 1 (compases simples); si no, `1`;
   - `eighth`: de 0 a `beats` en pasos de una corchea; `quarter`: `groupStarts`; `half`: los `groupStarts` de índice par; `whole`: `[0]`;
   - `length` = `(siguiente at ?? beats) − at`.

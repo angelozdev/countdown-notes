@@ -14,6 +14,8 @@ import { usePractice } from '@/practice/store'
 export function SettingsPanel() {
   const bpm = usePractice((state) => state.bpm)
   const setBpm = usePractice((state) => state.setBpm)
+  const barsPerNote = usePractice((state) => state.barsPerNote)
+  const setBarsPerNote = usePractice((state) => state.setBarsPerNote)
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -32,7 +34,9 @@ export function SettingsPanel() {
       >
         <SheetHeader>
           <SheetTitle className="text-xl">Ajustes</SheetTitle>
-          <SheetDescription>El tempo cambia al instante.</SheetDescription>
+          <SheetDescription>
+            El tempo cambia al instante; lo demás, desde la siguiente vuelta.
+          </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-6 px-4 pb-6">
           <Stepper
@@ -44,6 +48,20 @@ export function SettingsPanel() {
             decreaseLabel="Bajar BPM"
             increaseLabel="Subir BPM"
           />
+          <div className="flex flex-col gap-1">
+            <Stepper
+              label="Compases por nota"
+              min={1}
+              max={16}
+              value={barsPerNote}
+              onChange={setBarsPerNote}
+              decreaseLabel="Bajar compases por nota"
+              increaseLabel="Subir compases por nota"
+            />
+            <p className="text-sm text-muted-foreground">
+              Se aplica desde la siguiente vuelta.
+            </p>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

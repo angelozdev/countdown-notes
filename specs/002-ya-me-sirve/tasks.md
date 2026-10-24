@@ -292,7 +292,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Bajo y "Ahora" (test primero)
 
-- [ ] T018 [US3] Escribir `src/random-mode.test.tsx`. El archivo define su propia tabla de lo que exige FR-025, `{ C: ['C', 'Do'], Db: ['D♭', 'Re bemol'], …, B: ['B', 'Si'] }`, sin importar `NOTES`. También define un helper `bassByBar(fake)`, que devuelve un `Map` del compás al `pitch` de los sonidos `bass`. Tests:
+- [x] T018 [US3] Escribir `src/random-mode.test.tsx`. El archivo define su propia tabla de lo que exige FR-025, `{ C: ['C', 'Do'], Db: ['D♭', 'Re bemol'], …, B: ['B', 'Si'] }`, sin importar `NOTES`. También define un helper `bassByBar(fake)`, que devuelve un `Map` del compás al `pitch` de los sonidos `bass`. Tests:
   - `'el bajo no suena en la cuenta y toca la raíz en el tiempo 1 de cada compás'`:
     - Play y `fake.beat(4 + 4 * 4)`;
     - ningún `bass` en el compás 0 ni en los tiempos 1–3;
@@ -315,7 +315,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T019 [US3] Implementar (data-model.md, "Ajustes", "Vuelta" y "Sonido"):
+- [x] T019 [US3] Implementar (data-model.md, "Ajustes", "Vuelta" y "Sonido"):
   - **`store.ts`**:
     - `barsPerNote: 2`, `setBarsPerNote(n)` (entero, se limita a 1–16, FR-017), `notes: NoteId[]` con las 12 y `rounds: Round[]`, con `Round = { number, notes, barsPerNote, firstBar }`;
     - **`play()`**: además, pone `rounds: [{ number: 1, notes: drawRound(notes), barsPerNote, firstBar: 1 }]`;

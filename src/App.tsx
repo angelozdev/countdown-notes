@@ -1,6 +1,7 @@
 import { Play, Square } from 'lucide-react'
 import { useState } from 'react'
 import type { Engine } from '@/audio/engine'
+import { Now } from '@/components/now'
 import { SettingsPanel } from '@/components/settings-panel'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,7 +17,7 @@ export default function App({ engine }: { engine: Engine }) {
       <main className="flex min-h-dvh flex-col p-safe">
         <h1 className="sr-only">Countdown Notes</h1>
         <StatusLine />
-        <div className="flex-1" />
+        <Now />
         <footer className="flex items-center justify-center gap-4 p-6">
           <PlayButton />
           <SettingsPanel />

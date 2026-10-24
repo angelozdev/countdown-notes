@@ -39,7 +39,7 @@ description: 'Lista de tareas de la Entrega 1 · "Ya me sirve"'
 
 **Purpose**: comprobar que la rama parte en verde. Las dependencias nuevas entran en la historia que las usa (plan, Constitution Check II).
 
-- [ ] T001 En la rama `002-ya-me-sirve`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
+- [x] T001 En la rama `002-ya-me-sirve`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
 
 ## Phase 2: Foundational
 
@@ -486,8 +486,8 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T029 Correr quickstart §1 completo: `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`, los 5 en verde. Comprobar con `grep -rn "setTimeout\|setInterval" src --include=*.ts --include=*.tsx` que solo aparecen en los tests de precisión, como `context.setTimeout` del reloj de audio.
-- [ ] T030 Informar al usuario, por cada issue (#15–#19), qué criterios de aceptación quedaron en verde y cuáles necesitan su verificación. Pendientes de él:
+- [x] T029 Correr quickstart §1 completo: `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`, los 5 en verde. Comprobar con `grep -rn "setTimeout\|setInterval" src --include=*.ts --include=*.tsx` que solo aparecen en los tests de precisión, como `context.setTimeout` del reloj de audio.
+- [x] T030 Informar al usuario, por cada issue (#15–#19), qué criterios de aceptación quedaron en verde y cuáles necesitan su verificación. Pendientes de él:
   - el iPhone con el interruptor de silencio activado (quickstart §3);
   - la prueba de oído de 10 minutos a 60 y a 200 BPM (§4);
   - tocar con la guitarra (§5).

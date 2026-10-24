@@ -340,3 +340,27 @@ test('un setMix que llega antes de que exista la cadena no se pierde', async () 
   }, 3)
   expect(onsets(buffer, 1e-3, 0.1)).toHaveLength(0)
 })
+
+test('después del último compás no suena nada', async () => {
+  // dos compases con clicks y un bajo de 4 golpes; desde el 2, el fin
+  const buffer = await renderPractice(
+    60,
+    (bar): Bar | undefined =>
+      bar < 2
+        ? {
+            beats: 4,
+            beatLength: 1,
+            events: [
+              ...clickEvents,
+              { at: 0, sound: { kind: 'bass', pitch: 'Bb2', length: 4 } }
+            ]
+          }
+        : undefined,
+    10
+  )
+  expect(onsets(buffer, 1e-3, 0.1)).toHaveLength(2)
+  const after = buffer
+    .getChannelData(0)
+    .slice(Math.round(8.5 * buffer.sampleRate))
+  expect(after.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
+})

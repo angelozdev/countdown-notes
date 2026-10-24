@@ -1,6 +1,7 @@
 import * as Tone from 'tone'
 import { expect, test } from 'vitest'
-import type { Engine, EngineStart } from './engine'
+import { accentAt, METERS, type Meter } from '@/music/meters'
+import type { Bar, Engine, EngineStart } from './engine'
 import { createToneEngine } from './tone-engine'
 
 type During = (engine: Engine, context: Tone.OfflineContext) => void
@@ -53,6 +54,16 @@ const clicks: EngineStart['barAt'] = () => ({
   events: clickEvents
 })
 
+// un click por golpe, con el acento que le toca en el compás
+const barOf = (meter: Meter) => (): Bar => ({
+  beats: meter.beats,
+  beatLength: meter.beatLength,
+  events: Array.from({ length: meter.beats }, (_, at) => ({
+    at,
+    sound: { kind: 'click', accent: accentAt(meter, at) }
+  }))
+})
+
 test.each([30, 60, 200, 240])(
   'a %i BPM, cada golpe cae en su tiempo',
   async (bpm) => {
@@ -69,6 +80,54 @@ test.each([30, 60, 200, 240])(
     }
   }
 )
+
+test.each(METERS)('en $id, cada golpe cae en su tiempo', async (meter) => {
+  // a 60 BPM, un golpe dura beatLength segundos
+  const { beats, beatLength } = meter
+  const found = onsets(
+    await renderPractice(60, barOf(meter), (2 * beats - 0.5) * beatLength),
+    1e-3,
+    0.1
+  )
+  expect(found).toHaveLength(2 * beats)
+  for (const [k, { time }] of found.entries()) {
+    expect(Math.abs(time - (found[0].time + k * beatLength))).toBeLessThan(
+      0.001
+    )
+  }
+})
+
+test('en 12/8 a 240 BPM, los golpes caen cada 83 ms', async () => {
+  const meter = METERS.find(({ id }) => id === '12/8')!
+  const beat = (meter.beatLength * 60) / 240
+  const found = onsets(
+    await renderPractice(240, barOf(meter), (3 * meter.beats - 0.5) * beat),
+    1e-3,
+    0.02
+  )
+  expect(found).toHaveLength(3 * meter.beats)
+  for (const [k, { time }] of found.entries()) {
+    expect(Math.abs(time - (found[0].time + k * beat))).toBeLessThan(0.001)
+  }
+})
+
+test('el acento fuerte suena más que el suave, y el suave más que el sin acento', async () => {
+  const meter = METERS.find(({ id }) => id === '6/8')!
+  const peaks = onsets(
+    await renderPractice(
+      60,
+      barOf(meter),
+      (meter.beats - 0.5) * meter.beatLength
+    ),
+    1e-3,
+    0.1
+  ).map((onset) => onset.peak)
+  expect(peaks).toHaveLength(6)
+  expect(peaks[0]).toBeGreaterThan(1.1 * peaks[3])
+  expect(peaks[3]).toBeGreaterThan(
+    1.1 * Math.max(peaks[1], peaks[2], peaks[4], peaks[5])
+  )
+})
 
 test('el tiempo 1 suena más fuerte que los demás', async () => {
   const peaks = onsets(await renderPractice(120, clicks, 3.75), 1e-3, 0.1).map(

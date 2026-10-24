@@ -1,8 +1,15 @@
 import * as Tone from 'tone'
-import type { Engine, Sound } from './engine'
+import type { Accent, Engine, Sound } from './engine'
 
 // audioSession existe en Safari 17+, pero no está en los tipos del DOM
 type AudioSessionNavigator = Navigator & { audioSession?: { type: string } }
+
+// [Hz, velocidad] de cada acento (research.md §4)
+const CLICKS: Record<Accent, [number, number]> = {
+  strong: [1760, 1],
+  soft: [1480, 0.8],
+  none: [1175, 0.55]
+}
 
 export function createToneEngine(): Engine {
   // el contexto en que arrancó: con Tone.Offline, el global ya es otro cuando se llama a stop
@@ -49,13 +56,8 @@ export function createToneEngine(): Engine {
       transport.bpm.setValueAtTime(bpm, startAt)
       const play = (sound: Sound, time: number, barTicks: number) => {
         if (sound.kind === 'click') {
-          const strong = sound.accent === 'strong'
-          click.triggerAttackRelease(
-            strong ? 1760 : 1175,
-            0.05,
-            time,
-            strong ? 1 : 0.55
-          )
+          const [frequency, velocity] = CLICKS[sound.accent]
+          click.triggerAttackRelease(frequency, 0.05, time, velocity)
         } else {
           // 90 % del compás, para que cada ataque se distinga
           const ticks = Math.round(barTicks * 0.9)

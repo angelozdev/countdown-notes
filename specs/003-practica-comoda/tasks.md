@@ -180,7 +180,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `pnpm test --project ui` debe quedar **en verde**, incluidos los tests de la entrega 1. **Commit**: `feat: compases comunes en ajustes, carril y cuenta (#20)`. Done: el `<span role="img">` de `BeatSlashes` lleva un `oxlint-disable-next-line jsx-a11y/prefer-tag-over-role` (un `<img>` no puede contener las marcas).
 
-- [ ] T011 [US1] En `src/audio/tone-engine.browser.test.ts`, agregar:
+- [x] T011 [US1] En `src/audio/tone-engine.browser.test.ts`, agregar:
   - `test.each(METERS)('en $id, cada golpe cae en su tiempo')`:
     - a 60 BPM, 2 compases;
     - `barAt` devuelve el compás con un click por golpe y `accent: accentAt(meter, at)`;
@@ -191,7 +191,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project audio` y **verlo fallar** en el acento suave.
 
-- [ ] T012 [US1] En `tone-engine.ts`, el click usa una tabla por acento (research.md §4): `strong` → 1760 Hz y velocidad 1; `soft` → 1480 Hz y 0,8; `none` → 1175 Hz y 0,55. `pnpm test` **en verde en los dos proyectos**. **Commit**: `feat: acento suave del metrónomo (#20)`.
+- [x] T012 [US1] En `tone-engine.ts`, el click usa una tabla por acento (research.md §4): `strong` → 1760 Hz y velocidad 1; `soft` → 1480 Hz y 0,8; `none` → 1175 Hz y 0,55. `pnpm test` **en verde en los dos proyectos**. **Commit**: `feat: acento suave del metrónomo (#20)`.
 - [ ] T013 [US1] Verificación manual: quickstart §2, filas 1–4, con `pnpm dev`. Anotar en research.md §4 si el acento suave necesita otros valores.
 
 **Checkpoint**: US1 completa. Se puede practicar en cualquier compás.

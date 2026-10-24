@@ -26,7 +26,7 @@ canales → output (Gain 1, el que silencia stop) → Gain(1/4) → WaveShaper �
 
 - La curva trabaja en la escala original `v = 4x`: es lineal hasta 0,8 (`y = v`) y arriba es `y = 0,8 + 0,2 · tanh((v − 0,8) / 0,2)`, con el signo de la entrada. Así nunca pasa de 1,0.
 - Se usa la escala 1/4 porque la entrada de un `WaveShaper` se recorta a [−1, 1]. Con 1/2 (el experimento de la entrega 2) cabe una suma de hasta 2,0, pero bajo + click al 100 ya dan 2,06, y con el acorde la suma pasa de 2. Con 1/4 cabe hasta 4,0.
-- La curva tiene 8192 puntos y `oversample = 'none'`. Con `'4x'`, los filtros de remuestreo pasan de 1,0 (entrega 2, `final-fix-report.md`).
+- La curva tiene 8193 puntos, un número impar para que la entrada 0 caiga justo en el punto central, que vale 0: sin eso, el silencio después de `stop` no sería exacto. Va con `oversample = 'none'`; con `'4x'`, los filtros de remuestreo pasan de 1,0 (entrega 2, `final-fix-report.md`).
 
 **Razón**: con la mezcla por defecto la salida ya pasa de 1,0 sin el acorde. Lo midió la revisión final de la entrega 2 (`.az-orchestrate/003-practica-comoda/review-final.md`, I1): el bajo solo en 80 da 1,03–1,10 y bajo + click en 80 dan 1,22–1,32.
 
@@ -50,7 +50,10 @@ canales → output (Gain 1, el que silencia stop) → Gain(1/4) → WaveShaper �
 
 **Razón**: el estilo es del compás (FR-016), no de cada evento. Opcional, deja intactos los `Bar` que arman los tests de la entrega 2.
 
-**Tests existentes**: la constante `MIX` de `tone-engine.browser.test.ts` suma `chord: { volume: 80, muted: false }`, porque `Mix` es un `Record` de los tres canales y `tsc -b` compila el test. No cambia ninguna aserción.
+**Tests existentes** (traducción, como en la entrega 2; el usuario la revisa en tasks.md):
+
+- La constante `MIX` de `tone-engine.browser.test.ts` suma `chord: { volume: 80, muted: false }`, porque `Mix` es un `Record` de los tres canales y `tsc -b` compila el test. No cambia ninguna aserción.
+- `'Play arranca con la mezcla del panel'` de `src/mix.test.tsx` compara la mezcla entera con `toEqual`, así que el valor esperado suma el mismo canal. La aserción queda más estricta, no más débil.
 
 ## 4. Estilos en el motor
 

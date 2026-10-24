@@ -270,7 +270,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Sorteo (test primero)
 
-- [ ] T015 [P] [US3] Escribir `src/practice/round.test.ts`, que importa `drawRound` de `./round`. Tests:
+- [x] T015 [P] [US3] Escribir `src/practice/round.test.ts`, que importa `drawRound` de `./round`. Tests:
   - `'cada vuelta tiene cada nota del pool exactamente una vez, con cualquier pool de 2 a 12 notas'`:
     - para cada tamaño de 2 a 12, toma las primeras n notas de `['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']`;
     - encadena 100 vueltas, cada una con `avoidFirst` = la última nota de la anterior;
@@ -280,11 +280,11 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T016 [P] [US3] Crear `src/music/notes.ts`:
+- [x] T016 [P] [US3] Crear `src/music/notes.ts`:
   - exporta `type NoteId = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | 'Ab' | 'A' | 'Bb' | 'B'`;
   - exporta `NOTES: { id: NoteId; label: string; name: string; natural: boolean }[]`, con la tabla exacta de data-model.md "Nota", en orden cromático. El `id` de F♯ es `'Gb'` y su `label` es `'F♯'`. Las grafías de las negras son D♭, E♭, F♯, A♭ y B♭, con los caracteres ♭ y ♯.
 
-- [ ] T017 [US3] Crear `src/practice/round.ts` con `export function drawRound(pool: NoteId[], avoidFirst?: NoteId): NoteId[]` (research.md §7):
+- [x] T017 [US3] Crear `src/practice/round.ts` con `export function drawRound(pool: NoteId[], avoidFirst?: NoteId): NoteId[]` (research.md §7):
   - copia el pool y lo mezcla con Fisher–Yates usando `Math.random`;
   - si `avoidFirst` está definido y la primera nota es igual, la intercambia con la de una posición al azar entre 1 y `length − 1`.
 

@@ -729,3 +729,33 @@ test('con el Pad, la mezcla tampoco pasa de 1', async () => {
     expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)
   }
 })
+
+// la cuenta, un compás cálido con lo que se pida (o vacío) y uno en Pad con el acorde
+const warmThenPad =
+  (first?: Sound): EngineStart['barAt'] =>
+  (bar): Bar | undefined => {
+    if (bar === 0) {
+      return { beats: 4, beatLength: 1, countIn: true, events: clickEvents }
+    }
+    if (bar > 2) return undefined
+    const sound = bar === 1 ? first : CHORD
+    return {
+      beats: 4,
+      beatLength: 1,
+      style: bar === 1 ? 'warm' : 'pad',
+      events: sound ? [{ at: 0, sound }] : []
+    }
+  }
+
+test('al cambiar de estilo, el acorde anterior sigue sonando junto al nuevo', async () => {
+  // el acorde cálido dura 8 golpes: sigue sostenido cuando entra el Pad
+  const both = await renderPractice(60, warmThenPad({ ...CHORD, length: 8 }), 9)
+  const padOnly = await renderPractice(60, warmThenPad(), 9)
+  const t2 = onsets(both, 1e-4, 0.5)[0].time + 8
+  // dos ventanas de 20 ms justo después del cambio, donde el Pad apenas entra (ataque de 0,8 s).
+  // Se promedia la potencia para que el ruido de una sola ventana no decida
+  const level = (buffer: Tone.ToneAudioBuffer) =>
+    Math.sqrt((rms(buffer, t2 + 0.02) ** 2 + rms(buffer, t2 + 0.04) ** 2) / 2)
+  // con el acorde cálido sosteniéndose es 7-8 veces el Pad solo; cortado de golpe, 1
+  expect(level(both)).toBeGreaterThan(3 * level(padOnly))
+})

@@ -276,7 +276,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 **Independent Test**: quickstart §2, filas 10–13. Con Pad, el acorde entra lento; al cambiar de estilo mientras suena, la cola del anterior termina sola.
 
-- [x] T016 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar tres tests (fallan). Usan un helper `rms(buffer, from)`: el RMS del canal 0 en [from, from + 0,02 s]. Done: antes del código solo falló el primero; el 2 y el 3 ya pasaban con un solo estilo y quedan como guardas.
+- [x] T016 [US3] En `src/audio/tone-engine.browser.test.ts`, agregar tres tests (fallan). Usan un helper `rms(buffer, from)`: el RMS del canal 0 en [from, from + 0,02 s]. Done: antes del código solo falló el primero; el 2 y el 3 ya pasaban con un solo estilo y quedan como guardas. Más un 4.º test, `'al cambiar de estilo, el acorde anterior sigue sonando junto al nuevo'`, porque el 2 también pasa si se corta de golpe la cadena anterior.
   1. `'el bajo y el acorde de un compás suenan con su estilo'`. Cuenta (`clickEvents`, `countIn`) a 60 BPM y un compás 1 con `style` `'warm'` o `'pad'`. Cuatro renders: solo un `chord` `['C3', 'G3', 'E4']` de `length: 4`, o solo un `bass` `'C2'` de `length: 4`, en cada estilo. Con `t` el inicio del compás 1 (`found[0].time + 4`):
      - acorde: `rms(t + 0.05) / rms(t + 1.5)` es mayor que 0,8 en `'warm'` y menor que 0,3 en `'pad'`;
      - bajo: `rms(t + 0.01) / rms(t + 0.5)` es mayor que 0,8 en `'warm'` y menor que 0,3 en `'pad'`.

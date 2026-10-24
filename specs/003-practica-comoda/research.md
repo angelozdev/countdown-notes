@@ -102,9 +102,11 @@ Fecha: 2026-10-24. Las versiones salen del registro de npm de ese día (`pnpm vi
   - Hay dos canales, `click` y `bass`, y cada uno tiene `{ volume: 0–100, muted }`. Por defecto, `{ volume: 80, muted: false }`.
   - El motor recibe la mezcla en `start` y la cambia con `setMix(mix)` de inmediato (FR-017).
   - **Curva**: 80 es la mezcla de la entrega 1 (clicks −8 dB y bajo 0 dB en su bus). El bus suma `40 × log10(volume / 80)` dB: 100 → +3,9 dB, 50 → −8,2 dB, 20 → −24 dB. Con 0, el canal se calla.
-  - **Cadena por canal**: sintetizador → `Gain` de silencio (1 o 0) → `Volume` del canal (dB) → salida. Los cambios hacen `rampTo` de 20 ms, para que no haya chasquidos (FR-017, "sin cortes"). Un volumen de 0 se trata como silencio en el `Gain`, porque `rampTo(-Infinity)` en dB no sirve.
-  - **Cuenta de entrada** (aclaración del spec, FR-019): en un `Bar` con `countIn: true`, los clicks los toca un segundo sintetizador de click, conectado directo al `Volume` del canal `click`, sin pasar por su `Gain` de silencio. La cuenta suena aunque el metrónomo esté silenciado, al volumen del metrónomo.
-  - `stop` sigue silenciando en `now − lookAhead`, ahora con un `Gain` de salida común.
+  - **Cadena por canal**: sintetizador → `Gain` de silencio (1 o 0) → `Gain` de volumen → `Gain` de salida común.
+    - El `Gain` de volumen vale `dbToGain(base + 40 × log10(volume / 80))`, con `base` = −8 dB para los clicks y 0 dB para el bajo (los buses de la entrega 1). Con `volume = 0`, vale 0.
+    - Los dos se cambian con `rampTo` de 20 ms, para que no haya chasquidos (FR-017, "sin cortes"). Por eso son `Gain` lineales: `rampTo(-Infinity)` en dB no sirve.
+  - **Cuenta de entrada** (aclaración del spec, FR-019): en un `Bar` con `countIn: true`, los clicks los toca un segundo sintetizador de click, conectado directo al `Gain` de volumen del canal `click`, sin pasar por su `Gain` de silencio. La cuenta suena aunque el metrónomo esté silenciado, al volumen del metrónomo; con el volumen en 0, no se oye (spec, Edge Cases).
+  - `stop` sigue silenciando en `now − lookAhead`, ahora en el `Gain` de salida común.
 - **Rationale**: el volumen y el silencio cambian en el bus, no en los eventos, así que aplican al instante, también a una nota de bajo que ya está sonando. El acento y la cuenta de entrada son datos del compás, así que el motor no conoce la regla de producto: solo enruta los clicks de un compás de cuenta.
 - **Alternatives considered**:
   - Que el store no pida los clicks con el metrónomo silenciado: quitar el silencio tardaría hasta un compás en oírse (14 s en 7/8 a 30 BPM), y el bajo que ya está sonando no se callaría (descartado).
@@ -115,7 +117,7 @@ Fecha: 2026-10-24. Las versiones salen del registro de npm de ese día (`pnpm vi
 - **Decision**:
   - Ajuste `repeats: { on: boolean, count: 1–999 }`. Por defecto `{ on: false, count: 10 }`.
   - **Fin**: si ninguna vuelta contiene el compás pedido, `barAt` devuelve `undefined`. El motor no programa nada más y llama a `onEnd` con `draw.schedule`, en el momento en que ese compás empezaría. El store hace entonces lo mismo que Stop.
-  - **Sorteo de la siguiente** (FR-023): solo si `!repeats.on || vuelta.number < repeats.count`. La condición pasa de `bar === últimaNota` a `bar >= últimaNota`. Así, si el usuario sube N o apaga la opción durante la última nota, la siguiente vuelta se sortea en el compás siguiente.
+  - **Sorteo de la siguiente** (FR-023): solo si `!repeats.on || vuelta.number < repeats.count`. La condición pasa de `bar === últimaNota` a `bar >= últimaNota`, comparada con la última vuelta de `rounds` y **antes** de buscar la vuelta del compás. Así, si el usuario sube N o apaga la opción durante la última nota, la siguiente vuelta se sortea en el compás siguiente, aunque ese compás ya sea el primero de ella (con compases por nota en 1).
   - **Cambio mientras suena** (FR-024): si la vuelta en curso ya es la N o una posterior, `setRepeats` descarta la vista previa de la vuelta siguiente, y la práctica termina al completar la vuelta en curso.
   - **Contador**: `Vuelta {n} de {N} · nota {i} de {total}` con la opción activada, e igual que en la entrega 1 sin ella.
 - **Rationale**: el fin cae exacto en el reloj de audio (SC-004), y el store no necesita medir tiempo.

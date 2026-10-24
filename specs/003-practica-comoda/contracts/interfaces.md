@@ -54,7 +54,7 @@ export type Engine = {
 }
 ```
 
-Llega en la fase fundacional (refactor) con `Accent` sin `'soft'`, sin `mix`, sin `setMix` y sin `onEnd`. `'soft'` llega en US1, `mix`/`setMix` en US3 y `onEnd` en US4.
+Llega en la fase fundacional (refactor) con `Accent` sin `'soft'`, el bajo sin `length` (dura el 90 % del compás, como en la entrega 1), `barAt` sin `undefined`, y sin `mix`, `setMix`, `countIn` ni `onEnd`. `'soft'` llega en US1, `length` en US2, `mix`/`setMix`/`countIn` en US3, y `undefined`/`onEnd` en US4.
 
 Garantías que cumple todo motor, sea el real o el falso:
 
@@ -69,10 +69,11 @@ Garantías que cumple todo motor, sea el real o el falso:
 - El compás siguiente empieza en `t_c + beats × beatLength × 60 / b`.
 - El detalle está en [research](../research.md) §2 y §6.
 
-**Motor falso** (`src/test/fake-engine.ts`), solo para tests de UI: `createFakeEngine()` devuelve `{ engine, beat(n?), played, bpm, mix, running }`.
+**Motor falso** (`src/test/fake-engine.ts`), solo para tests de UI: `createFakeEngine()` devuelve `{ engine, beat(n?), played, bars, bpm, mix, running }`.
 
 - `beat(n = 1)`: avanza n golpes, dentro de `act`. Al empezar un compás pide `barAt`; si es `undefined`, llama a `onEnd`, queda detenido y no avanza más. Por cada golpe agrega a `played` los eventos con `beat ≤ at < beat + 1` y llama a `onBeat`.
 - `played`: lista de `{ bar, beat, sound }`, donde `beat` es el `at` del evento. Es la misma forma de la entrega 1, así que su `toEqual` sigue valiendo.
+- `bars`: los `Bar` que devolvió `barAt`, en orden (`bars[0]` es la cuenta de entrada). Llega en US3.
 - `bpm` y `mix`: lo último recibido en `start`, `setBpm` o `setMix`. `undefined` si nunca arrancó.
 - `running`: `true` entre `start` y `stop`, o hasta `onEnd`.
 

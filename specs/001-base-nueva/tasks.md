@@ -31,7 +31,7 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 - [X] T001 Crear la rama `001-base-nueva` desde `main` con `git switch -c 001-base-nueva`. Los cambios sin commitear pasan con ella.
 - [X] T002 Borrar de `.specify/memory/constitution.md` el bloque de comentario HTML `<!-- Sync Impact Report ... -->` del inicio (la constitución dice que se borra antes del commit). Después commitear el material de planificación: `docs/`, `specs/001-base-nueva/`, `.specify/`, `.claude/` y `.gitignore`. `pnpm-lock.yaml` y `pnpm-workspace.yaml` no van en este commit: se rehacen en T005. Mensaje: `docs: spec, plan y tareas de la entrega 0 (#1)`.
-- [ ] T003 Borrar la app vieja:
+- [X] T003 Borrar la app vieja:
   - `src/` completo;
   - `public/` (solo tiene `vite.svg`);
   - `tailwind.config.cjs` y `postcss.config.cjs`;
@@ -39,10 +39,10 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
   - `vite.config.ts` e `index.html`.
 
   `.prettierrc.json` se queda hasta T014.
-- [ ] T004 Generar la plantilla oficial en el scratchpad, con `pnpm create vite@9.3.1 <scratchpad>/vite-template --template react-ts --no-interactive`. Copiar a la raíz solo `index.html`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` y `vite.config.ts`. No copiar `README.md`, `public/`, `src/` ni `.oxlintrc.json`. Después:
+- [X] T004 Generar la plantilla oficial en el scratchpad, con `pnpm create vite@9.3.1 <scratchpad>/vite-template --template react-ts --no-interactive`. Copiar a la raíz solo `index.html`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` y `vite.config.ts`. No copiar `README.md`, `public/`, `src/` ni `.oxlintrc.json`. Después:
   - en `index.html`: cambiar `lang="en"` por `lang="es"`, poner `<title>Countdown Notes</title>` y borrar la línea `<link rel="icon" …>`;
   - en `tsconfig.app.json`: agregar `"strict": true` en `compilerOptions` (la constitución lo exige de forma explícita).
-- [ ] T005 Reescribir `package.json` (research.md §1 y §3):
+- [X] T005 Reescribir `package.json` (research.md §1 y §3):
   - `"name": "countdown-notes"`, `"private": true`, `"version": "0.0.0"`, `"type": "module"`;
   - `scripts`: `"dev": "vite"`, `"build": "tsc -b && vite build"` y `"preview": "vite preview"`;
   - `dependencies`: `react` `19.3.1` y `react-dom` `19.3.1`;
@@ -59,8 +59,8 @@ description: "Lista de tareas de la Entrega 0 · Base nueva"
 
 **⚠️ CRITICAL**: US1 no puede empezar test-first sin esta fase.
 
-- [ ] T006 Instalar los tests de UI con versión exacta: `pnpm add -D -E vitest@5.0.5 jsdom@30.1.3 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8`.
-- [ ] T007 Configurar Vitest en `vite.config.ts` (research.md §6):
+- [X] T006 Instalar los tests de UI con versión exacta: `pnpm add -D -E vitest@5.0.5 jsdom@30.1.3 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8`.
+- [X] T007 Configurar Vitest en `vite.config.ts` (research.md §6):
   - agregar `/// <reference types="vitest/config" />` en la primera línea;
   - agregar `test: { environment: 'jsdom', globals: true, include: ['src/**/*.test.{ts,tsx}'] }`, con un comentario de una línea: `globals` solo existe para que Testing Library limpie el DOM entre tests;
   - en `package.json`, agregar el script `"test": "vitest run"`.

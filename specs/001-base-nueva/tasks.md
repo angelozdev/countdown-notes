@@ -159,11 +159,11 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T017 [US3] Preparar Playwright:
+- [x] T017 [US3] Preparar Playwright:
   - instalar con `pnpm add -D -E @playwright/test@1.64.1` y bajar los navegadores con `pnpm exec playwright install chromium webkit`;
   - agregar a `package.json` el script `"test:e2e": "playwright test"`;
   - agregar a `.gitignore`: `test-results/`, `playwright-report/`, `blob-report/` y `playwright/.cache/`.
-- [ ] T018 [US3] Escribir `e2e/base-screen.spec.ts`, con un test `'abre la pantalla base'` que:
+- [x] T018 [US3] Escribir `e2e/base-screen.spec.ts`, con un test `'abre la pantalla base'` que:
   - hace `page.goto('/')`;
   - espera `page.getByRole('heading', { level: 1, name: 'Countdown Notes' })` con `toBeVisible()`;
   - espera `page.locator('html')` con `toHaveAttribute('lang', 'es')`;
@@ -173,7 +173,7 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Crear `playwright.config.ts` (research.md §7):
+- [x] T019 [US3] Crear `playwright.config.ts` (research.md §7):
   - `testDir: 'e2e'`;
   - `use: { baseURL: 'http://localhost:4173' }`;
   - `webServer: { command: 'pnpm build && pnpm preview --port 4173 --strictPort', url: 'http://localhost:4173', reuseExistingServer: !process.env.CI }`;
@@ -181,7 +181,7 @@ description: 'Lista de tareas de la Entrega 0 · Base nueva'
 
   En `tsconfig.node.json`, cambiar `include` a `["vite.config.ts", "playwright.config.ts", "e2e"]`. Correr `pnpm test:e2e`: debe quedar **en verde en los 2 proyectos**.
 
-- [ ] T020 [US3] Verificar SC-005: cambiar el texto del `<h1>` en `src/App.tsx`, comprobar que fallan `pnpm test` y `pnpm test:e2e`, y deshacer el cambio. Al final deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. **Commit**: `test: smoke E2E con Playwright en Chromium y iPhone (#12)`.
+- [x] T020 [US3] Verificar SC-005: cambiar el texto del `<h1>` en `src/App.tsx`, comprobar que fallan `pnpm test` y `pnpm test:e2e`, y deshacer el cambio. Al final deben pasar `pnpm lint`, `pnpm format:check` y `pnpm build`. **Commit**: `test: smoke E2E con Playwright en Chromium y iPhone (#12)`.
 
 **Checkpoint**: US1–US3 en verde.
 

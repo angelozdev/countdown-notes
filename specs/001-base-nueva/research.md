@@ -79,6 +79,7 @@ Fecha: 2026-10-24. Versiones tomadas del registro de npm ese día (`pnpm view <p
 - **Rationale**: el iPhone es un dispositivo objetivo y WebKit es su motor. Así el smoke test detecta antes de publicar problemas propios de Safari, como desbordes o viewport.
 - **Qué prueba el smoke test**: en cada proyecto, que el título de la pantalla base se ve, y que en el iPhone no hay desplazamiento horizontal (`scrollWidth <= clientWidth`).
 - **Alternatives considered**: solo Chromium (más rápido, pero no ve WebKit).
+- **Ajustes en la implementación**: `tsconfig.node.json` incluye `e2e/` y suma la lib `DOM`, porque los callbacks de `page.evaluate` corren en el navegador y usan `document`. Sin `testDir`, Playwright también tomaba `src/App.test.tsx` de Vitest.
 
 ## 8. Tema y componentes: shadcn/ui
 

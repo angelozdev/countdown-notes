@@ -362,8 +362,8 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 **Independent Test**: `pnpm test` en verde; con `pnpm dev`, quickstart §2, filas 9–10.
 
-- [ ] T022 [US4] Correr `pnpm dlx shadcn@4.22.1 add toggle`, que crea `src/components/ui/toggle.tsx`, y después `pnpm format`.
-- [ ] T023 [US4] Escribir `src/note-filters.test.tsx`. Para abrir el panel: clic en `Ajustes`; las notas se buscan con `within(dialog).getByRole('group', { name: 'Notas' })`. Tests:
+- [x] T022 [US4] Correr `pnpm dlx shadcn@4.22.1 add toggle`, que crea `src/components/ui/toggle.tsx`, y después `pnpm format`.
+- [x] T023 [US4] Escribir `src/note-filters.test.tsx`. Para abrir el panel: clic en `Ajustes`; las notas se buscan con `within(dialog).getByRole('group', { name: 'Notas' })`. Tests:
   - `'las 12 notas empiezan incluidas, con la grafía de las negras'`: los `button` del grupo, en orden, se llaman `C, D♭, D, E♭, E, F, F♯, G, A♭, A, B♭, B` y todos tienen `aria-pressed="true"`.
   - `'una nota se excluye y se vuelve a incluir'`: clic en `F♯` → `aria-pressed="false"`; otro clic → `"true"`.
   - `'los atajos incluyen o excluyen naturales y alteradas, y se deshabilitan si no cambiarían nada'`:
@@ -388,7 +388,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T024 [US4] Implementar:
+- [x] T024 [US4] Implementar:
   - **`store.ts`**:
     - `toggleNote(id)` y `setGroup(natural: boolean, included: boolean)`. Las dos dejan `notes` sin duplicados y en orden cromático (`NOTES.map((n) => n.id).filter(…)`);
     - `play()` no hace nada si `notes.length < 2` (`canPlay`, FR-023). El pool de reserva ya existe desde T019.

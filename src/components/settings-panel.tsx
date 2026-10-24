@@ -9,7 +9,9 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/ui/sheet'
-import { usePractice } from '@/practice/store'
+import { Toggle } from '@/components/ui/toggle'
+import { NOTES } from '@/music/notes'
+import { NOT_ENOUGH_NOTES, usePractice } from '@/practice/store'
 
 export function SettingsPanel() {
   const bpm = usePractice((state) => state.bpm)
@@ -62,8 +64,68 @@ export function SettingsPanel() {
               Se aplica desde la siguiente vuelta.
             </p>
           </div>
+          <NoteFilters />
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+function NoteFilters() {
+  const notes = usePractice((state) => state.notes)
+  const toggleNote = usePractice((state) => state.toggleNote)
+  const setGroup = usePractice((state) => state.setGroup)
+  const group = (natural: boolean) =>
+    NOTES.filter((note) => note.natural === natural)
+  const allIn = (natural: boolean) =>
+    group(natural).every((note) => notes.includes(note.id))
+  const allOut = (natural: boolean) =>
+    group(natural).every((note) => !notes.includes(note.id))
+  const shortcuts = [
+    { label: 'Incluir naturales', natural: true, included: true },
+    { label: 'Excluir naturales', natural: true, included: false },
+    { label: 'Incluir alteradas', natural: false, included: true },
+    { label: 'Excluir alteradas', natural: false, included: false }
+  ]
+
+  return (
+    <section className="flex flex-col gap-3">
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-3 text-base font-semibold">Notas</legend>
+        <div className="grid grid-cols-6 gap-2">
+          {NOTES.map((note) => (
+            <Toggle
+              key={note.id}
+              variant="outline"
+              size="lg"
+              className="h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+              pressed={notes.includes(note.id)}
+              onPressedChange={() => toggleNote(note.id)}
+            >
+              {note.label}
+            </Toggle>
+          ))}
+        </div>
+      </fieldset>
+      <div className="grid grid-cols-2 gap-2">
+        {shortcuts.map(({ label, natural, included }) => (
+          <Button
+            key={label}
+            variant="secondary"
+            className="h-11"
+            disabled={included ? allIn(natural) : allOut(natural)}
+            onClick={() => setGroup(natural, included)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+      {notes.length < 2 && (
+        <p className="text-sm font-medium text-primary">{NOT_ENOUGH_NOTES}</p>
+      )}
+      <p className="text-sm text-muted-foreground">
+        Se aplica desde la siguiente vuelta.
+      </p>
+    </section>
   )
 }

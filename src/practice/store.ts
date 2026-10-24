@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
 import type { Engine, Sound } from '@/audio/engine'
-import { NOTES, type NoteId } from '@/music/notes'
+import { NOTES, type Note, type NoteId } from '@/music/notes'
 import { drawRound } from './round'
 
 export type Status = 'stopped' | 'countIn' | 'playing'
@@ -30,6 +30,8 @@ export type PracticeState = {
   stop: () => void
   setBpm: (bpm: number) => void
   setBarsPerNote: (barsPerNote: number) => void
+  toggleNote: (id: NoteId) => void
+  setGroup: (natural: boolean, included: boolean) => void
 }
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
@@ -47,6 +49,15 @@ export function nowPlaying({ status, position, rounds }: PracticeState) {
   const round = rounds[0]
   return { round, index: noteIndexAt(round, position.bar) }
 }
+
+export const NOT_ENOUGH_NOTES = 'Elige al menos 2 notas para tocar.'
+
+/** Con menos de 2 notas no se puede evitar repetir una nota seguida. */
+export const canPlay = (state: PracticeState) => state.notes.length >= 2
+
+/** Las notas incluidas, sin duplicados y en orden cromático. */
+const notesWhere = (included: (note: Note) => boolean) =>
+  NOTES.filter(included).map((note) => note.id)
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, Math.round(value)))
@@ -103,7 +114,7 @@ export function createPracticeStore(engine: Engine) {
       rounds: [],
       play() {
         const { status, notes, barsPerNote, bpm } = get()
-        if (status !== 'stopped') return
+        if (status !== 'stopped' || !canPlay(get())) return
         set({
           status: 'countIn',
           position: null,
@@ -126,6 +137,23 @@ export function createPracticeStore(engine: Engine) {
       },
       setBarsPerNote(barsPerNote) {
         set({ barsPerNote: clamp(barsPerNote, 1, 16) })
+      },
+      toggleNote(id) {
+        const { notes } = get()
+        const wasIncluded = notes.includes(id)
+        set({
+          notes: notesWhere((note) =>
+            note.id === id ? !wasIncluded : notes.includes(note.id)
+          )
+        })
+      },
+      setGroup(natural, included) {
+        const { notes } = get()
+        set({
+          notes: notesWhere((note) =>
+            note.natural === natural ? included : notes.includes(note.id)
+          )
+        })
       }
     }
   })

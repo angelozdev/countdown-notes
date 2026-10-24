@@ -205,7 +205,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 **Independent Test**: quickstart §2, filas 7–9. Cm7, C7alt y C13 suenan distintos y sin raíz, y `F♯m(maj7)` cabe a 320 px.
 
-- [ ] T011 [US2] Escribir dos tests que fallan antes del código:
+- [x] T011 [US2] Escribir dos tests que fallan antes del código:
   - **`src/music/chords.test.ts`**: extender la tabla literal a los 25 tipos de FR-005, en su orden. Para los 19 nuevos, en lugar de la forma, cada fila trae las clases que exige FR-008, en semitonos desde la raíz:
 
     | id      | sufijo    | nombre                          | clases obligatorias               |
@@ -244,7 +244,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test --project ui` y **verlos fallar**.
 
-- [ ] T012 [US2] En `src/music/chords.ts`:
+- [x] T012 [US2] En `src/music/chords.ts`:
   - sumar los 19 tipos a `ChordTypeId` y a `CHORD_TYPES`, con su familia, sufijo, nombre y las formas A y B de research §5;
   - en `voicingOf`, con dos formas, aplicar la ubicación de research §5: para cada forma y cada desplazamiento de octava de la raíz (`raíz = índice + 12k`), las que caen enteras en 48–76; gana la de altura media más cercana a 60, y la A en caso de empate. Las tríadas siguen con su forma fija.
 

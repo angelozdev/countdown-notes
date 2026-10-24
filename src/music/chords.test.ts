@@ -29,6 +29,53 @@ describe.each(TRIADS)('tríada %s', (id, suffix, name, shape) => {
   )
 })
 
+// FR-008: clases (semitonos desde la raíz) que el voicing debe tener; un
+// arreglo es "una de". `absent` son las que no puede tener.
+const JAZZ: [ChordTypeId, string, string, (number | number[])[], number[]][] = [
+  ['6', '6', 'sexta', [4, 9], []],
+  ['m6', 'm6', 'menor sexta', [3, 9], []],
+  ['69', '6/9', 'sexta novena', [4, 9, 2], []],
+  ['maj7', 'maj7', 'séptima mayor', [4, 11], []],
+  ['m7', 'm7', 'menor séptima', [3, 10], []],
+  ['7', '7', 'séptima', [4, 10], []],
+  ['m7b5', 'm7♭5', 'semidisminuido', [3, 6, 10], []],
+  ['dim7', '°7', 'disminuido séptima', [3, 6, 9], []],
+  ['mMaj7', 'm(maj7)', 'menor séptima mayor', [3, 11], []],
+  ['7sus4', '7sus4', 'séptima con cuarta suspendida', [5, 10], [4]],
+  ['maj9', 'maj9', 'novena mayor', [4, 11, 2], []],
+  ['m9', 'm9', 'menor novena', [3, 10, 2], []],
+  ['9', '9', 'novena', [4, 10, 2], []],
+  ['m11', 'm11', 'menor oncena', [3, 10, 5], []],
+  ['13', '13', 'trecena', [4, 10, 9], []],
+  ['7b9', '7♭9', 'séptima novena bemol', [4, 10, 1], []],
+  ['7#9', '7♯9', 'séptima novena sostenida', [4, 10, 3], []],
+  ['7#11', '7♯11', 'séptima oncena sostenida', [4, 10, 6], []],
+  ['7alt', '7alt', 'séptima alterada', [4, 10, [1, 3], [6, 8]], []]
+]
+
+describe.each(JAZZ)('%s', (id, suffix, name, required, absent) => {
+  test.each(NOTES.map((note, index) => ({ note, index })))(
+    'sobre $note.label: cifrado, nombre y voicing sin raíz',
+    ({ note, index }) => {
+      expect(chordSymbol(note.id, id)).toBe(note.label + suffix)
+      expect(chordName(note.id, id)).toBe(`${note.name} ${name}`)
+      const pitches = voicingOf(note.id, id).map(midi)
+      const classes = pitches.map((pitch) => (pitch - index) % 12)
+      expect(pitches.length).toBeGreaterThanOrEqual(3)
+      expect(pitches.length).toBeLessThanOrEqual(5)
+      expect(pitches).toEqual([...pitches].sort((a, b) => a - b))
+      expect(classes).not.toContain(0)
+      for (const wanted of required) {
+        expect(
+          [wanted].flat().some((semitones) => classes.includes(semitones))
+        ).toBe(true)
+      }
+      for (const semitones of absent) expect(classes).not.toContain(semitones)
+      expect(pitches.every((pitch) => pitch >= 48 && pitch <= 76)).toBe(true)
+    }
+  )
+})
+
 test('F♯ menor se cifra F♯m y se nombra Fa sostenido menor', () => {
   expect(chordSymbol('Gb', 'm')).toBe('F♯m')
   expect(chordName('Gb', 'm')).toBe('Fa sostenido menor')
@@ -36,4 +83,13 @@ test('F♯ menor se cifra F♯m y se nombra Fa sostenido menor', () => {
 
 test('Do mayor se toca en voicing abierto: C3, G3, E4', () => {
   expect(voicingOf('C', 'maj')).toEqual(['C3', 'G3', 'E4'])
+})
+
+test('B♭m7♭5 se cifra B♭m7♭5 y se nombra Si bemol semidisminuido', () => {
+  expect(chordSymbol('Bb', 'm7b5')).toBe('B♭m7♭5')
+  expect(chordName('Bb', 'm7b5')).toBe('Si bemol semidisminuido')
+})
+
+test('F♯m7 se toca en A3, D♭4, E4', () => {
+  expect(voicingOf('Gb', 'm7')).toEqual(['A3', 'Db4', 'E4'])
 })

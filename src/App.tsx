@@ -1,6 +1,7 @@
 import { Play, Square } from 'lucide-react'
 import { useState } from 'react'
 import type { Engine } from '@/audio/engine'
+import { Lane } from '@/components/lane'
 import { Now } from '@/components/now'
 import { SettingsPanel } from '@/components/settings-panel'
 import { Button } from '@/components/ui/button'
@@ -8,6 +9,7 @@ import {
   canPlay,
   createPracticeStore,
   NOT_ENOUGH_NOTES,
+  nowPlaying,
   PracticeContext,
   usePractice
 } from '@/practice/store'
@@ -16,11 +18,13 @@ export default function App({ engine }: { engine: Engine }) {
   const [store] = useState(() => createPracticeStore(engine))
   return (
     <PracticeContext value={store}>
-      <main className="flex min-h-dvh flex-col p-safe">
+      <main className="flex h-dvh flex-col p-safe">
         <h1 className="sr-only">Countdown Notes</h1>
         <StatusLine />
         <Now />
+        <Lane />
         <footer className="flex flex-col items-center gap-3 p-6">
+          <Counter />
           <NotEnoughNotes />
           <div className="flex items-center justify-center gap-4">
             <PlayButton />
@@ -39,6 +43,21 @@ function StatusLine() {
       Aleatorio · Analógico cálido · {bpm} BPM · 4/4
     </p>
   )
+}
+
+function Counter() {
+  const text = usePractice((state) => {
+    const now = nowPlaying(state)
+    return (
+      now &&
+      `Vuelta ${now.round.number} · nota ${now.index + 1} de ${now.round.notes.length}`
+    )
+  })
+  return text ? (
+    <p className="text-lg font-semibold text-muted-foreground tabular-nums">
+      {text}
+    </p>
+  ) : null
 }
 
 function NotEnoughNotes() {

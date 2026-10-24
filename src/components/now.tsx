@@ -9,12 +9,20 @@ export function Now() {
     return now && now.round.notes[now.index]
   })
   const note = id && NOTE_BY_ID[id]
+  const countdown = usePractice((state) =>
+    state.status === 'countIn' ? 4 - (state.position?.beat ?? 0) : undefined
+  )
 
   return (
     <section
       aria-label="Ahora"
       className="flex flex-1 flex-col items-center justify-center gap-2 text-center"
     >
+      {countdown !== undefined && (
+        <p className="font-heading text-[min(32vw,38dvh)] leading-none font-black text-primary tabular-nums">
+          {countdown}
+        </p>
+      )}
       {note && (
         <>
           <p className="font-heading text-[min(32vw,38dvh)] leading-none font-black tracking-tight">

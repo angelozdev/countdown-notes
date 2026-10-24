@@ -419,7 +419,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Tests primero
 
-- [ ] T025 [P] [US5] Escribir `src/lane.test.tsx`. Se usan `ahora = () => screen.getByRole('region', { name: 'Ahora' })` y `carril = () => screen.getByRole('list', { name: 'Carril' })`. Tests:
+- [x] T025 [P] [US5] Escribir `src/lane.test.tsx`. Se usan `ahora = () => screen.getByRole('region', { name: 'Ahora' })` y `carril = () => screen.getByRole('list', { name: 'Carril' })`. Tests:
   - `'detenida, "Ahora" invita a tocar y no hay carril'`: `within(ahora()).getByText('Toca Play para empezar.')` y `screen.queryByRole('list', { name: 'Carril' })` es `null`.
   - `'durante la cuenta de entrada, "Ahora" muestra 4, 3, 2, 1'`:
     - Play; después de cada `fake.beat(1)`, "Ahora" contiene `'4'`, `'3'`, `'2'` y `'1'`;
@@ -441,7 +441,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T026 [P] [US5] En `e2e/practice.spec.ts`, agregar `'Play cuenta, muestra una nota con su nombre y Stop la detiene'` (research.md §12):
+- [x] T026 [P] [US5] En `e2e/practice.spec.ts`, agregar `'Play cuenta, muestra una nota con su nombre y Stop la detiene'` (research.md §12):
   - en `Ajustes`, `fill('240')` en el `spinbutton` `BPM`, `press('Enter')` y `Cerrar`;
   - Play;
   - `expect(region Ahora).toHaveText(/^\s*[1-4]\s*$/)`;
@@ -452,7 +452,7 @@ No hay fase fundacional. El contrato del motor, el motor falso y el store nacen 
 
 ### Implementación
 
-- [ ] T027 [US5] Implementar (data-model.md, "Derivados para la UI"):
+- [x] T027 [US5] Implementar (data-model.md, "Derivados para la UI"):
   - **`now.tsx`**: con `status === 'countIn'`, muestra `4 − (position?.beat ?? 0)` con el mismo tamaño que la nota.
   - **`src/components/lane.tsx`**:
     - `<ol aria-label="Carril" className="grid grid-cols-4 …">` con un `<li>` por compás de `rounds[0]` (`notes.length × barsPerNote` compases), cada uno con el `label` de su nota;

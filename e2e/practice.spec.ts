@@ -36,3 +36,25 @@ test('Play cambia a Stop y Stop vuelve a Play', async ({ page }) => {
   await page.getByRole('button', { name: 'Stop' }).click()
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
 })
+
+test('Play cuenta, muestra una nota con su nombre y Stop la detiene', async ({
+  page
+}) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  const bpm = page.getByRole('spinbutton', { name: 'BPM' })
+  await bpm.fill('240')
+  await bpm.press('Enter')
+  await page.getByRole('button', { name: 'Cerrar' }).click()
+
+  await page.getByRole('button', { name: 'Play' }).click()
+  const ahora = page.getByRole('region', { name: 'Ahora' })
+  await expect(ahora).toHaveText(/^\s*[1-4]\s*$/)
+  await expect(ahora).toContainText(/Do|Re|Mi|Fa|Sol|La|Si/)
+  await expect(
+    page.getByRole('list', { name: 'Carril' }).locator('[aria-current="true"]')
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Stop' }).click()
+  await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
+})

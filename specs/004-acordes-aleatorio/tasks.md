@@ -68,7 +68,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 ### Tríadas: cifrado, nombre y voicing
 
-- [ ] T004 [P] [US1] Crear `src/music/chords.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3):
+- [x] T004 [P] [US1] Crear `src/music/chords.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3):
   - Helper `midi(pitch)`: con `/^([A-G]b?)(\d)$/`, el índice de su id en `NOTES` más `12 × (octava + 1)`.
   - Tabla literal de las 6 tríadas, según FR-005 y FR-007:
 
@@ -88,7 +88,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
     - todas las alturas quedan entre 48 (C3) y 76 (E5).
   - Casos sueltos: `chordSymbol('Gb', 'm')` es `'F♯m'`, `chordName('Gb', 'm')` es `'Fa sostenido menor'` y `voicingOf('C', 'maj')` es `['C3', 'G3', 'E4']`.
 
-- [ ] T005 [US1] Crear `src/music/chords.ts` según [data-model](./data-model.md) (Tipo de acorde) y [contracts](./contracts/interfaces.md) §3, por ahora con las 6 tríadas:
+- [x] T005 [US1] Crear `src/music/chords.ts` según [data-model](./data-model.md) (Tipo de acorde) y [contracts](./contracts/interfaces.md) §3, por ahora con las 6 tríadas:
   - `ChordTypeId` con las 6 tríadas (crece en US2), `ChordFamily` con las 5 familias y `ChordType` (`id`, `family`, `suffix`, `name`, `forms`). Cada tríada tiene `family: 'Tríadas'` y una sola forma.
   - `CHORD_TYPES`, `CHORD_TYPE_BY_ID`, `chordSymbol`, `chordName` y `voicingOf`.
   - Altura de un MIDI: `` `${NOTES[midi % 12].id}${Math.floor(midi / 12) - 1}` ``.

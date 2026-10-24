@@ -247,7 +247,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   `pnpm test --project ui` **en verde**. **Commit**: `feat: figura y octava del bajo (#21)`.
 
-- [ ] T018 [US2] En `engine.ts`, el bajo pasa a `{ kind: 'bass'; pitch: string; length: number }` (length en golpes). En el store, cada `bass` lleva el `length` de `bassAttacks`. En `tone-engine.browser.test.ts`:
+- [x] T018 [US2] En `engine.ts`, el bajo pasa a `{ kind: 'bass'; pitch: string; length: number }` (length en golpes). En el store, cada `bass` lleva el `length` de `bassAttacks`. En `tone-engine.browser.test.ts`:
   - traducir el test del bajo: su `bass` lleva `length: 4`;
   - agregar `'el bajo ataca a mitad de golpe y dura lo que dice length'`:
     - a 60 BPM, 4/4;
@@ -257,7 +257,7 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
   Correr `pnpm test --project audio` y **verlo fallar** en el largo, porque el motor todavía suena el 90 % del compás.
 
-- [ ] T019 [US2] En `tone-engine.ts`, el bajo dura el 90 % de su `length`: `transport.toSeconds(`${Math.round(sound.length * perBeat * 0.9)}i`)`. `pnpm test` **en verde en los dos proyectos**. **Commit**: `feat: duración del bajo según la figura (#21)`.
+- [x] T019 [US2] En `tone-engine.ts`, el bajo dura el 90 % de su `length`: `transport.toSeconds(`${Math.round(sound.length * perBeat * 0.9)}i`)`. `pnpm test` **en verde en los dos proyectos**. **Commit**: `feat: duración del bajo según la figura (#21)`.
 - [ ] T020 [US2] Verificación manual: quickstart §2, filas 5–7, con `pnpm dev`.
 
 **Checkpoint**: US1 y US2 en verde.

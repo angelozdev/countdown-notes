@@ -14,10 +14,12 @@ async function choose(app: App, group: string, name: string) {
   await app.closeSettings()
 }
 
-/** Los ataques del bajo de ese compás: en qué golpe y con qué altura. */
+/** Los ataques del bajo de ese compás: en qué golpe, con qué altura y cuánto dura. */
 const bassOf = (fake: FakeEngine, bar: number) =>
   fake.played.flatMap(({ bar: b, beat, sound }) =>
-    b === bar && sound.kind === 'bass' ? [{ beat, pitch: sound.pitch }] : []
+    b === bar && sound.kind === 'bass'
+      ? [{ beat, pitch: sound.pitch, length: sound.length }]
+      : []
   )
 
 const checked = (radios: HTMLElement[]) =>
@@ -60,6 +62,23 @@ test.each([
   expect(bass[0].beat).toBe(0)
   expect(new Set(bass.map(({ pitch }) => pitch)).size).toBe(1)
 })
+
+test.each([
+  ['Corcheas', [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]],
+  ['Negras', [1, 1, 1, 1]],
+  ['Blancas', [2, 2]],
+  ['Redondas', [4]]
+])(
+  'en 4/4 con %s cada ataque del bajo dura %j golpes',
+  async (figure, lengths) => {
+    const app = renderApp()
+    await choose(app, 'Figura del bajo', figure)
+    await app.user.click(screen.getByRole('button', { name: 'Play' }))
+    app.fake.beat(4 + 4)
+
+    expect(bassOf(app.fake, 1).map(({ length }) => length)).toEqual(lengths)
+  }
+)
 
 test.each(['3', '1'])(
   'la octava %s cambia la altura del bajo',

@@ -2,7 +2,7 @@ export type Accent = 'strong' | 'soft' | 'none'
 
 export type Sound =
   | { kind: 'click'; accent: Accent }
-  | { kind: 'bass'; pitch: string } // altura de Tone, p. ej. 'Bb2'
+  | { kind: 'bass'; pitch: string; length: number } // altura de Tone ('Bb2'); length en golpes
 
 export type Bar = {
   /** Golpes de metrónomo del compás. */

@@ -178,7 +178,7 @@ test('el bajo ataca en el tiempo 1 de su compás', async () => {
         bar === 0
           ? [{ at: 0, sound: { kind: 'click', accent: 'strong' } }]
           : bar % 2 === 1
-            ? [{ at: 0, sound: { kind: 'bass', pitch: 'Bb2' } }]
+            ? [{ at: 0, sound: { kind: 'bass', pitch: 'Bb2', length: 4 } }]
             : []
     }),
     14
@@ -187,4 +187,30 @@ test('el bajo ataca en el tiempo 1 de su compás', async () => {
   expect(times).toHaveLength(3)
   expect(Math.abs(times[1] - (times[0] + 4))).toBeLessThan(0.001)
   expect(Math.abs(times[2] - (times[0] + 12))).toBeLessThan(0.001)
+})
+
+test('el bajo ataca a mitad de golpe y dura lo que dice length', async () => {
+  const buffer = await renderPractice(
+    60,
+    (bar): Bar => ({
+      beats: 4,
+      beatLength: 1,
+      events:
+        bar === 0
+          ? [{ at: 0, sound: { kind: 'click', accent: 'strong' } }]
+          : bar === 1
+            ? [{ at: 1.5, sound: { kind: 'bass', pitch: 'Bb2', length: 0.5 } }]
+            : []
+    }),
+    10
+  )
+  const times = onsets(buffer, 1e-5, 1).map((onset) => onset.time)
+  expect(times).toHaveLength(2)
+  expect(Math.abs(times[1] - (times[0] + 5.5))).toBeLessThan(0.001)
+  // 0,45 s de nota (90 % de 0,5 golpes) + 0,3 s de release + margen
+  const silentFrom = times[0] + 5.5 + 0.45 + 0.3 + 0.2
+  const after = buffer
+    .getChannelData(0)
+    .slice(Math.round(silentFrom * buffer.sampleRate))
+  expect(after.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
 })

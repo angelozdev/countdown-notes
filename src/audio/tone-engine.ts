@@ -54,13 +54,13 @@ export function createToneEngine(): Engine {
       // bpm.value aplicaría el tempo recién en now + lookAhead y el primer tiempo saldría corto
       const startAt = context.now()
       transport.bpm.setValueAtTime(bpm, startAt)
-      const play = (sound: Sound, time: number, barTicks: number) => {
+      const play = (sound: Sound, time: number, perBeat: number) => {
         if (sound.kind === 'click') {
           const [frequency, velocity] = CLICKS[sound.accent]
           click.triggerAttackRelease(frequency, 0.05, time, velocity)
         } else {
-          // 90 % del compás, para que cada ataque se distinga
-          const ticks = Math.round(barTicks * 0.9)
+          // 90 % de su largo, para que cada ataque se distinga
+          const ticks = Math.round(sound.length * perBeat * 0.9)
           bass.triggerAttackRelease(
             sound.pitch,
             transport.toSeconds(`${ticks}i`),
@@ -82,7 +82,7 @@ export function createToneEngine(): Engine {
                   `${tick + Math.round(beats * perBeat)}i`
                 )
           for (const event of plan.events) {
-            at(event.at, (t) => play(event.sound, t, barTicks))
+            at(event.at, (t) => play(event.sound, t, perBeat))
           }
           for (let b = 0; b < plan.beats; b++) {
             at(b, (t) => draw.schedule(() => onBeat(bar, b), t))

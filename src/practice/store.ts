@@ -126,9 +126,13 @@ export function createPracticeStore(engine: Engine) {
       // figura y octava se leen aquí, al armar el compás: un cambio aplica desde el siguiente
       const { bassFigure, bassOctave } = get()
       const bass = bassAttacks(meter, bassFigure).map(
-        ({ at }): Bar['events'][number] => ({
+        ({ at, length }): Bar['events'][number] => ({
           at,
-          sound: { kind: 'bass', pitch: `${round.notes[index]}${bassOctave}` }
+          sound: {
+            kind: 'bass',
+            pitch: `${round.notes[index]}${bassOctave}`,
+            length
+          }
         })
       )
       // el sort es estable: en el mismo at, el click queda antes que el bajo

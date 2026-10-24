@@ -428,8 +428,8 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
 
 **Independent Test**: `pnpm test` y `pnpm test:e2e` en verde; con `pnpm dev`, quickstart §2, filas 14–15.
 
-- [ ] T036 [US6] `pnpm add -E zod@4.6.7`. Comprobar en `package.json` que la versión no tiene `^` ni `~`.
-- [ ] T037 [P] [US6] Preparar y escribir los tests:
+- [x] T036 [US6] `pnpm add -E zod@4.6.7`. Comprobar en `package.json` que la versión no tiene `^` ni `~`.
+- [x] T037 [P] [US6] Preparar y escribir los tests:
   - `src/test/setup.ts` suma `afterEach(() => localStorage.clear())`, importando `afterEach` de `vitest`;
   - `renderApp` (`src/test/app.tsx`) también devuelve `unmount`, del resultado de `render`;
   - escribir `src/saved-settings.test.tsx`, con `const KEY = 'countdown-notes:ajustes'`. Tests:
@@ -443,10 +443,10 @@ description: 'Lista de tareas de la Entrega 2 · Práctica cómoda'
     - `'los datos de otra versión se descartan'`: `{ version: 2, settings: { bpm: 90 } }` → BPM `60`.
     - `'sin almacenamiento, la app funciona igual'`: `vi.spyOn(Storage.prototype, 'getItem')` y `'setItem'` lanzan un error; `renderApp()`, BPM a 90 en el panel, `Cerrar` y Play → `fake.running` es `true` y `fake.bpm` es 90. Al final, `vi.restoreAllMocks()`.
 
-  Correr `pnpm test --project ui` y **verlo fallar**.
+  Correr `pnpm test --project ui` y **verlo fallar**. Done: fallaron 2 de 6, los que dependen de que algo se guarde (`se recuerdan al volver a abrir` y `un ajuste inválido`); los otros 4 pasan sin guardado, porque describen los valores por defecto y la app detenida. Se sumó un test, `las notas guardadas se limpian: sin repetidas y en orden cromático`, para el `transform` de `notes`.
 
-- [ ] T038 [P] [US6] En `e2e/practice.spec.ts`, agregar `'los ajustes siguen después de recargar'`: BPM 90 y compás `6/8` desde el panel, `page.reload()` → se ve `Aleatorio · Analógico cálido · 90 BPM · 6/8`. Correr `pnpm test:e2e` y **verlo fallar**.
-- [ ] T039 [US6] Implementar (data-model.md, "Ajustes" y "Guardado"; research.md §9):
+- [x] T038 [P] [US6] En `e2e/practice.spec.ts`, agregar `'los ajustes siguen después de recargar'`: BPM 90 y compás `6/8` desde el panel, `page.reload()` → se ve `Aleatorio · Analógico cálido · 90 BPM · 6/8`. Correr `pnpm test:e2e` y **verlo fallar**. Done: falló en chromium y en iphone (no aparecía `90 BPM · 6/8` después de recargar).
+- [x] T039 [US6] Implementar (data-model.md, "Ajustes" y "Guardado"; research.md §9):
   - **`src/practice/settings.ts`**:
     - `SETTINGS_KEY = 'countdown-notes:ajustes'`;
     - `DEFAULT_SETTINGS` con los valores de data-model.md y el tipo `Settings`;

@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
+import { shallow } from 'zustand/shallow'
 import { createStore } from 'zustand/vanilla'
 import type { Bar, Channel, Engine, Mix } from '@/audio/engine'
 import {
@@ -12,6 +13,12 @@ import {
 } from '@/music/meters'
 import { NOTES, type Note, type NoteId } from '@/music/notes'
 import { drawRound } from './round'
+import {
+  DEFAULT_SETTINGS,
+  loadSettings,
+  type Settings,
+  saveSettings
+} from './settings'
 
 export type Status = 'stopped' | 'countIn' | 'playing'
 
@@ -88,8 +95,13 @@ const notesWhere = (included: (note: Note) => boolean) =>
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, Math.round(value)))
 
+const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]
+
+const settingsOf = (state: PracticeState) =>
+  Object.fromEntries(SETTING_KEYS.map((key) => [key, state[key]])) as Settings
+
 export function createPracticeStore(engine: Engine) {
-  return createStore<PracticeState>()((set, get) => {
+  const store = createStore<PracticeState>()((set, get) => {
     // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
     let requested = 0
 
@@ -174,19 +186,9 @@ export function createPracticeStore(engine: Engine) {
     }
 
     return {
+      ...loadSettings(),
       status: 'stopped',
       position: null,
-      bpm: 60,
-      barsPerNote: 2,
-      meter: '4/4',
-      bassFigure: 'whole',
-      bassOctave: 2,
-      mix: {
-        click: { volume: 80, muted: false },
-        bass: { volume: 80, muted: false }
-      },
-      notes: NOTES.map((note) => note.id),
-      repeats: { on: false, count: 10 },
       rounds: [],
       play() {
         const { status, notes, barsPerNote, meter, bpm, mix } = get()
@@ -275,6 +277,12 @@ export function createPracticeStore(engine: Engine) {
       }
     }
   })
+  // se guarda solo cuando cambia un ajuste, no en cada golpe
+  store.subscribe((state, prev) => {
+    const settings = settingsOf(state)
+    if (!shallow(settings, settingsOf(prev))) saveSettings(settings)
+  })
+  return store
 }
 
 export const PracticeContext = createContext<PracticeStore | null>(null)

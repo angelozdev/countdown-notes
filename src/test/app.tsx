@@ -9,7 +9,7 @@ export type FakeEngine = ReturnType<typeof createFakeEngine>
 export function renderApp() {
   const fake = createFakeEngine()
   const user = userEvent.setup()
-  render(<App engine={fake.engine} />)
+  const { unmount } = render(<App engine={fake.engine} />)
 
   async function openSettings() {
     await user.click(screen.getByRole('button', { name: 'Ajustes' }))
@@ -26,5 +26,5 @@ export function renderApp() {
     await user.type(field, `${value}{Enter}`)
   }
 
-  return { fake, user, openSettings, closeSettings, typeNumber }
+  return { fake, user, unmount, openSettings, closeSettings, typeNumber }
 }

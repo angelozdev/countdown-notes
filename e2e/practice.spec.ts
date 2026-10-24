@@ -71,3 +71,18 @@ test('la barra espaciadora hace Play y Stop una vez por pulsación', async ({
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
   expect(await page.evaluate(() => window.scrollY)).toBe(0)
 })
+
+test('los ajustes siguen después de recargar', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  const bpm = page.getByRole('spinbutton', { name: 'BPM' })
+  await bpm.fill('90')
+  await bpm.press('Enter')
+  await page.getByRole('radio', { name: '6/8' }).click()
+  await page.getByRole('button', { name: 'Cerrar' }).click()
+
+  await page.reload()
+  await expect(
+    page.getByText('Aleatorio · Analógico cálido · 90 BPM · 6/8')
+  ).toBeVisible()
+})

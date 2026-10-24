@@ -1,5 +1,6 @@
 import * as Tone from 'tone'
 import { expect, test } from 'vitest'
+import { userEvent } from 'vitest/browser'
 import { accentAt, METERS, type Meter } from '@/music/meters'
 import type { Bar, Engine, EngineStart, Mix } from './engine'
 import { createToneEngine } from './tone-engine'
@@ -155,6 +156,42 @@ test('stop calla todo de inmediato', async () => {
     .getChannelData(0)
     .slice(Math.round(1.6 * buffer.sampleRate))
   expect(afterStop.every((sample) => Math.abs(sample) <= 1e-3)).toBe(true)
+})
+
+// tiempo real, sin Offline: Draw avisa de cada golpe con unos 0,1 s de anticipación, y es lo que
+// debe quedar cancelado al parar. Los timers de aquí solo esperan, no marcan tiempo musical
+test('después de stop no se llama a ningún onBeat', async () => {
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+  // el audio solo se desbloquea dentro de un toque, como el de Play en la app
+  const unlock = document.body.appendChild(document.createElement('button'))
+  unlock.addEventListener('click', () => void Tone.start())
+  await userEvent.click(unlock)
+  unlock.remove()
+
+  const engine = createToneEngine()
+  const late: number[] = []
+  // el golpe siguiente cae 0,25 s después del primero; parar en distintos momentos de los
+  // últimos 0,1 s, cuando su aviso ya está en cola
+  for (const stopAfter of [0.17, 0.185, 0.2, 0.215, 0.23]) {
+    let calls = 0
+    let firstBeatAt = 0
+    await engine.start({
+      bpm: 240,
+      mix: MIX,
+      barAt: clicks,
+      onBeat: () => {
+        if (++calls === 1) firstBeatAt = Tone.getContext().currentTime
+      }
+    })
+    while (calls === 0) await wait(2)
+    while (Tone.getContext().currentTime < firstBeatAt + stopAfter)
+      await wait(2)
+    engine.stop()
+    const atStop = calls
+    await wait(350)
+    late.push(calls - atStop)
+  }
+  expect(late).toEqual([0, 0, 0, 0, 0])
 })
 
 test('un cambio de BPM no duplica ni salta golpes', async () => {

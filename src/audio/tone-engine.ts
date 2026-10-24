@@ -97,7 +97,8 @@ export function createToneEngine(): Engine {
       if (!context) return
       context.transport.stop()
       context.transport.cancel()
-      context.draw.cancel()
+      // sin argumento solo cancela lo que cae después de now() (con lookAhead), y quedan golpes en cola
+      context.draw.cancel(0)
       // silenciar ya, sin anticipación, corta también lo ya programado. Es now − lookAhead
       // y no immediate(), porque en Tone.Offline immediate() vale 0 hasta el render
       const silenceAt = Math.max(0, context.now() - context.lookAhead)

@@ -41,7 +41,16 @@ export function createToneEngine(): Engine {
       context = Tone.getContext()
       const { transport, draw } = context
       // sintetizador → silencio → volumen → salida común, un tramo por canal
-      const output = new Tone.Gain(1).toDestination()
+      // soft clipper (research.md §2): 8193 puntos, impar para que el silencio siga siendo exacto
+      const shaper = new Tone.WaveShaper((x) => {
+        const v = Math.abs(x) * 4
+        const y = v <= 0.8 ? v : 0.8 + 0.2 * Math.tanh((v - 0.8) / 0.2)
+        return Math.sign(x) * y
+      }, 8193).toDestination()
+      shaper.oversample = 'none'
+      // 1/4 porque la entrada del WaveShaper se recorta a [−1, 1] y la suma de los canales puede pasar de 2
+      const quarter = new Tone.Gain(0.25).connect(shaper)
+      const output = new Tone.Gain(1).connect(quarter)
       // la mezcla más reciente: un setMix pudo llegar mientras esperaba a Tone.start()
       const initial = latestMix
       const channel = (name: Channel) => {
@@ -77,6 +86,8 @@ export function createToneEngine(): Engine {
         volume: -4
       }).connect(channels.bass.mute)
       nodes = [
+        shaper,
+        quarter,
         output,
         click,
         countClick,

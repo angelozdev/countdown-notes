@@ -409,6 +409,47 @@ test('la octava llega al motor como altura: una más arriba suena al doble de fr
   expect(c4 / c3).toBeCloseTo(2, 1)
 })
 
+// cuenta, y luego dos compases con un click fuerte en cada golpe y un bajo grave sostenido
+const loudBars = (): EngineStart['barAt'] => (bar) => {
+  if (bar === 0) {
+    return { beats: 4, beatLength: 1, countIn: true, events: clickEvents }
+  }
+  if (bar > 2) return undefined
+  return {
+    beats: 4,
+    beatLength: 1,
+    events: [
+      ...[0, 1, 2, 3].map((at) => ({
+        at,
+        sound: { kind: 'click', accent: 'strong' } as const
+      })),
+      {
+        at: 0,
+        sound: { kind: 'bass', pitch: bar === 1 ? 'E1' : 'C2', length: 4 }
+      }
+    ]
+  }
+}
+
+test('con la mezcla por defecto, ninguna muestra pasa de 1', async () => {
+  const data = (await renderPractice(120, loudBars(), 6.5)).getChannelData(0)
+  // el bajo suena de verdad, para que el tope no se cumpla por silencio
+  expect(data.some((sample) => Math.abs(sample) > 0.5)).toBe(true)
+  expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)
+})
+
+test('con los dos canales al máximo, ninguna muestra pasa de 1', async () => {
+  const data = (
+    await renderPractice(120, loudBars(), 6.5, undefined, {
+      ...MIX,
+      click: { volume: 100, muted: false },
+      bass: { volume: 100, muted: false }
+    })
+  ).getChannelData(0)
+  expect(data.some((sample) => Math.abs(sample) > 0.5)).toBe(true)
+  expect(data.every((sample) => Math.abs(sample) <= 1)).toBe(true)
+})
+
 test('un canal silenciado no suena', async () => {
   // la cuenta (compás 0) suena; desde el compás 1 solo hay un bajo, silenciado
   const buffer = await renderPractice(

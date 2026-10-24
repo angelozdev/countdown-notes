@@ -40,7 +40,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 **Purpose**: comprobar que la rama parte en verde.
 
-- [ ] T001 En la rama `004-acordes-aleatorio`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
+- [x] T001 En la rama `004-acordes-aleatorio`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Sin commit.
 
 ---
 
@@ -52,14 +52,14 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 ### La mezcla no satura (#22, #26)
 
-- [ ] T002 [US1] En `src/audio/tone-engine.browser.test.ts`, agregar dos tests. El borrador de la entrega 2 está en `.az-orchestrate/003-practica-comoda/i1-test-draft.patch`.
+- [x] T002 [US1] En `src/audio/tone-engine.browser.test.ts`, agregar dos tests. El borrador de la entrega 2 está en `.az-orchestrate/003-practica-comoda/i1-test-draft.patch`.
   - Escenario: 120 BPM, 4/4. El compás 0 es la cuenta (`countIn: true`, `clickEvents`). Los compases 1 y 2 tienen un click `'strong'` en cada golpe y un `bass` de `length: 4`, `'E1'` en el compás 1 y `'C2'` en el 2. Desde el compás 3, `undefined`. Render de 6,5 s.
   - `'con la mezcla por defecto, ninguna muestra pasa de 1'`: con `MIX`, alguna muestra pasa de 0,5 y todas cumplen `Math.abs(sample) <= 1`.
   - `'con los dos canales al máximo, ninguna muestra pasa de 1'`: lo mismo con `click` y `bass` en `volume: 100`.
 
   Correr `pnpm test --project audio` y **verlos fallar** en Chromium y WebKit: hoy, en 80, la suma da 1,22–1,32 (research §2).
 
-- [ ] T003 [US1] En `src/audio/tone-engine.ts`, agregar el soft clipper entre `output` y el destino (research §2):
+- [x] T003 [US1] En `src/audio/tone-engine.ts`, agregar el soft clipper entre `output` y el destino (research §2):
   - `const shaper = new Tone.WaveShaper((x) => { const v = Math.abs(x) * 4; const y = v <= 0.8 ? v : 0.8 + 0.2 * Math.tanh((v - 0.8) / 0.2); return Math.sign(x) * y }, 8193).toDestination()` y `shaper.oversample = 'none'`;
   - `const quarter = new Tone.Gain(0.25).connect(shaper)`; `output` pasa de `.toDestination()` a `.connect(quarter)`;
   - `shaper` y `quarter` se suman a `nodes`. `stop` sigue silenciando `output`.

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Brainstorming companion
+.superpowers/
+
+# Spec Kit catalog cache
+.specify/extensions/.cache/

@@ -296,7 +296,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   **Verde completo**. **Commit**: `feat: estilo Pad ambiental en el motor (#28)`. Done: `maxPolyphony: 64` va en `new PolySynth({ voice, maxPolyphony, options })`, porque con la forma `(voice, options)` Tone lo ignora.
 
-- [ ] T018 [US3] Crear `src/styles.test.tsx` (falla):
+- [x] T018 [US3] Crear `src/styles.test.tsx` (falla):
   1. `'empieza en Analógico cálido'`: el `radiogroup` `Estilo` tiene `Analógico cálido` y `Pad ambiental`, con el primero marcado, y la línea de estado dice `Aleatorio · Analógico cálido · 60 BPM · 4/4`.
   2. `'con la música detenida, la línea de estado muestra el estilo elegido'`: al elegir `Pad ambiental`, dice `Aleatorio · Pad ambiental · 60 BPM · 4/4`.
   3. `'un cambio de estilo a mitad de compás aplica desde el compás siguiente'`:
@@ -307,7 +307,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T019 [US3] Implementar:
+- [x] T019 [US3] Implementar:
   - **`src/practice/settings.ts`**: `style: Style` (`'warm'`), con `z.enum(['warm', 'pad']).catch(D.style)`.
   - **`src/practice/store.ts`**:
     - `style`, `setStyle` y `sounding.style`;

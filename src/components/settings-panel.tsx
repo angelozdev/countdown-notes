@@ -1,6 +1,6 @@
 import { Settings, Volume2, VolumeX } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
-import type { Channel } from '@/audio/engine'
+import type { Channel, Style } from '@/audio/engine'
 import { Stepper } from '@/components/stepper'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +18,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
-import { NOT_ENOUGH_NOTES, usePractice } from '@/practice/store'
+import { NOT_ENOUGH_NOTES, STYLE_LABELS, usePractice } from '@/practice/store'
 
 /** Un grupo del panel: filete arriba y título; los controles grandes van debajo. */
 const SECTION = 'flex flex-col gap-3 border-t border-border pt-5'
@@ -131,6 +131,8 @@ function SoundPicker() {
   const setWithChord = usePractice((state) => state.setWithChord)
   const chordType = usePractice((state) => state.chordType)
   const setChordType = usePractice((state) => state.setChordType)
+  const style = usePractice((state) => state.style)
+  const setStyle = usePractice((state) => state.setStyle)
   return (
     <Section title="Sonido">
       <p className={CAPTION}>Qué suena</p>
@@ -175,6 +177,24 @@ function SoundPicker() {
           </select>
         </>
       )}
+      <p className={CAPTION}>Estilo</p>
+      <ToggleGroup
+        type="single"
+        aria-label="Estilo"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-2"
+        value={style}
+        onValueChange={(value) => value && setStyle(value as Style)}
+      >
+        {(Object.entries(STYLE_LABELS) as [Style, string][]).map(
+          ([id, label]) => (
+            <ToggleGroupItem key={id} value={id} className={PICKED_ITEM}>
+              {label}
+            </ToggleGroupItem>
+          )
+        )}
+      </ToggleGroup>
     </Section>
   )
 }

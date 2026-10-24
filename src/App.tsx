@@ -13,6 +13,7 @@ import {
   NOT_ENOUGH_NOTES,
   nowPlaying,
   PracticeContext,
+  STYLE_LABELS,
   usePractice
 } from '@/practice/store'
 
@@ -58,9 +59,14 @@ function HandsFree() {
 function StatusLine() {
   const bpm = usePractice((state) => state.bpm)
   const meter = usePractice((state) => meterOf(state).id)
+  const style = usePractice((state) =>
+    state.status !== 'stopped'
+      ? (state.sounding?.style ?? state.style)
+      : state.style
+  )
   return (
     <p className="p-2 text-center text-sm text-muted-foreground">
-      Aleatorio · Analógico cálido · {bpm} BPM · {meter}
+      Aleatorio · {STYLE_LABELS[style]} · {bpm} BPM · {meter}
     </p>
   )
 }

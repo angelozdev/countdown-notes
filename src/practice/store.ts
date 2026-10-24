@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 import { useStore } from 'zustand'
 import { shallow } from 'zustand/shallow'
 import { createStore } from 'zustand/vanilla'
-import type { Bar, Channel, Engine, Mix } from '@/audio/engine'
+import type { Bar, Channel, Engine, Mix, Style } from '@/audio/engine'
 import { type ChordTypeId, voicingOf } from '@/music/chords'
 import {
   accentAt,
@@ -47,11 +47,12 @@ export type PracticeState = {
   bassOctave: 1 | 2 | 3
   withChord: boolean
   chordType: ChordTypeId
+  style: Style
   mix: Mix
   /** Parar tras `count` vueltas, si `on`. */
   repeats: { on: boolean; count: number }
   /** Lo armado para el compás que suena; sin acorde, `chordType` es null. */
-  sounding: { chordType: ChordTypeId | null } | null
+  sounding: { chordType: ChordTypeId | null; style: Style } | null
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
   play: () => void
@@ -63,6 +64,7 @@ export type PracticeState = {
   setBassOctave: (octave: 1 | 2 | 3) => void
   setWithChord: (withChord: boolean) => void
   setChordType: (type: ChordTypeId) => void
+  setStyle: (style: Style) => void
   setVolume: (channel: Channel, volume: number) => void
   toggleMute: (channel: Channel) => void
   setRepeats: (patch: Partial<PracticeState['repeats']>) => void
@@ -92,6 +94,11 @@ export const meterOf = (state: PracticeState): Meter =>
 
 export const NOT_ENOUGH_NOTES = 'Elige al menos 2 notas para tocar.'
 
+export const STYLE_LABELS: Record<Style, string> = {
+  warm: 'Analógico cálido',
+  pad: 'Pad ambiental'
+}
+
 /** Con menos de 2 notas no se puede evitar repetir una nota seguida. */
 export const canPlay = (state: PracticeState) => state.notes.length >= 2
 
@@ -112,7 +119,10 @@ export function createPracticeStore(engine: Engine) {
     // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
     let requested = 0
     // lo armado en barAt para cada compás, hasta que suena su primer golpe (research §7)
-    const planned = new Map<number, { chordType: ChordTypeId | null }>()
+    const planned = new Map<
+      number,
+      { chordType: ChordTypeId | null; style: Style }
+    >()
 
     function nextRound(previous: Round): Round {
       const { notes, barsPerNote, meter } = get()
@@ -161,7 +171,7 @@ export function createPracticeStore(engine: Engine) {
       const meter = METER_BY_ID[round.meter]
       const index = noteIndexAt(round, bar)
       // figura, octava y acorde se leen aquí, al armar el compás: un cambio aplica desde el siguiente
-      const { bassFigure, bassOctave, withChord, chordType } = get()
+      const { bassFigure, bassOctave, withChord, chordType, style } = get()
       const bass = bassAttacks(meter, bassFigure).map(
         ({ at, length }): Bar['events'][number] => ({
           at,
@@ -184,10 +194,11 @@ export function createPracticeStore(engine: Engine) {
             }
           ]
         : []
-      planned.set(bar, { chordType: withChord ? chordType : null })
+      planned.set(bar, { chordType: withChord ? chordType : null, style })
       // el sort es estable: en el mismo at, el click queda antes que el bajo y el bajo antes que el acorde
       return {
         ...planOf(meter),
+        style,
         events: [...clicksOf(meter), ...bass, ...chord].sort(
           (a, b) => a.at - b.at
         )
@@ -267,6 +278,9 @@ export function createPracticeStore(engine: Engine) {
       },
       setChordType(chordType) {
         set({ chordType })
+      },
+      setStyle(style) {
+        set({ style })
       },
       setVolume(channel, volume) {
         const { mix } = get()

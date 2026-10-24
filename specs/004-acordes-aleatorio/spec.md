@@ -10,6 +10,12 @@
 
 Hasta la entrega 2, la app toca solo el bajo en la raíz de la nota sorteada. Esta entrega suma el acorde: el usuario elige "bajo + acorde" y un tipo de acorde de jazz, y cada nota de la vuelta suena con ese acorde, en un voicing que suena bien. También suma el segundo estilo de sonido, Pad ambiental, que se elige junto al Analógico cálido de siempre.
 
+## Clarifications
+
+### Session 2026-10-24
+
+- Q: Hoy, con los volúmenes por defecto, la mezcla ya pasa del máximo sin el acorde (bajo + click en 80: picos de 1,22 a 1,32, revisión final de la entrega 2). ¿Cómo se cumple FR-018? → A: Con un soft clipper en la salida común: lineal hasta 0,8 y una curva suave arriba. No baja el volumen general y también resuelve el hueco de #22 (bajo por encima de ~90).
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Bajo + acorde con tríadas (Priority: P1) · #26
@@ -144,7 +150,7 @@ En ajustes, el usuario elige el estilo de sonido: Analógico cálido (el de siem
 
 **Mezcla y ajustes recordados**
 
-- **FR-018**: Con los volúmenes por defecto, en los dos estilos y con cualquier acorde, la mezcla de los tres canales MUST NOT saturar.
+- **FR-018**: Con cualquier volumen, incluidos los tres canales al máximo, en los dos estilos y con cualquier acorde, la mezcla MUST NOT pasar del nivel máximo. Por debajo de 0,8 del máximo, el sonido no cambia; arriba, los picos se redondean suavemente en lugar de recortarse.
 - **FR-019**: La app MUST recordar en el dispositivo los ajustes nuevos (qué suena, tipo de acorde, estilo, y volumen y silencio del acorde), con las reglas de la entrega 2 (FR-030 a FR-034). Los ajustes guardados por la entrega 2 MUST conservarse: los nuevos toman su valor por defecto.
 
 ### Key Entities
@@ -165,7 +171,7 @@ En ajustes, el usuario elige el estilo de sonido: Analógico cálido (el de siem
 - **SC-002**: Para los 300 acordes (12 raíces por 25 tipos), el 100% de los voicings cumple FR-007 a FR-009.
 - **SC-003**: Para los 300 acordes, "Ahora" muestra el cifrado y el nombre en español de la tabla de FR-005, y el más largo cabe completo en una pantalla de 320 px.
 - **SC-004**: Un cambio de "qué suena", tipo o estilo aplica en el compás siguiente en el 100% de los casos, sin cortar la práctica.
-- **SC-005**: En el audio generado sin parlantes, con los volúmenes por defecto, en los dos estilos y con el acorde más denso, la mezcla nunca supera el nivel máximo (no satura).
+- **SC-005**: En el audio generado sin parlantes, con los volúmenes por defecto y con los tres canales al máximo, en los dos estilos y con el acorde más denso, la mezcla nunca supera el nivel máximo.
 - **SC-006**: Tras una sesión con la guitarra, el usuario confirma que improvisó sobre acordes de séptima en los dos estilos, y que los voicings suenan bien y se distinguen los tipos.
 
 ## Assumptions
@@ -177,5 +183,5 @@ En ajustes, el usuario elige el estilo de sonido: Analógico cálido (el de siem
 - El algoritmo de voicings es del builder (diseño, sección 11). La spec fija solo las reglas que se pueden comprobar (FR-007 a FR-009).
 - Los parámetros de sonido del Anexo A del diseño son el punto de partida; se afinan de oído dentro de la app (diseño, 5.1).
 - Con "solo bajo", el canal del acorde y el selector de tipo se ocultan para no llenar el panel (decisión del builder). Sus valores se conservan.
-- El hueco conocido de la entrega 2 sigue: el bajo satura con su volumen por encima de ~90 (#22). Esta entrega pide que no sature la mezcla con los volúmenes por defecto (FR-018), no con todos al máximo.
+- El soft clipper de FR-018 (decisión del usuario, Clarifications) también cierra el hueco conocido de la entrega 2: el bajo por encima de ~90 (#22).
 - Los ajustes guardados por la entrega 2 se conservan porque cada ajuste guardado ya vuelve a su valor por defecto cuando falta o es inválido (entrega 2, data-model). Los detalles del esquema van en el plan.

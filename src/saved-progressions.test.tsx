@@ -173,3 +173,70 @@ test('los ajustes de la entrega 4 se conservan', () => {
     )
   ).toBeDefined()
 })
+
+const nameField = (editor: Panel) =>
+  editor.getByRole('textbox', { name: 'Nombre' }) as HTMLInputElement
+
+test('el nombre por defecto es el primer número libre', async () => {
+  savedSettings({ mode: 'progression' })
+  const first = renderApp()
+  const editor = await newProgression(first)
+  expect(nameField(editor).value).toBe('Progresión 1')
+  await first.user.type(chords(editor), 'Dm7 G7 Cmaj7 Cmaj7')
+  await first.user.click(editor.getByRole('button', { name: 'Guardar' }))
+  await first.user.click(editor.getByRole('button', { name: 'Listo' }))
+  expect(nameField(await newProgression(first)).value).toBe('Progresión 2')
+  first.unmount()
+
+  stored([{ ...andaluza, name: 'Progresión 2' }])
+  const app = renderApp()
+  expect(nameField(await newProgression(app)).value).toBe('Progresión 1')
+})
+
+test('renombrar cambia el selector y la línea de estado', async () => {
+  stored([andaluza])
+  savedSettings({ mode: 'progression', progression: 'propia-1', tonic: 'A' })
+  const first = renderApp()
+  const panel = await first.openSettings()
+  await first.user.click(
+    panel.getByRole('button', { name: 'Editar progresión' })
+  )
+  const editor = within(
+    screen.getByRole('main', { name: 'Editor de progresiones' })
+  )
+  await first.user.clear(nameField(editor))
+  await first.user.type(nameField(editor), 'Andaluza de La')
+  await first.user.click(editor.getByRole('button', { name: 'Guardar' }))
+  await first.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  expect(screen.getByText(/^Andaluza de La · La menor/)).toBeDefined()
+  expect(groups(await first.openSettings())[0].options).toEqual([
+    'Andaluza de La'
+  ])
+  await first.closeSettings()
+  first.unmount()
+
+  const app = renderApp()
+  expect(screen.getByText(/^Andaluza de La · La menor/)).toBeDefined()
+  expect(groups(await app.openSettings())[0].options).toEqual([
+    'Andaluza de La'
+  ])
+})
+
+test('un nombre vacío conserva el anterior', async () => {
+  stored([andaluza])
+  savedSettings({ mode: 'progression', progression: 'propia-1', tonic: 'A' })
+  const app = renderApp()
+  const panel = await app.openSettings()
+  await app.user.click(panel.getByRole('button', { name: 'Editar progresión' }))
+  const editor = within(
+    screen.getByRole('main', { name: 'Editor de progresiones' })
+  )
+  await app.user.clear(nameField(editor))
+  await app.user.clear(chords(editor))
+  await app.user.type(chords(editor), 'Am G F E Dm')
+  await app.user.click(editor.getByRole('button', { name: 'Guardar' }))
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  expect(screen.getByText(/^Andaluza mía · La menor/)).toBeDefined()
+})

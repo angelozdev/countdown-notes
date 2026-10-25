@@ -125,6 +125,7 @@ export type PracticeState = {
   /** Sin `id`, un borrador nuevo, elegido, y detiene la práctica; con `id`, el de esa guardada, sin tocar nada más. */
   openEditor: (id?: MyProgression['id']) => void
   setDraftText: (text: string) => void
+  setDraftName: (name: string) => void
   /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
   saveDraft: () => void
   /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
@@ -559,6 +560,10 @@ export function createPracticeStore(engine: Engine) {
               : { errors: result.errors })
           }
         })
+      },
+      setDraftName(name) {
+        const { editor } = get()
+        if (editor) set({ editor: { ...editor, name } })
       },
       saveDraft() {
         const { editor, mine, progression, tonic } = get()

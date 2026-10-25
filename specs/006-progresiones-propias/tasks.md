@@ -287,14 +287,14 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### Nombre
 
-- [ ] T014 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
+- [x] T014 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
   1. `'el nombre por defecto es el primer número libre'`: la primera progresión nueva tiene el `textbox` `Nombre` en `Progresión 1`. Tras guardarla, la siguiente nueva tiene `Progresión 2`. Con `stored` de una sola progresión llamada `Progresión 2`, la nueva es `Progresión 1`.
   2. `'renombrar cambia el selector y la línea de estado'`: en `Editar progresión` de la andaluza, `Nombre` en `Andaluza de La`, `Guardar` y `Listo`: la opción y la línea de estado dicen `Andaluza de La`, y siguen así al reabrir la app.
   3. `'un nombre vacío conserva el anterior'`: borrar `Nombre`, escribir un cambio en `Acordes`, `Guardar` y `Listo`: la línea de estado sigue con `Andaluza mía`.
 
   Correr y **verlo fallar**: los casos del nombre por defecto pueden pasar ya por T007; el del `textbox` `Nombre` no.
 
-- [ ] T015 [US2] Implementar:
+- [x] T015 [US2] Implementar:
   - `setDraftName(name)` en `src/practice/store.ts`;
   - en `src/components/progression-editor.tsx`, el `<input aria-label="Nombre">` arriba, con `editor.name`.
 

@@ -20,11 +20,12 @@ export function ProgressionEditor() {
   const savable = usePractice(canSave)
   const dirty = usePractice(isDirty)
   const setDraftText = usePractice((state) => state.setDraftText)
+  const setDraftName = usePractice((state) => state.setDraftName)
   const saveDraft = usePractice((state) => state.saveDraft)
   const closeEditor = usePractice((state) => state.closeEditor)
   const discardDraft = usePractice((state) => state.discardDraft)
   if (!editor) return null
-  const { text, errors, bars } = editor
+  const { name, text, errors, bars } = editor
 
   return (
     <main
@@ -41,6 +42,14 @@ export function ProgressionEditor() {
           Listo
         </Button>
       </div>
+      <input
+        aria-label="Nombre"
+        autoCapitalize="sentences"
+        spellCheck={false}
+        className="h-12 w-full rounded-lg border border-input bg-transparent px-3 text-lg font-bold outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        value={name}
+        onChange={(event) => setDraftName(event.target.value)}
+      />
       <textarea
         aria-label="Acordes"
         aria-invalid={errors.length > 0 || undefined}

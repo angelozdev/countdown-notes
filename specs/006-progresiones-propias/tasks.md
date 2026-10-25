@@ -116,7 +116,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   - `Progression.id` pasa a `ProgressionId | MyProgressionId`;
   - `myProgression` usa la tabla `TONICS` del archivo para `key.tonic` y `formatProgression` para `bars` ([data-model](./data-model.md), Progresión propia).
 
-  `PROGRESSION_BY_ID` sigue tipado con `ProgressionId`. **Verde completo**. **Commit**: `feat: una progresión propia se lee como la biblioteca (#33)`.
+  `PROGRESSION_BY_ID` sigue tipado con `ProgressionId`. **Verde completo**. **Commit**: `feat: una progresión propia se lee como la biblioteca (#33)`. Done: `PROGRESSIONS` queda tipado `(Progression & { id: ProgressionId })[]`, para que el `z.enum` de `settings.ts` siga viendo los ids de la biblioteca y no el ancho.
 
 ### El editor en la app
 
@@ -148,7 +148,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [x] T007 [US1] Implementar ([data-model](./data-model.md), Borrador y Derivados): Done: también `useSpaceToggle` ignora el espacio en `input, textarea, select, [contenteditable]` (adelantado de T009: sin eso no se puede escribir un espacio en Acordes); `closeEditor()` de una nueva sin guardar devuelve lo que regía (`opened`), para no dejar `progression` apuntando a una propia que no existe.
+- [x] T007 [US1] Implementar ([data-model](./data-model.md), Borrador y Derivados):
   - **`src/practice/store.ts`**:
     - Estado `mine: MyProgression[]`, que empieza en `[]` (US2 lo carga), y `editor: Draft | null`, con `null` al empezar. `Draft` se exporta, con los campos de data-model.
     - Se exporta `progressionOf(state, id = state.progression)`: el borrador si `editor?.id === id`; si no, `myProgression` de la de `mine`; si no, `PROGRESSION_BY_ID[id]`.
@@ -180,7 +180,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - El `<select>` suma primero el `<optgroup label="Mis progresiones">` con las de `mine`, en orden, si hay alguna.
     - `ProgressionPicker` y `SoundPicker` usan `progressionOf` en vez de `PROGRESSION_BY_ID`.
 
-  **Verde completo**. **Commit**: `feat: escribir una progresión y tocar encima (#33)`.
+  **Verde completo**. **Commit**: `feat: escribir una progresión y tocar encima (#33)`. Done: también `useSpaceToggle` ignora el espacio en `input, textarea, select, [contenteditable]` (research §9, adelantado de T009: sin eso no se puede escribir un espacio en Acordes); `closeEditor()` de una nueva sin guardar devuelve lo que regía (`opened`), para no dejar `progression` apuntando a una propia que no existe; `progressionOf` guarda en un `WeakMap` la `Progression` convertida de cada propia, para no rehacerla en cada lectura; `StatusLine` toma `progression` y `tonic` de la vuelta (o de los ajustes) y llama `progressionOf(state, progression)`.
 
 ### Salir del editor
 
@@ -203,7 +203,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - `Seguir editando`: cierra el `Sheet`.
   - **`src/lib/hands-free.ts`**: `useSpaceToggle` también ignora el espacio si `event.target` es un `Element` dentro de `input, textarea, select, [contenteditable]` (research §9). Se actualiza el comentario de la función. Done: ya estaba en T007; el comentario ya era exacto.
 
-  **Verde completo**. **Commit**: `feat: preguntar al salir con cambios sin guardar (#33)`. Comentar en #33.
+  **Verde completo**. **Commit**: `feat: preguntar al salir con cambios sin guardar (#33)`. Comentar en #33. Done: el `Sheet` `Cambios sin guardar` no tiene botón de cerrar (`showCloseButton={false}`); `Escape` y tocar el fondo valen como `Seguir editando`.
 
 - [ ] T010 [US1] Verificación manual: quickstart §2, filas 1–6.
 
@@ -283,7 +283,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - `openEditor(id)` copia la guardada al borrador, con `text: formatProgression(bars)`, `isNew: false` y `opened` con lo actual, sin cambiar la progresión, la tónica ni la música.
   - **`src/components/settings-panel.tsx`**: con una propia elegida, el botón `Editar progresión` (en `SheetClose asChild`) llama a `openEditor(progression)`.
 
-  **Verde completo**. **Commit**: `feat: las progresiones propias se guardan en el dispositivo (#34)`. Done: decisión 1 confirmada por el usuario (research §1 tal cual); `Editar progresión` va tras `Nueva progresión`; `openEditor(id)` no hace nada si el id no está guardado.
+  **Verde completo**. **Commit**: `feat: las progresiones propias se guardan en el dispositivo (#34)`. Done: decisión 1 confirmada por el usuario (research §1 tal cual); `Editar progresión` va tras `Nueva progresión`; `openEditor(id)` no hace nada si el id no está guardado; el id `propia-N` es un `myProgressionId` compartido por `my-progressions.ts` y `settings.ts`, con un `refine` que da el tipo `MyProgressionId` en vez de `z.string().regex`; `Nueva progresión` llama `() => openEditor()` para que el evento del clic no llegue como id; el comentario de `PROGRESSIONS` explica por qué su id sigue siendo `ProgressionId`.
 
 ### Nombre
 
@@ -292,7 +292,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   2. `'renombrar cambia el selector y la línea de estado'`: en `Editar progresión` de la andaluza, `Nombre` en `Andaluza de La`, `Guardar` y `Listo`: la opción y la línea de estado dicen `Andaluza de La`, y siguen así al reabrir la app.
   3. `'un nombre vacío conserva el anterior'`: borrar `Nombre`, escribir un cambio en `Acordes`, `Guardar` y `Listo`: la línea de estado sigue con `Andaluza mía`.
 
-  Correr y **verlo fallar**: los casos del nombre por defecto pueden pasar ya por T007; el del `textbox` `Nombre` no.
+  Correr y **verlo fallar**: los casos del nombre por defecto pueden pasar ya por T007; el del `textbox` `Nombre` no. Done: el caso 3 escribe un texto de reemplazo (`Am G F E Dm`) porque el lector todavía no aceptaba `|` y el texto guardado trae barras.
 
 - [x] T015 [US2] Implementar:
   - `setDraftName(name)` en `src/practice/store.ts`;
@@ -323,7 +323,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - `setProgression(id)`, con un id que está en `mine`, además pone `tonic` en su `key.tonic`.
   - **`src/components/progression-editor.tsx`**: `<TonicPicker label="Tonalidad de origen" progression={myProgression(editor)} … />` y un `ToggleGroup` `Tipo de tonalidad` con `Mayor` y `Menor`, debajo del nombre.
 
-  **Verde completo**. **Commit**: `feat: tonalidad de origen de una progresión propia (#34)`.
+  **Verde completo**. **Commit**: `feat: tonalidad de origen de una progresión propia (#34)`. Done: `PICKED_ITEM`, la clase del ítem marcado, pasó a `src/components/tonic-picker.tsx` y se exporta, porque el editor la usa también en `Tipo de tonalidad`.
 
 ### Probar sin guardar
 
@@ -416,7 +416,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - también `ChordTypeSelect` con el tipo del acorde, y `Quitar` (desactivado con un compás). Las acciones del `Sheet` (`Quitar` aquí; `Partir`, `Unir` y `Duplicar` en T029) lo cierran al usarse, para que el carril vuelva a ser accesible;
     - debajo del carril, `Agregar compás`.
 
-  **Verde completo**. **Commit**: `feat: armar una progresión tocando el carril (#35)`. Comentar en #35.
+  **Verde completo**. **Commit**: `feat: armar una progresión tocando el carril (#35)`. Comentar en #35. Done: `chord-type-select.tsx` exporta la clase `SELECT` del `<select>`, para que el selector de progresión del panel la reuse; el `Sheet` del compás edita solo la parte 0 (las partes llegan en T029).
 
 - [ ] T025 [US3] Verificación manual: quickstart §2, filas 13–14.
 
@@ -478,7 +478,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - cada parte abre su `Sheet` `Compás {n}, parte {k}`, que edita esa parte;
     - en el `Sheet`, `Partir` (compás de un acorde) o `Unir` (de dos), y `Duplicar`.
 
-  **Verde completo**. **Commit**: `feat: partir, unir y duplicar compases (#36)`.
+  **Verde completo**. **Commit**: `feat: partir, unir y duplicar compases (#36)`. Done: `lane.tsx` exporta `SplitLabel` para que el editor dibuje las partes igual que la práctica; el `Sheet` guarda en `kept` el compás como estaba al cerrarlo con una acción, para que no cambie al deslizarse; la raíz y el tipo salen de un `ChordFields` compartido por todas las partes.
 
 - [x] T030 [P] [US4] En `src/practice/progression.browser.test.ts`, agregar `'una progresión propia con compases partidos cae a tiempo'` (research §11). Con `renderStore` del archivo, en `setup`:
   - `setMode('progression')`, `openEditor()`, `setDraftText('Cmaj7 A7 | Dm7 G7')` y `saveDraft()`;
@@ -513,7 +513,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   - con el teclado del iPhone abierto, el campo y la primera fila del carril a la vista;
   - los mensajes de error junto al campo.
 
-  Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del editor de progresiones (#6)`. Done: el editor usa `Section` del panel (filete y título) y el orden pasó a nombre, acordes con el carril debajo y tonalidad, para que con el teclado a 393 × 430 px se vean el campo y la primera fila; los errores van pegados al campo, con fondo propio; la parte que se edita queda en ámbar mientras su hoja está abierta; el campo ya no se aplasta con progresiones largas; `Borrar progresión` pasó al final (cabe a 320 px) y el foco vuelve al compás al cerrar su hoja (commit aparte, `66cc950`).
+  Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del editor de progresiones (#6)`. Done: el editor usa `Section` del panel (filete y título) y el orden pasó a nombre, acordes con el carril debajo y tonalidad, para que con el teclado a 393 × 430 px se vean el campo y la primera fila; los errores van pegados al campo, con fondo propio; la parte que se edita queda en ámbar mientras su hoja está abierta; el campo ya no se aplasta con progresiones largas; `Borrar progresión` pasó al final (cabe a 320 px) y el foco vuelve al compás al cerrar su hoja (commit aparte, `66cc950`, con `src/bar-focus.test.tsx`); `Guardar` es una píldora gris (`secondary`) para que Play sea la única acción en ámbar.
 
 - [x] T034 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §12. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #6 el resumen de la entrega. Done: quickstart §1 en verde (1100 tests, 18 e2e); el bundle pasó de 696,79 kB (gzip 202,87) a 727,23 kB (gzip 211,20), +30,44 kB, anotado en research §12; research §10 dice el orden final del editor (la tonalidad pasó después del carril). El comentario en #6 lo hace la sesión principal.
 - [ ] T035 El usuario hace quickstart §2–§5: la prueba de oído, el blues de 12 compases en menos de 3 minutos (SC-005) y la sesión con la guitarra (SC-006). Si algo falla, se reabre el issue de esa historia.

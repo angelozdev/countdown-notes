@@ -100,6 +100,10 @@ export function Lane() {
                         />
                       )}
                       <span
+                        // un <img> no puede contener las dos líneas; sin esto se lee "D m7"
+                        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
+                        role="img"
+                        aria-label={labels[j]}
                         data-at={chord.at}
                         style={{
                           flexGrow:

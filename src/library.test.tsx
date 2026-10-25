@@ -123,6 +123,18 @@ test('el blues de jazz parte los compases 11 y 12', async () => {
   ])
 })
 
+test('cada mitad de un compás partido se lee como un solo cifrado', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  await pickProgression(app, 'Blues de jazz')
+  await play(app)
+  app.fake.beat(5)
+
+  const split = within(bars()[11])
+  expect(split.getByRole('img', { name: 'Dm7' })).toBeDefined()
+  expect(split.getByRole('img', { name: 'G7' })).toBeDefined()
+})
+
 test('el bajo y el acorde atacan en el cambio de mitad de compás', async () => {
   const app = renderApp()
   await pickMode(app, 'Progresión')

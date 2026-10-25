@@ -163,7 +163,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### Audio renderizado
 
-- [ ] T009 [US1] Crear `src/practice/progression.browser.test.ts` (research §12). Un helper `renderStore(setup, seconds)`:
+- [x] T009 [US1] Crear `src/practice/progression.browser.test.ts` (research §12). Un helper `renderStore(setup, seconds)`:
   - corre dentro de `Tone.Offline` con `context.lookAhead = 0.1`;
   - hace `localStorage.clear()` y crea `createToneEngine()`, envuelto para guardar la promesa de `start` (`start: (o) => (started = real.start(o))`);
   - arma `createPracticeStore(engine)`, aplica `setup(store.getState())`, llama a `play()` y espera `started`.

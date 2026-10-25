@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import { CHORD_TYPES, chordSymbol, type ChordTypeId } from './chords'
 import { NOTES } from './notes'
-import { formatProgression, parseProgression } from './progression-text'
+import {
+  formatProgression,
+  parseProgression,
+  type WrittenBar
+} from './progression-text'
 
 const tonal = (label: string) => label.replace(/♭/g, 'b').replace(/♯/g, '#')
 
@@ -69,6 +73,30 @@ describe('separadores', () => {
   })
 })
 
+describe('compases de dos acordes', () => {
+  test('con barras, cada trozo es un compás de uno o dos acordes', () => {
+    expect(parseProgression('Cmaj7 | C7 A7 | Dm7 G7')).toEqual({
+      bars: [
+        [{ root: 'C', type: 'maj7' }],
+        [
+          { root: 'C', type: '7' },
+          { root: 'A', type: '7' }
+        ],
+        [
+          { root: 'D', type: 'm7' },
+          { root: 'G', type: '7' }
+        ]
+      ]
+    })
+  })
+
+  test('una barra al borde es opcional', () => {
+    expect(parseProgression('| Dm7 | G7 |')).toEqual({
+      bars: [[{ root: 'D', type: 'm7' }], [{ root: 'G', type: '7' }]]
+    })
+  })
+})
+
 describe('errores', () => {
   test('un acorde que no se reconoce, citado y con su posición', () => {
     expect(parseProgression('Dm7 Hm7 G7')).toEqual({
@@ -92,6 +120,32 @@ describe('errores', () => {
     })
   })
 
+  test('tres acordes en un compás, citados con su posición', () => {
+    expect(parseProgression('C | Dm7 G7 C')).toEqual({
+      errors: [
+        {
+          start: 4,
+          end: 12,
+          message: 'Un compás tiene uno o dos acordes: «Dm7 G7 C».'
+        }
+      ]
+    })
+  })
+
+  test('un compás vacío entre dos barras', () => {
+    expect(parseProgression('Dm7 || G7')).toEqual({
+      errors: [
+        { start: 4, end: 6, message: 'Hay un compás vacío entre dos barras.' }
+      ]
+    })
+  })
+
+  test('un acorde que no se reconoce dentro de un compás', () => {
+    expect(parseProgression('Dm7 | Hm7 G7')).toEqual({
+      errors: [{ start: 6, end: 9, message: 'No reconozco «Hm7».' }]
+    })
+  })
+
   test('varios errores, en orden', () => {
     expect(parseProgression('Hm7 Xb')).toEqual({
       errors: [
@@ -111,5 +165,31 @@ describe('formatProgression', () => {
         [{ root: 'C', type: 'maj7' }]
       ])
     ).toBe('Dm7 | G7 | Cmaj7')
+  })
+
+  test('los acordes de un compás, con espacio', () => {
+    expect(
+      formatProgression([
+        [{ root: 'C', type: 'maj7' }],
+        [
+          { root: 'C', type: '7' },
+          { root: 'A', type: '7' }
+        ],
+        [
+          { root: 'D', type: 'm7' },
+          { root: 'G', type: '7' }
+        ]
+      ])
+    ).toBe('Cmaj7 | C7 A7 | Dm7 G7')
+  })
+
+  test.each([
+    'Dm7 G7 Cmaj7 Cmaj7',
+    'Cmaj7 | C7 A7 | Dm7 G7',
+    '| Dm7 | G7 |',
+    'Bbm7b5 E7b9 | Am | F#7 B'
+  ])('%s: escrito y leído da los mismos compases', (text) => {
+    const { bars } = parseProgression(text) as { bars: WrittenBar[] }
+    expect(parseProgression(formatProgression(bars))).toEqual({ bars })
   })
 })

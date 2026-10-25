@@ -430,7 +430,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 **Independent Test**: quickstart §2, filas 15–17, y §3.
 
-- [ ] T026 [P] [US4] En `src/music/progression-text.test.ts`, agregar lo marcado US4 en [contracts](./contracts/interfaces.md) §3 (falla):
+- [x] T026 [P] [US4] En `src/music/progression-text.test.ts`, agregar lo marcado US4 en [contracts](./contracts/interfaces.md) §3 (falla):
   - `'Cmaj7 | C7 A7 | Dm7 G7'` da 3 compases, el segundo `[C7, A7]` y el tercero `[Dm7, G7]`;
   - `'| Dm7 | G7 |'` da 2 compases;
   - `'C | Dm7 G7 C'` da un error `Un compás tiene uno o dos acordes: «Dm7 G7 C».`, con `start` y `end` de ese texto;
@@ -439,7 +439,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   - `formatProgression` de los compases del primer caso es `'Cmaj7 | C7 A7 | Dm7 G7'`;
   - `test.each` sobre esos textos, con y sin barras: `parseProgression(formatProgression(bars))` devuelve los mismos `bars`.
 
-- [ ] T027 [US4] En `src/music/progression-text.ts`:
+- [x] T027 [US4] En `src/music/progression-text.ts`:
   - con `|` en el texto, se parte por `|` guardando la posición de cada trozo;
   - se ignoran el primero y el último si solo tienen espacios;
   - cada trozo es un compás con sus palabras: 0 palabras es el error de compás vacío, más de 2 el de uno o dos acordes (cita el trozo sin espacios al borde), y cada palabra se lee como en T003;

@@ -31,24 +31,78 @@ function readChord(word: string): WrittenChord | undefined {
   return { root: simplify(root), type: type.id }
 }
 
-/** El texto del editor: sin `|`, un acorde por compás. */
+type Word = { text: string; start: number }
+/** Un compás del texto: sus palabras y el trozo (`start`–`end`) que ocupa entre barras. */
+type Piece = { words: Word[]; start: number; end: number }
+
+const wordsOf = (text: string, offset: number): Word[] =>
+  Array.from(text.matchAll(/\S+/g), (match) => ({
+    text: match[0],
+    start: offset + match.index
+  }))
+
+/** Sin `|`, un compás por palabra; con `|`, un compás por trozo, y una barra al borde es opcional. */
+function piecesOf(text: string): Piece[] {
+  if (!text.includes('|')) {
+    return wordsOf(text, 0).map((word) => ({
+      words: [word],
+      start: word.start,
+      end: word.start + word.text.length
+    }))
+  }
+  let start = 0
+  const pieces = text.split('|').map((chunk) => {
+    const end = start + chunk.length
+    const piece = { words: wordsOf(chunk, start), start, end }
+    start = end + 1
+    return piece
+  })
+  return pieces.filter(
+    ({ words }, i) => words.length > 0 || (i > 0 && i < pieces.length - 1)
+  )
+}
+
+/** El texto del editor: sin `|`, un acorde por compás; con `|`, compases de 1 o 2 acordes. */
 export function parseProgression(
   text: string
 ): { bars: WrittenBar[] } | { errors: TextError[] } {
   const bars: WrittenBar[] = []
   const errors: TextError[] = []
-  for (const { 0: word, index } of text.matchAll(/\S+/g)) {
-    const chord = readChord(word)
-    if (chord) bars.push([chord])
-    else {
+  const pieces = piecesOf(text)
+  for (const { words, start, end } of pieces) {
+    if (words.length === 0) {
+      // el trozo vacío, con las dos barras que lo rodean
       errors.push({
-        start: index,
-        end: index + word.length,
-        message: `No reconozco «${word}».`
+        start: start - 1,
+        end: end + 1,
+        message: 'Hay un compás vacío entre dos barras.'
       })
+    } else if (words.length > 2) {
+      const first = words[0].start
+      const last = words[words.length - 1]
+      const lastEnd = last.start + last.text.length
+      errors.push({
+        start: first,
+        end: lastEnd,
+        message: `Un compás tiene uno o dos acordes: «${text.slice(first, lastEnd)}».`
+      })
+    } else {
+      const bar: WrittenBar = []
+      for (const word of words) {
+        const chord = readChord(word.text)
+        if (chord) bar.push(chord)
+        else {
+          errors.push({
+            start: word.start,
+            end: word.start + word.text.length,
+            message: `No reconozco «${word.text}».`
+          })
+        }
+      }
+      bars.push(bar)
     }
   }
-  if (bars.length + errors.length === 0) {
+  if (pieces.length === 0) {
     errors.push({
       start: 0,
       end: text.length,

@@ -259,7 +259,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### La biblioteca
 
-- [ ] T018 [P] [US3] En `src/music/progressions.test.ts`, agregar (falla):
+- [x] T018 [P] [US3] En `src/music/progressions.test.ts`, agregar (falla):
   - `'la biblioteca trae las 17 progresiones de FR-018'`: los `name` de `PROGRESSIONS` con `group` `Jazz` y `Pop, rock y latino` son los de la lista de nombres (Reglas), en ese orden.
   - `test.each` con la tabla literal de FR-018, escrita sin `×N` (cada compás repetido a mano), con su tónica de origen (`'C'`; `'A'` en `andaluza`; `'D'` en `modal`): `text(barsOf(p, origen, 4/4))` es esa cadena. Por ejemplo, `blues-menor` es `'Cm7 | Cm7 | Cm7 | Cm7 | Fm7 | Fm7 | Cm7 | Cm7 | A♭7 | G7 | Cm7 | G7'`.
   - `'en las 12 tónicas, cada acorde conserva su lugar y una grafía simple'`. Para cada progresión y cada `NOTES[t]`:
@@ -275,7 +275,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
   - El compás partido: en `turnaround`, el segundo acorde de cada compás tiene `at` 2 en 4/4, 2 en 3/4 y 4 en 7/8.
   - `'un sufijo desconocido es un error'`: un `Progression` armado en el test con `bars: 'Cxyz'` hace que `barsOf` lance.
 
-- [ ] T019 [US3] En `src/music/progressions.ts`:
+- [x] T019 [US3] En `src/music/progressions.ts`:
   - las 17 progresiones de FR-018, en orden, con los ids de [data-model](./data-model.md), los nombres de la lista (Reglas) y `bars` copiado de la tabla de FR-018 (con `♭`, `♯` y `×N`);
   - `key`: `{ tonic: 'C', type: 'major' }`, salvo `ii-v-i-menor` y `blues-menor` (`'minor'`), `andaluza` (`{ tonic: 'A', type: 'minor' }`) y `modal` (`{ tonic: 'D', type: 'dorian' }`);
   - `KeyType` suma `'minor' | 'dorian'`, con la tabla `minor` de research §5 para los dos;

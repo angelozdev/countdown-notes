@@ -165,14 +165,14 @@ Si el texto tenía un error, editar tocando lo reemplaza por la última versión
 
 ## 10. UI
 
-- **Pantalla del editor** (`src/components/progression-editor.tsx`), de arriba abajo:
+- **Pantalla del editor** (`src/components/progression-editor.tsx`), de arriba abajo, tal como quedó tras el pulido (T033):
   - "Listo";
-  - nombre;
-  - tonalidad (tónica y mayor o menor);
-  - el campo "Acordes" con sus errores;
-  - el carril del editor, de 4 columnas, como el de práctica, con un botón por compás o por parte;
-  - "Agregar compás";
-  - Play/Stop, "Guardar" y "Borrar progresión".
+  - nombre, que hace de título;
+  - sección "Acordes": el campo con sus errores pegados debajo, el carril del editor, de 4 columnas, como el de práctica, con un botón por compás o por parte, y "Agregar compás";
+  - sección "Tonalidad de origen" (tónica y mayor o menor);
+  - Play/Stop y "Guardar", y debajo "Borrar progresión" (solo en una progresión guardada).
+- **Cambió el orden respecto del plan**: la tonalidad iba antes del campo, pero con el teclado del iPhone abierto (unos 430 px de alto) sus dos filas de tónicas y el Mayor/Menor se comían el lugar del carril. La tonalidad se toca poco (arranca en la de los ajustes), así que va después. A 393 × 430 px se ven el campo y la primera fila del carril.
+- **Pulido**: las secciones son las del panel (`Section`, con filete y título); en pantallas anchas el editor se centra en 36 rem; la parte que se edita queda en ámbar mientras su hoja está abierta; los mensajes de error van en un recuadro pegado al campo (no hizo falta subrayar dentro del texto, §8); y al cerrar la hoja de un compás el foco vuelve al botón que la abrió, o al que ocupa su lugar tras Unir o Quitar.
 - **El carril del editor** no sigue la reproducción (spec, Assumptions). Los compases partidos reparten el ancho según `splitAt`, como en la práctica.
 - **Diálogos**: el selector de un compás, la pregunta de "Listo" y la confirmación de "Borrar" son `Sheet` desde abajo, el mismo componente del panel. No se agrega ningún componente de shadcn.
 - **Componentes compartidos con el panel**, que se extraen al llegar su historia:
@@ -196,3 +196,12 @@ Si el texto tenía un error, editar tocando lo reemplaza por la última versión
 ## 12. Dependencias
 
 Ninguna nueva. zod, zustand, tonal (`simplify`) y el `Sheet` de radix ya están. El bundle crece solo por el código nuevo; quickstart §1 lo mide.
+
+**Tamaño del bundle** (T034, `dist/assets/index-*.js` de `pnpm build`):
+
+| Momento                   | Minificado | gzip      |
+| ------------------------- | ---------- | --------- |
+| T001, antes de la entrega | 696,79 kB  | 202,87 kB |
+| T034, entrega completa    | 727,23 kB  | 211,20 kB |
+
+La entrega suma 30,44 kB (4,4 %) y 8,33 kB en gzip, todo código nuevo: el lector de texto, el store de progresiones propias con su esquema zod, el editor y sus hojas. No hay dependencias nuevas. El aviso de chunks de más de 500 kB ya estaba antes.

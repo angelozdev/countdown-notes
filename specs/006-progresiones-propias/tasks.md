@@ -515,7 +515,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del editor de progresiones (#6)`. Done: el editor usa `Section` del panel (filete y título) y el orden pasó a nombre, acordes con el carril debajo y tonalidad, para que con el teclado a 393 × 430 px se vean el campo y la primera fila; los errores van pegados al campo, con fondo propio; la parte que se edita queda en ámbar mientras su hoja está abierta; el campo ya no se aplasta con progresiones largas; `Borrar progresión` pasó al final (cabe a 320 px) y el foco vuelve al compás al cerrar su hoja (commit aparte, `66cc950`).
 
-- [ ] T034 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §12. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #6 el resumen de la entrega.
+- [x] T034 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §12. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #6 el resumen de la entrega. Done: quickstart §1 en verde (1100 tests, 18 e2e); el bundle pasó de 696,79 kB (gzip 202,87) a 727,23 kB (gzip 211,20), +30,44 kB, anotado en research §12; research §10 dice el orden final del editor (la tonalidad pasó después del carril). El comentario en #6 lo hace la sesión principal.
 - [ ] T035 El usuario hace quickstart §2–§5: la prueba de oído, el blues de 12 compases en menos de 3 minutos (SC-005) y la sesión con la guitarra (SC-006). Si algo falla, se reabre el issue de esa historia.
 
 ---

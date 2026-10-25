@@ -379,7 +379,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   **Verde completo**. **Commit**: `feat: ciclos por las 12 tonalidades en la biblioteca (#32)`.
 
-- [ ] T027 [US4] Crear `src/cycles.test.tsx` (falla). Helpers como en T020, más `pickChordType(app, name)` con `user.selectOptions(panel.getByRole('combobox', { name: 'Tipo de acorde' }), name)`.
+- [x] T027 [US4] Crear `src/cycles.test.tsx` (falla). Helpers como en T020, más `pickChordType(app, name)` con `user.selectOptions(panel.getByRole('combobox', { name: 'Tipo de acorde' }), name)`.
   1. `'el grupo Ciclos va primero'`: los `group` del `combobox` `Progresión` son `Ciclos`, `Jazz` y `Pop, rock y latino`, en ese orden, y `Ciclos` tiene las 4 opciones.
   2. `'el ciclo de cuartas desde Fa'`: con `Ciclo de cuartas` y `Fa`, Play y `fake.beat(5)`:
      - el carril tiene 24 `listitem`, desde `F F B♭ B♭` hasta `C C`;
@@ -397,7 +397,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T028 [US4] En `src/components/settings-panel.tsx`, `Tipo de acorde` aparece con `Bajo + acorde` si el modo es aleatorio o si la progresión elegida tiene `rootsOnly`. El store ya usa `chord.type ?? chordType` (T006), y la línea de estado, `keyLabel` (T008). **Verde completo**. **Commit**: `feat: ciclos por las 12 tonalidades (#32)`. Comentar en #32.
+- [x] T028 [US4] En `src/components/settings-panel.tsx`, `Tipo de acorde` aparece con `Bajo + acorde` si el modo es aleatorio o si la progresión elegida tiene `rootsOnly`. El store ya usa `chord.type ?? chordType` (T006), y la línea de estado, `keyLabel` (T008). **Verde completo**. **Commit**: `feat: ciclos por las 12 tonalidades (#32)`. Comentar en #32.
 
 - [ ] T029 [US4] Verificación manual: quickstart §2, filas 15–17.
 

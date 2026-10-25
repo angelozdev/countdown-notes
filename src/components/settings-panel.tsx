@@ -236,8 +236,12 @@ const FAMILIES = [...new Set(CHORD_TYPES.map(({ family }) => family))]
 function SoundPicker() {
   const withChord = usePractice((state) => state.withChord)
   const setWithChord = usePractice((state) => state.setWithChord)
-  // en la progresión cada acorde trae su tipo
-  const random = usePractice((state) => state.mode === 'random')
+  // en la progresión cada acorde trae su tipo, salvo en los ciclos de solo raíces
+  const choosesType = usePractice(
+    (state) =>
+      state.mode === 'random' ||
+      !!PROGRESSION_BY_ID[state.progression].rootsOnly
+  )
   const chordType = usePractice((state) => state.chordType)
   const setChordType = usePractice((state) => state.setChordType)
   const style = usePractice((state) => state.style)
@@ -261,7 +265,7 @@ function SoundPicker() {
           Bajo + acorde
         </ToggleGroupItem>
       </ToggleGroup>
-      {withChord && random && (
+      {withChord && choosesType && (
         <>
           <p className={CAPTION}>Tipo de acorde</p>
           <div className="relative">

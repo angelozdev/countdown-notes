@@ -20,6 +20,7 @@ import { canSave, isDirty, usePractice } from '@/practice/store'
 export function ProgressionEditor() {
   const errorsId = useId()
   const [asking, setAsking] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const editor = usePractice((state) => state.editor)
   const savable = usePractice(canSave)
   const dirty = usePractice(isDirty)
@@ -29,6 +30,11 @@ export function ProgressionEditor() {
   const saveDraft = usePractice((state) => state.saveDraft)
   const closeEditor = usePractice((state) => state.closeEditor)
   const discardDraft = usePractice((state) => state.discardDraft)
+  const deleteProgression = usePractice((state) => state.deleteProgression)
+  // lo que se borra es lo guardado, no el nombre que se está escribiendo
+  const savedName = usePractice(
+    (state) => state.mine.find(({ id }) => id === state.editor?.id)?.name
+  )
   if (!editor) return null
   const { name, key, text, errors, bars } = editor
 
@@ -37,7 +43,7 @@ export function ProgressionEditor() {
       aria-label="Editor de progresiones"
       className="flex h-dvh flex-col gap-4 overflow-y-auto p-safe"
     >
-      <div>
+      <div className="flex items-center justify-between">
         <Button
           variant="ghost"
           size="lg"
@@ -46,6 +52,16 @@ export function ProgressionEditor() {
         >
           Listo
         </Button>
+        {!editor.isNew && (
+          <Button
+            variant="destructive"
+            size="lg"
+            className="h-12 rounded-full px-5 text-base"
+            onClick={() => setDeleting(true)}
+          >
+            Borrar progresión
+          </Button>
+        )}
       </div>
       <input
         aria-label="Nombre"
@@ -179,6 +195,37 @@ export function ProgressionEditor() {
               onClick={() => setAsking(false)}
             >
               Seguir editando
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+      <Sheet open={deleting} onOpenChange={setDeleting}>
+        <SheetContent
+          side="bottom"
+          aria-describedby={undefined}
+          showCloseButton={false}
+          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+        >
+          <SheetHeader>
+            <SheetTitle className="text-xl">{`¿Borrar «${savedName}»?`}</SheetTitle>
+          </SheetHeader>
+          <SheetFooter>
+            {/* Cancelar va primero: Radix le da el foco inicial, no a Borrar */}
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 text-base"
+              onClick={() => setDeleting(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="lg"
+              className="h-12 text-base"
+              onClick={() => deleteProgression(editor.id)}
+            >
+              Borrar
             </Button>
           </SheetFooter>
         </SheetContent>

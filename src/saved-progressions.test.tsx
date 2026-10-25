@@ -413,3 +413,65 @@ test('descartar vuelve a la tónica de cuando se abrió', async () => {
     ['La']
   )
 })
+
+const askDelete = () =>
+  within(screen.getByRole('dialog', { name: '¿Borrar «Andaluza mía»?' }))
+
+test('Borrar progresión solo en una guardada', async () => {
+  andaluzaChosen()
+  const first = renderApp()
+  const fresh = await newProgression(first)
+  expect(fresh.queryByRole('button', { name: 'Borrar progresión' })).toBeNull()
+  await first.user.click(fresh.getByRole('button', { name: 'Listo' }))
+  first.unmount()
+
+  const app = renderApp()
+  const editor = await editChosen(app)
+  expect(
+    editor.getByRole('button', { name: 'Borrar progresión' })
+  ).toBeDefined()
+})
+
+test('borrar pide confirmación', async () => {
+  andaluzaChosen()
+  const app = renderApp()
+  const editor = await editChosen(app)
+  await app.user.click(
+    editor.getByRole('button', { name: 'Borrar progresión' })
+  )
+  await app.user.click(askDelete().getByRole('button', { name: 'Cancelar' }))
+
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(chords(editor).value).toBe('Am | G | F | E')
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+  expect(groups(await app.openSettings())[0].options).toEqual(['Andaluza mía'])
+})
+
+test('borrar la quita, deja el ii–V–I mayor y detiene la música', async () => {
+  andaluzaChosen()
+  const first = renderApp()
+  await first.user.click(screen.getByRole('button', { name: 'Play' }))
+  first.fake.beat(5)
+  const editor = await editChosen(first)
+  await first.user.click(
+    editor.getByRole('button', { name: 'Borrar progresión' })
+  )
+  await first.user.click(askDelete().getByRole('button', { name: 'Borrar' }))
+
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+  expect(first.fake.running).toBe(false)
+  expect(screen.getByText(/^ii–V–I mayor/)).toBeDefined()
+  const noGroup = async (app: App) =>
+    within(progressionSelect(await app.openSettings())).queryByRole('group', {
+      name: 'Mis progresiones'
+    })
+  expect(await noGroup(first)).toBeNull()
+  await first.closeSettings()
+  first.unmount()
+
+  const app = renderApp()
+  expect(screen.getByText(/^ii–V–I mayor/)).toBeDefined()
+  expect(await noGroup(app)).toBeNull()
+})

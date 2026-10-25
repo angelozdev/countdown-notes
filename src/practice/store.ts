@@ -134,6 +134,8 @@ export type PracticeState = {
   closeEditor: () => void
   /** Cierra el editor sin guardar; vuelven la progresión y la tónica que regían al abrirlo. */
   discardDraft: () => void
+  /** La quita de `mine`; si era la elegida vuelve la de siempre, y detiene la práctica. Cierra el editor. */
+  deleteProgression: (id: MyProgression['id']) => void
 }
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
@@ -607,6 +609,19 @@ export function createPracticeStore(engine: Engine) {
           get().setProgression(opened.progression)
         }
         set({ tonic: opened.tonic, editor: null })
+      },
+      deleteProgression(id) {
+        if (get().status !== 'stopped') get().stop()
+        const { mine, progression } = get()
+        const rest = mine.filter((p) => p.id !== id)
+        saveMyProgressions(rest)
+        set({
+          mine: rest,
+          ...(progression === id && {
+            progression: DEFAULT_SETTINGS.progression
+          }),
+          editor: null
+        })
       }
     }
   })

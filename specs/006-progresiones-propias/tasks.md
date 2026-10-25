@@ -350,7 +350,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### Borrar
 
-- [ ] T020 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
+- [x] T020 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
   1. `'Borrar progresión solo en una guardada'`: en una nueva no está; en `Editar progresión` de la andaluza, sí.
   2. `'borrar pide confirmación'`: `Borrar progresión` abre el `dialog` `¿Borrar «Andaluza mía»?`. `Cancelar` lo cierra, y la progresión sigue en el editor y en el `<select>`.
   3. `'borrar la quita, deja el ii–V–I mayor y detiene la música'`: con la andaluza sonando (Play y `fake.beat(5)`), `Editar progresión`, `Borrar progresión` y `Borrar`:
@@ -360,7 +360,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr y **verlo fallar**.
 
-- [ ] T021 [US2] Implementar:
+- [x] T021 [US2] Implementar: Done: en el `Sheet`, `Cancelar` va antes que `Borrar`, para que el foco inicial no caiga en el botón destructivo; el título usa el nombre guardado.
   - **`src/practice/store.ts`**: `deleteProgression(id)`:
     - `stop()` si sonaba;
     - la quita de `mine` y llama a `saveMyProgressions`;

@@ -55,7 +55,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 **Purpose**: comprobar que la rama parte en verde.
 
-- [ ] T001 En la rama `006-progresiones-propias`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Anotar el tamaño de `dist/assets/*.js` que imprime `pnpm build`, para comparar en T034. Sin commit.
+- [x] T001 En la rama `006-progresiones-propias`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Anotar el tamaño de `dist/assets/*.js` que imprime `pnpm build`, para comparar en T034. Sin commit.
 
 ---
 
@@ -67,7 +67,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### El lector de texto
 
-- [ ] T002 [P] [US1] Crear `src/music/progression-text.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3, todo salvo lo marcado US4):
+- [x] T002 [P] [US1] Crear `src/music/progression-text.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3, todo salvo lo marcado US4):
   - Helper `tonal(label)`: `label` con `♭` → `b` y `♯` → `#` (`'F♯'` → `'F#'`).
   - `test.each` sobre los 25 `CHORD_TYPES` por las 12 `NOTES`. Para cada tipo `t` y nota `n`:
     - `parseProgression(n.label + t.suffix)` es `{ bars: [[{ root: tonal(n.label), type: t.id }]] }`;
@@ -90,7 +90,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T003 [US1] Crear `src/music/progression-text.ts` con los tipos y las dos funciones de [contracts](./contracts/interfaces.md) §3, según research §5:
+- [x] T003 [US1] Crear `src/music/progression-text.ts` con los tipos y las dos funciones de [contracts](./contracts/interfaces.md) §3, según research §5:
   - **Palabras**: se recorren con `/\S+/g`, guardando `index` y largo para `start` y `end`.
   - **Cada palabra**: `/^([A-Ga-g])([#b♯♭]?)(.*)$/u`.
     - La raíz es la letra en mayúscula más `#` o `b`, y pasa por `simplify` de `@tonaljs/note`.

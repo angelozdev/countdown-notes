@@ -2,11 +2,15 @@ import { distance } from '@tonaljs/interval'
 import { simplify, transpose } from '@tonaljs/note'
 import { CHORD_TYPES, type ChordTypeId } from './chords'
 import { type Meter, splitAt } from './meters'
-import { type Note, type NoteId, spell } from './notes'
+import { type Note, NOTES, type NoteId, spell } from './notes'
 
 export type KeyType = 'major' | 'minor' | 'dorian'
 export type ProgressionGroup = 'Ciclos' | 'Jazz' | 'Pop, rock y latino'
 export type ProgressionId =
+  | 'ciclo-cuartas'
+  | 'ciclo-quintas'
+  | 'ii-v-i-12'
+  | 'dominantes-encadenados'
   | 'ii-v-i-mayor'
   | 'ii-v-i-menor'
   | 'turnaround'
@@ -41,6 +45,39 @@ const MINOR = { tonic: 'C', type: 'minor' } as const
 
 /** En el orden de FR-016, FR-018 y FR-019. */
 export const PROGRESSIONS: Progression[] = [
+  {
+    id: 'ciclo-cuartas',
+    name: 'Ciclo de cuartas',
+    group: 'Ciclos',
+    key: MAJOR,
+    bars: 'C ×2',
+    cycle: 'fourths',
+    rootsOnly: true
+  },
+  {
+    id: 'ciclo-quintas',
+    name: 'Ciclo de quintas',
+    group: 'Ciclos',
+    key: MAJOR,
+    bars: 'C ×2',
+    cycle: 'fifths',
+    rootsOnly: true
+  },
+  {
+    id: 'ii-v-i-12',
+    name: 'ii–V–I por las 12 tonalidades',
+    group: 'Ciclos',
+    key: MAJOR,
+    bars: 'Dm7 | G7 | Cmaj7 | Cmaj7',
+    cycle: 'fourths'
+  },
+  {
+    id: 'dominantes-encadenados',
+    name: 'Dominantes encadenados',
+    group: 'Ciclos',
+    key: MAJOR,
+    bars: 'E7 | A7 | D7 | G7 | Cmaj7 | Cmaj7'
+  },
   {
     id: 'ii-v-i-mayor',
     name: 'ii–V–I mayor',
@@ -201,6 +238,13 @@ const TONICS: Record<KeyType, Record<NoteId, string>> = {
   dorian: MINOR_TONICS
 }
 
+/** La tabla de los ciclos por cuartas (research §5): como la mayor, pero G♭ en vez de F♯. */
+const FOURTHS_TONICS: Record<NoteId, string> = { ...TONICS.major, Gb: 'Gb' }
+
+/** La tabla con la que se escribe la tónica de la progresión: la de su tipo, o la de cuartas. */
+const tableOf = ({ cycle, key }: Progression) =>
+  cycle === 'fourths' ? FOURTHS_TONICS : TONICS[key.type]
+
 /** 'Dm7' → raíz 'D', tipo m7; 'B♭maj7' → raíz 'Bb' (el formato de tonal). */
 function readChord(chord: string): { root: string; type: ChordTypeId } {
   const [, letter, accidental, suffix] = /^([A-G])([♭♯]?)(.*)$/.exec(chord)!
@@ -214,7 +258,7 @@ function readChord(chord: string): { root: string; type: ChordTypeId } {
 
 /** La tónica escrita con la tabla de la progresión. */
 export const tonicOf = (progression: Progression, tonic: NoteId): Note =>
-  spell(TONICS[progression.key.type][tonic])
+  spell(tableOf(progression)[tonic])
 
 const KEY_TYPE_NAMES: Record<KeyType, string> = {
   major: 'mayor',
@@ -222,20 +266,19 @@ const KEY_TYPE_NAMES: Record<KeyType, string> = {
   dorian: 'dórico'
 }
 
-/** 'Fa mayor', 'Do sostenido menor', 'Re dórico' */
+/** 'Fa mayor', 'Do sostenido menor', 'Re dórico'; en los ciclos de 12, 'desde Fa' */
 export const keyLabel = (progression: Progression, tonic: NoteId) =>
-  `${tonicOf(progression, tonic).name} ${KEY_TYPE_NAMES[progression.key.type]}`
+  progression.cycle
+    ? `desde ${tonicOf(progression, tonic).name}`
+    : `${tonicOf(progression, tonic).name} ${KEY_TYPE_NAMES[progression.key.type]}`
 
-/** Los compases transportados a la tónica; un compás con dos acordes parte en `splitAt(meter)`. */
-export const barsOf = (
+/** Los compases transportados a la tónica `destination` (formato de tonal); un compás con dos acordes parte en `splitAt(meter)`. */
+const transposed = (
   progression: Progression,
-  tonic: NoteId,
+  destination: string,
   meter: Meter
 ): RoundChord[][] => {
-  const interval = distance(
-    progression.key.tonic,
-    TONICS[progression.key.type][tonic]
-  )
+  const interval = distance(progression.key.tonic, destination)
   return progression.bars.split('|').flatMap((bar) => {
     const [, symbols, repeat] = /^(.*?)(?:\s*×(\d+))?$/.exec(bar.trim())!
     const chords = symbols.split(/\s+/)
@@ -245,10 +288,27 @@ export const barsOf = (
       // simplify evita E♯, B♯, C♭, F♭ y las dobles alteraciones (FR-013).
       return {
         root: spell(simplify(transpose(root, interval))),
-        type,
+        ...(progression.rootsOnly ? {} : { type }),
         at: i === 0 ? 0 : splitAt(meter)
       }
     })
     return Array.from({ length: Number(repeat ?? 1) }, () => chordBar)
   })
+}
+
+/** Los compases transportados a la tónica; en los ciclos, la unidad por las 12 tónicas desde ella. */
+export const barsOf = (
+  progression: Progression,
+  tonic: NoteId,
+  meter: Meter
+): RoundChord[][] => {
+  const table = tableOf(progression)
+  if (!progression.cycle) {
+    return transposed(progression, table[tonic], meter)
+  }
+  const step = progression.cycle === 'fourths' ? 5 : 7
+  const start = NOTES.findIndex(({ id }) => id === tonic)
+  return Array.from({ length: 12 }, (_, k) =>
+    transposed(progression, table[NOTES[(start + k * step) % 12].id], meter)
+  ).flat()
 }

@@ -114,8 +114,31 @@ describe('ii–V–I mayor', () => {
 
 const FOUR_FOUR = METER_BY_ID['4/4']
 
-/** FR-018 sin ×N: cada compás escrito a mano, en su tonalidad de origen. */
+const CYCLE_FOURTHS =
+  'C | C | F | F | B♭ | B♭ | E♭ | E♭ | A♭ | A♭ | D♭ | D♭ | G♭ | G♭ | B | B | E | E | A | A | D | D | G | G'
+const CYCLE_FIFTHS =
+  'C | C | G | G | D | D | A | A | E | E | B | B | F♯ | F♯ | D♭ | D♭ | A♭ | A♭ | E♭ | E♭ | B♭ | B♭ | F | F'
+const II_V_I_12 = [
+  'Dm7 | G7 | Cmaj7 | Cmaj7',
+  'Gm7 | C7 | Fmaj7 | Fmaj7',
+  'Cm7 | F7 | B♭maj7 | B♭maj7',
+  'Fm7 | B♭7 | E♭maj7 | E♭maj7',
+  'B♭m7 | E♭7 | A♭maj7 | A♭maj7',
+  'E♭m7 | A♭7 | D♭maj7 | D♭maj7',
+  'A♭m7 | D♭7 | G♭maj7 | G♭maj7',
+  'C♯m7 | F♯7 | Bmaj7 | Bmaj7',
+  'F♯m7 | B7 | Emaj7 | Emaj7',
+  'Bm7 | E7 | Amaj7 | Amaj7',
+  'Em7 | A7 | Dmaj7 | Dmaj7',
+  'Am7 | D7 | Gmaj7 | Gmaj7'
+].join(' | ')
+
+/** FR-018 sin ×N y los ciclos de FR-019: cada compás escrito a mano, en su tonalidad de origen. */
 const LIBRARY: [ProgressionId, NoteId, string][] = [
+  ['ciclo-cuartas', 'C', CYCLE_FOURTHS],
+  ['ciclo-quintas', 'C', CYCLE_FIFTHS],
+  ['ii-v-i-12', 'C', II_V_I_12],
+  ['dominantes-encadenados', 'C', 'E7 | A7 | D7 | G7 | Cmaj7 | Cmaj7'],
   ['ii-v-i-mayor', 'C', 'Dm7 | G7 | Cmaj7 | Cmaj7'],
   ['ii-v-i-menor', 'C', 'Dm7♭5 | G7♭9 | Cm6 | Cm6'],
   ['turnaround', 'C', 'Cmaj7 A7 | Dm7 G7'],
@@ -271,5 +294,102 @@ describe('la biblioteca de jazz, pop, rock y latino', () => {
       bars: 'C F G'
     }
     expect(() => barsOf(crowded, 'C', FOUR_FOUR)).toThrow('Más de dos acordes')
+  })
+})
+
+describe('los ciclos por las 12 tonalidades', () => {
+  const CYCLES = [
+    'ciclo-cuartas',
+    'ciclo-quintas',
+    'ii-v-i-12',
+    'dominantes-encadenados'
+  ] as const
+
+  test('el grupo Ciclos va primero, con sus 4 progresiones', () => {
+    expect(PROGRESSIONS.slice(0, 4).map(({ name }) => name)).toEqual([
+      'Ciclo de cuartas',
+      'Ciclo de quintas',
+      'ii–V–I por las 12 tonalidades',
+      'Dominantes encadenados'
+    ])
+    expect(PROGRESSIONS.slice(0, 4).map(({ group }) => group)).toEqual(
+      Array(4).fill('Ciclos')
+    )
+    expect(PROGRESSIONS.slice(0, 4).map(({ id }) => id)).toEqual(CYCLES)
+    expect(PROGRESSIONS.filter(({ group }) => group === 'Ciclos')).toHaveLength(
+      4
+    )
+  })
+
+  test.each([
+    ['ciclo-cuartas', 'C', CYCLE_FOURTHS],
+    ['ciclo-quintas', 'C', CYCLE_FIFTHS],
+    ['dominantes-encadenados', 'C', 'E7 | A7 | D7 | G7 | Cmaj7 | Cmaj7'],
+    ['dominantes-encadenados', 'F', 'A7 | D7 | G7 | C7 | Fmaj7 | Fmaj7']
+  ] as const)('%s en %s suena %s', (id, tonic, expected) => {
+    expect(text(barsOf(PROGRESSION_BY_ID[id], tonic, FOUR_FOUR))).toBe(expected)
+  })
+
+  test('el ii–V–I por las 12 en Do tiene 48 compases, uno por cada acorde de cada tonalidad', () => {
+    const bars = barsOf(PROGRESSION_BY_ID['ii-v-i-12'], 'C', FOUR_FOUR)
+    const shown = text(bars).split(' | ')
+    expect(bars).toHaveLength(48)
+    expect(shown.slice(0, 4)).toEqual(['Dm7', 'G7', 'Cmaj7', 'Cmaj7'])
+    expect(shown[4]).toBe('Gm7')
+    expect(shown.slice(24, 28)).toEqual(['A♭m7', 'D♭7', 'G♭maj7', 'G♭maj7'])
+    expect(shown.slice(28, 31)).toEqual(['C♯m7', 'F♯7', 'Bmaj7'])
+    expect(
+      shown
+        .filter((_, i) => i % 4 === 2)
+        .map((chord) => chord.replace('maj7', ''))
+    ).toEqual('C F B♭ E♭ A♭ D♭ G♭ B E A D G'.split(' '))
+  })
+
+  test('desde otra tónica, el ciclo de cuartas sigue por cuartas y el de quintas, por quintas', () => {
+    const fourths = text(
+      barsOf(PROGRESSION_BY_ID['ciclo-cuartas'], 'F', FOUR_FOUR)
+    ).split(' | ')
+    expect(fourths).toHaveLength(24)
+    expect(fourths.slice(0, 3)).toEqual(['F', 'F', 'B♭'])
+    expect(fourths.slice(-2)).toEqual(['C', 'C'])
+  })
+
+  test('en Sol bemol, el ciclo de cuartas empieza en G♭ y el de quintas en F♯', () => {
+    const first = (id: ProgressionId) =>
+      barsOf(PROGRESSION_BY_ID[id], 'Gb', FOUR_FOUR)[0][0].root.label
+    expect(first('ciclo-cuartas')).toBe('G♭')
+    expect(first('ciclo-quintas')).toBe('F♯')
+  })
+
+  test.each(['ciclo-cuartas', 'ciclo-quintas'] as const)(
+    '%s no fija el tipo de ningún acorde',
+    (id) => {
+      const chords = barsOf(PROGRESSION_BY_ID[id], 'C', FOUR_FOUR).flat()
+      expect(chords).toHaveLength(24)
+      expect(chords.filter((chord) => chord.type !== undefined)).toEqual([])
+    }
+  )
+
+  test('cada compás empieza en el golpe 0, y las 12 vueltas no comparten acordes', () => {
+    for (const id of CYCLES) {
+      const bars = barsOf(PROGRESSION_BY_ID[id], 'C', FOUR_FOUR)
+      for (const bar of bars) expect(bar[0].at).toBe(0)
+    }
+    const bars = barsOf(PROGRESSION_BY_ID['ii-v-i-12'], 'C', FOUR_FOUR)
+    expect(new Set(bars.map((bar) => bar[0])).size).toBe(bars.length)
+  })
+
+  test('keyLabel dice desde qué tónica empieza el ciclo', () => {
+    expect(keyLabel(PROGRESSION_BY_ID['ciclo-cuartas'], 'F')).toBe('desde Fa')
+    expect(keyLabel(PROGRESSION_BY_ID['ii-v-i-12'], 'C')).toBe('desde Do')
+    expect(keyLabel(PROGRESSION_BY_ID['dominantes-encadenados'], 'F')).toBe(
+      'Fa mayor'
+    )
+  })
+
+  test('la tónica del ciclo de cuartas usa G♭, y la del de quintas, F♯', () => {
+    expect(tonicOf(PROGRESSION_BY_ID['ciclo-cuartas'], 'Gb').label).toBe('G♭')
+    expect(tonicOf(PROGRESSION_BY_ID['ii-v-i-12'], 'Gb').label).toBe('G♭')
+    expect(tonicOf(PROGRESSION_BY_ID['ciclo-quintas'], 'Gb').label).toBe('F♯')
   })
 })

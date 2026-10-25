@@ -352,7 +352,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 **Independent Test**: quickstart §2, filas 15–17.
 
-- [ ] T025 [P] [US4] En `src/music/progressions.test.ts`, agregar (falla):
+- [x] T025 [P] [US4] En `src/music/progressions.test.ts`, agregar (falla):
   - `'el grupo Ciclos va primero, con sus 4 progresiones'`: los primeros 4 `name` de `PROGRESSIONS` son los de Ciclos (Reglas), con `group: 'Ciclos'`.
   - En `'C'`, `text(barsOf(p, 'C', 4/4))`:
     - `ciclo-cuartas` → `'C | C | F | F | B♭ | B♭ | E♭ | E♭ | A♭ | A♭ | D♭ | D♭ | G♭ | G♭ | B | B | E | E | A | A | D | D | G | G'`;
@@ -367,7 +367,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
   - `keyLabel`: en `ciclo-cuartas` y `'F'`, `'desde Fa'`; en `ii-v-i-12` y `'C'`, `'desde Do'`; en `dominantes-encadenados` y `'F'`, `'Fa mayor'`.
   - El test de las 12 tónicas de T018 ya cubre las 4 nuevas sin cambios (sus ids se suman a la lista que recorre).
 
-- [ ] T026 [US4] En `src/music/progressions.ts`:
+- [x] T026 [US4] En `src/music/progressions.ts`:
   - las 4 progresiones de FR-019, al principio de `PROGRESSIONS`, con `key: { tonic: 'C', type: 'major' }`:
     - `ciclo-cuartas`: `{ bars: 'C ×2', cycle: 'fourths', rootsOnly: true }`;
     - `ciclo-quintas`: `{ bars: 'C ×2', cycle: 'fifths', rootsOnly: true }`;

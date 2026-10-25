@@ -13,33 +13,52 @@ import {
   type MeterId
 } from '@/music/meters'
 import { NOTE_BY_ID, NOTES, type Note, type NoteId } from '@/music/notes'
-import type { RoundChord } from '@/music/progressions'
+import {
+  barsOf,
+  PROGRESSION_BY_ID,
+  type ProgressionId,
+  type RoundChord
+} from '@/music/progressions'
 import { drawRound } from './round'
 import {
   DEFAULT_SETTINGS,
   loadSettings,
+  type Mode,
   type Settings,
   saveSettings
 } from './settings'
 
 export type Status = 'stopped' | 'countIn' | 'playing'
 
-export type Round = {
-  mode: 'random'
+type RoundBase = {
   number: number
   /** Los compases de la vuelta, cada uno con sus acordes. */
   bars: RoundChord[][]
-  /** Orden sorteado: cada nota del pool una vez. */
-  notes: NoteId[]
-  /** Copia del ajuste al sortearla; no cambia después. */
-  barsPerNote: number
-  /** Copia del ajuste al sortearla; no cambia después. */
+  /** Copia del ajuste al armarla; no cambia después. */
   meter: MeterId
   /** Compás global donde empieza: el 0 es la cuenta de entrada. */
   firstBar: number
 }
 
+export type Round =
+  | (RoundBase & {
+      mode: 'random'
+      /** Orden sorteado: cada nota del pool una vez. */
+      notes: NoteId[]
+      /** Copia del ajuste al sortearla; no cambia después. */
+      barsPerNote: number
+    })
+  | (RoundBase & {
+      mode: 'progression'
+      progression: ProgressionId
+      /** Copia del ajuste al armarla; no cambia después. */
+      tonic: NoteId
+    })
+
 export type PracticeState = {
+  mode: Mode
+  progression: ProgressionId
+  tonic: NoteId
   status: Status
   /** Lo que está sonando: el compás 0 es la cuenta de entrada. */
   position: { bar: number; beat: number } | null
@@ -61,6 +80,8 @@ export type PracticeState = {
   rounds: Round[]
   play: () => void
   stop: () => void
+  /** Cambiar de modo detiene la práctica. */
+  setMode: (mode: Mode) => void
   setBpm: (bpm: number) => void
   setBarsPerNote: (barsPerNote: number) => void
   setMeter: (meter: MeterId) => void
@@ -80,9 +101,11 @@ export type PracticeStore = ReturnType<typeof createPracticeStore>
 
 export const roundLength = (round: Round) => round.bars.length
 
-/** Compases desde el inicio de la vuelta hasta que empieza su última nota: ahí se sortea la siguiente. */
+/** Compases desde el inicio de la vuelta hasta que empieza su última nota (o su último compás): ahí se arma la siguiente. */
 export const previewFrom = (round: Round) =>
-  (round.notes.length - 1) * round.barsPerNote
+  round.mode === 'progression'
+    ? round.bars.length - 1
+    : (round.notes.length - 1) * round.barsPerNote
 
 /** El acorde que suena en ese golpe: el último que entró. */
 export const chordAt = (chords: RoundChord[], beat: number) =>
@@ -106,8 +129,9 @@ export const STYLE_LABELS: Record<Style, string> = {
   pad: 'Pad ambiental'
 }
 
-/** Con menos de 2 notas no se puede evitar repetir una nota seguida. */
-export const canPlay = (state: PracticeState) => state.notes.length >= 2
+/** En el modo aleatorio, con menos de 2 notas no se puede evitar repetir una nota seguida. */
+export const canPlay = (state: PracticeState) =>
+  state.mode === 'progression' || state.notes.length >= 2
 
 /** Las notas incluidas, sin duplicados y en orden cromático. */
 const notesWhere = (included: (note: Note) => boolean) =>
@@ -140,6 +164,22 @@ const randomRound = (
   barsPerNote
 })
 
+const progressionRound = (
+  number: number,
+  progression: ProgressionId,
+  tonic: NoteId,
+  meter: MeterId,
+  firstBar: number
+): Round => ({
+  mode: 'progression',
+  number,
+  meter,
+  firstBar,
+  progression,
+  tonic,
+  bars: barsOf(PROGRESSION_BY_ID[progression], tonic, METER_BY_ID[meter])
+})
+
 export function createPracticeStore(engine: Engine) {
   const store = createStore<PracticeState>()((set, get) => {
     // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
@@ -150,8 +190,21 @@ export function createPracticeStore(engine: Engine) {
       { chordType: ChordTypeId | null; style: Style }
     >()
 
+    // el último voicing armado en la vuelta: el siguiente acorde se liga a él (research §7)
+    let lastVoicing: string[] | undefined
+
     function nextRound(previous: Round): Round {
-      const { notes, barsPerNote, meter } = get()
+      const { notes, barsPerNote, meter, progression, tonic } = get()
+      const firstBar = previous.firstBar + roundLength(previous)
+      if (previous.mode === 'progression') {
+        return progressionRound(
+          previous.number + 1,
+          progression,
+          tonic,
+          meter,
+          firstBar
+        )
+      }
       // con menos de 2 notas no se puede sortear: sigue con las de la vuelta anterior
       const pool = notes.length >= 2 ? notes : previous.notes
       return randomRound(
@@ -159,7 +212,7 @@ export function createPracticeStore(engine: Engine) {
         drawRound(pool, previous.notes.at(-1)),
         barsPerNote,
         meter,
-        previous.firstBar + roundLength(previous)
+        firstBar
       )
     }
 
@@ -199,6 +252,8 @@ export function createPracticeStore(engine: Engine) {
       const chords = round.bars[bar - round.firstBar]
       // figura, octava y acorde se leen aquí, al armar el compás: un cambio aplica desde el siguiente
       const { bassFigure, bassOctave, withChord, chordType, style } = get()
+      // todas las vueltas de una progresión suenan igual: la primera no se liga a la anterior
+      if (bar === round.firstBar) lastVoicing = undefined
       const bass = bassAttacks(meter, bassFigure).map(
         ({ at, length }): Bar['events'][number] => ({
           at,
@@ -210,14 +265,22 @@ export function createPracticeStore(engine: Engine) {
         })
       )
       const chord: Bar['events'] = withChord
-        ? chords.map((chord, i): Bar['events'][number] => ({
-            at: chord.at,
-            sound: {
-              kind: 'chord',
-              pitches: voicingOf(chord.root.id, chord.type ?? chordType),
-              length: (chords[i + 1]?.at ?? meter.beats) - chord.at
+        ? chords.map((chord, i): Bar['events'][number] => {
+            const pitches = voicingOf(
+              chord.root.id,
+              chord.type ?? chordType,
+              round.mode === 'progression' ? lastVoicing : undefined
+            )
+            lastVoicing = pitches
+            return {
+              at: chord.at,
+              sound: {
+                kind: 'chord',
+                pitches,
+                length: (chords[i + 1]?.at ?? meter.beats) - chord.at
+              }
             }
-          }))
+          })
         : []
       planned.set(bar, { chordType: withChord ? chordType : null, style })
       // el sort es estable: en el mismo at, el click queda antes que el bajo y el bajo antes que el acorde
@@ -255,14 +318,28 @@ export function createPracticeStore(engine: Engine) {
       sounding: null,
       rounds: [],
       play() {
-        const { status, notes, barsPerNote, meter, bpm, mix } = get()
+        const {
+          status,
+          mode,
+          notes,
+          barsPerNote,
+          meter,
+          progression,
+          tonic,
+          bpm,
+          mix
+        } = get()
         if (status !== 'stopped' || !canPlay(get())) return
         planned.clear()
         set({
           status: 'countIn',
           position: null,
           sounding: null,
-          rounds: [randomRound(1, drawRound(notes), barsPerNote, meter, 1)]
+          rounds: [
+            mode === 'progression'
+              ? progressionRound(1, progression, tonic, meter, 1)
+              : randomRound(1, drawRound(notes), barsPerNote, meter, 1)
+          ]
         })
         engine
           .start({ bpm, mix, barAt, onBeat, onEnd: get().stop })
@@ -272,6 +349,10 @@ export function createPracticeStore(engine: Engine) {
         engine.stop()
         planned.clear()
         set({ status: 'stopped', position: null, sounding: null, rounds: [] })
+      },
+      setMode(mode) {
+        if (get().status !== 'stopped') get().stop()
+        set({ mode })
       },
       setBpm(bpm) {
         const next = clamp(bpm, 30, 240)

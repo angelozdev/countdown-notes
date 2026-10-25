@@ -3,9 +3,17 @@ import type { Mix, Style } from '@/audio/engine'
 import { CHORD_TYPES, type ChordTypeId } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES, type NoteId } from '@/music/notes'
+import { PROGRESSIONS, type ProgressionId } from '@/music/progressions'
+
+export type Mode = 'random' | 'progression'
 
 /** Los ajustes que se recuerdan en el dispositivo (data-model.md, "Ajustes"). */
 export type Settings = {
+  /** Notas al azar, o una progresión en loop. */
+  mode: Mode
+  progression: ProgressionId
+  /** La tónica en que suena la progresión. */
+  tonic: NoteId
   bpm: number
   barsPerNote: number
   notes: NoteId[]
@@ -25,6 +33,9 @@ export type Settings = {
 export const SETTINGS_KEY = 'countdown-notes:ajustes'
 
 export const DEFAULT_SETTINGS: Settings = {
+  mode: 'random',
+  progression: 'ii-v-i-mayor',
+  tonic: 'C',
   bpm: 60,
   barsPerNote: 2,
   notes: NOTES.map((note) => note.id),
@@ -55,6 +66,9 @@ const channel = (fallback: Mix['click']) =>
 // cada campo vuelve solo a su valor por defecto, y el objeto entero también
 export const settingsSchema = z
   .object({
+    mode: z.enum(['random', 'progression']).catch(D.mode),
+    progression: z.enum(PROGRESSIONS.map((p) => p.id)).catch(D.progression),
+    tonic: z.enum(NOTES.map((note) => note.id)).catch(D.tonic),
     bpm: z.number().int().min(30).max(240).catch(D.bpm),
     barsPerNote: z.number().int().min(1).max(16).catch(D.barsPerNote),
     notes: z

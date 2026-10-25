@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
+import type { Mode } from '@/practice/settings'
 import { NOT_ENOUGH_NOTES, STYLE_LABELS, usePractice } from '@/practice/store'
 
 /** Un grupo del panel: filete arriba y título; los controles grandes van debajo. */
@@ -43,6 +44,7 @@ export function SettingsPanel() {
   const setBpm = usePractice((state) => state.setBpm)
   const barsPerNote = usePractice((state) => state.barsPerNote)
   const setBarsPerNote = usePractice((state) => state.setBarsPerNote)
+  const random = usePractice((state) => state.mode === 'random')
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -67,6 +69,7 @@ export function SettingsPanel() {
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-6 px-4 pb-6">
+          <ModePicker />
           <Section title="Tiempo">
             <Stepper
               label="BPM"
@@ -78,24 +81,55 @@ export function SettingsPanel() {
               increaseLabel="Subir BPM"
             />
             <MeterPicker />
-            <Stepper
-              label="Compases por nota"
-              min={1}
-              max={16}
-              value={barsPerNote}
-              onChange={setBarsPerNote}
-              decreaseLabel="Bajar compases por nota"
-              increaseLabel="Subir compases por nota"
-            />
+            {random && (
+              <Stepper
+                label="Compases por nota"
+                min={1}
+                max={16}
+                value={barsPerNote}
+                onChange={setBarsPerNote}
+                decreaseLabel="Bajar compases por nota"
+                increaseLabel="Subir compases por nota"
+              />
+            )}
           </Section>
           <SoundPicker />
           <BassPicker />
           <Volumes />
-          <NoteFilters />
+          {random && <NoteFilters />}
           <Repeats />
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+const MODES: { id: Mode; label: string }[] = [
+  { id: 'random', label: 'Aleatorio' },
+  { id: 'progression', label: 'Progresión' }
+]
+
+function ModePicker() {
+  const mode = usePractice((state) => state.mode)
+  const setMode = usePractice((state) => state.setMode)
+  return (
+    <Section title="Modo">
+      <ToggleGroup
+        type="single"
+        aria-label="Modo"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-2"
+        value={mode}
+        onValueChange={(value) => value && setMode(value as Mode)}
+      >
+        {MODES.map(({ id, label }) => (
+          <ToggleGroupItem key={id} value={id} className={PICKED_ITEM}>
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </Section>
   )
 }
 
@@ -130,6 +164,8 @@ const FAMILIES = [...new Set(CHORD_TYPES.map(({ family }) => family))]
 function SoundPicker() {
   const withChord = usePractice((state) => state.withChord)
   const setWithChord = usePractice((state) => state.setWithChord)
+  // en la progresión cada acorde trae su tipo
+  const random = usePractice((state) => state.mode === 'random')
   const chordType = usePractice((state) => state.chordType)
   const setChordType = usePractice((state) => state.setChordType)
   const style = usePractice((state) => state.style)
@@ -153,7 +189,7 @@ function SoundPicker() {
           Bajo + acorde
         </ToggleGroupItem>
       </ToggleGroup>
-      {withChord && (
+      {withChord && random && (
         <>
           <p className={CAPTION}>Tipo de acorde</p>
           <div className="relative">

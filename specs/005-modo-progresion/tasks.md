@@ -111,7 +111,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### El modo progresión en la app
 
-- [ ] T007 [US1] Crear `src/progression-mode.test.tsx` (falla). Helpers locales: `pickMode(app, name)`, que abre el panel, toca el radio `name` del `radiogroup` `Modo` y lo cierra; `pickSound(app, name)`, como en `src/chords.test.tsx`; `bassByBar(fake)`, como en `src/random-mode.test.tsx`; y `bars()`, los `listitem` de la lista `Carril`.
+- [x] T007 [US1] Crear `src/progression-mode.test.tsx` (falla). Helpers locales: `pickMode(app, name)`, que abre el panel, toca el radio `name` del `radiogroup` `Modo` y lo cierra; `pickSound(app, name)`, como en `src/chords.test.tsx`; `bassByBar(fake)`, como en `src/random-mode.test.tsx`; y `bars()`, los `listitem` de la lista `Carril`.
   1. `'empieza en el modo aleatorio'`: el `radiogroup` `Modo` tiene `Aleatorio` (marcado) y `Progresión`, y la línea de estado empieza con `Aleatorio · `.
   2. `'en progresión, el panel no muestra lo del modo aleatorio'`: con `Progresión`, el panel no tiene el `spinbutton` `Compases por nota` ni el `group` `Notas`. Con `Bajo + acorde`, tampoco tiene el `combobox` `Tipo de acorde`.
   3. `'en progresión se puede tocar aunque haya una sola nota'`: con lo guardado `{ notes: ['C'], mode: 'progression' }`, `Play` está habilitado y no se ve `Elige al menos 2 notas para tocar.`.
@@ -137,7 +137,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T008 [US1] Implementar:
+- [x] T008 [US1] Implementar:
   - **`src/practice/settings.ts`**: `mode: 'random' | 'progression'` (por defecto `'random'`), `progression: ProgressionId` (`'ii-v-i-mayor'`) y `tonic: NoteId` (`'C'`), con:
     - `mode: z.enum(['random', 'progression']).catch(D.mode)`;
     - `progression: z.enum(PROGRESSIONS.map((p) => p.id)).catch(D.progression)`;

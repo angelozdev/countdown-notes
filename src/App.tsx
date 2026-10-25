@@ -6,6 +6,7 @@ import { Now } from '@/components/now'
 import { SettingsPanel } from '@/components/settings-panel'
 import { Button } from '@/components/ui/button'
 import { useSpaceToggle, useWakeLock } from '@/lib/hands-free'
+import { keyLabel, PROGRESSION_BY_ID } from '@/music/progressions'
 import {
   canPlay,
   createPracticeStore,
@@ -57,6 +58,14 @@ function HandsFree() {
 }
 
 function StatusLine() {
+  // la tónica de la vuelta que suena; detenida, la de los ajustes
+  const head = usePractice((state) => {
+    if (state.mode === 'random') return 'Aleatorio'
+    const round = state.rounds[0]
+    const { progression, tonic } = round?.mode === 'progression' ? round : state
+    const library = PROGRESSION_BY_ID[progression]
+    return `${library.name} · ${keyLabel(library, tonic)}`
+  })
   const bpm = usePractice((state) => state.bpm)
   const meter = usePractice((state) => meterOf(state).id)
   const style = usePractice((state) =>
@@ -66,7 +75,7 @@ function StatusLine() {
   )
   return (
     <p className="p-2 text-center text-sm text-muted-foreground">
-      Aleatorio · {STYLE_LABELS[style]} · {bpm} BPM · {meter}
+      {head} · {STYLE_LABELS[style]} · {bpm} BPM · {meter}
     </p>
   )
 }
@@ -75,10 +84,12 @@ function Counter() {
   const text = usePractice((state) => {
     const now = nowPlaying(state)
     const { on, count } = state.repeats
-    return (
-      now &&
-      `Vuelta ${now.round.number}${on ? ` de ${count}` : ''} · nota ${Math.floor(now.index / now.round.barsPerNote) + 1} de ${now.round.notes.length}`
-    )
+    if (!now) return undefined
+    const { round, index } = now
+    const lap = `Vuelta ${round.number}${on ? ` de ${count}` : ''}`
+    return round.mode === 'progression'
+      ? `${lap} · compás ${index + 1} de ${round.bars.length}`
+      : `${lap} · nota ${Math.floor(index / round.barsPerNote) + 1} de ${round.notes.length}`
   })
   return text ? (
     <p className="text-lg font-semibold text-muted-foreground tabular-nums">

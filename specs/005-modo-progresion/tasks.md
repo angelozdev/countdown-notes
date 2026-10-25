@@ -289,7 +289,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### La biblioteca en la app
 
-- [ ] T020 [US3] Crear `src/library.test.tsx` (falla). Helpers: `pickMode`, `pickTonic`, `pickSound`, `bassByBar` y `bars()` como en T007 y T013, `pickProgression(app, name)` con `user.selectOptions(panel.getByRole('combobox', { name: 'Progresión' }), name)` y `pickMeter(app, id)`, que toca el radio `id` del `radiogroup` `Compás`.
+- [x] T020 [US3] Crear `src/library.test.tsx` (falla). Helpers: `pickMode`, `pickTonic`, `pickSound`, `bassByBar` y `bars()` como en T007 y T013, `pickProgression(app, name)` con `user.selectOptions(panel.getByRole('combobox', { name: 'Progresión' }), name)` y `pickMeter(app, id)`, que toca el radio `id` del `radiogroup` `Compás`.
   1. `'el selector tiene la biblioteca por grupos'`: el `combobox` `Progresión` tiene los `group` `Jazz` y `Pop, rock y latino`, con las opciones de la lista de nombres (Reglas), y `ii–V–I mayor` elegida.
   2. `'el blues de jazz parte los compases 11 y 12'`: con `Blues de jazz` y Play, `fake.beat(5)`:
      - el carril tiene 12 `listitem`;
@@ -308,7 +308,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T021 [US3] Implementar:
+- [x] T021 [US3] Implementar:
   - **`src/practice/store.ts`**:
     - `setProgression(id)`, que llama a `stop()` si `status !== 'stopped'` y después guarda el ajuste;
     - en `barAt`, los ataques del bajo pasan a `bassAttacks(meter, bassFigure, chords.map((chord) => chord.at))`.

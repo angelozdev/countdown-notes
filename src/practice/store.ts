@@ -82,6 +82,8 @@ export type PracticeState = {
   stop: () => void
   /** Cambiar de modo detiene la práctica. */
   setMode: (mode: Mode) => void
+  /** Cambiar de progresión detiene la práctica. */
+  setProgression: (progression: ProgressionId) => void
   /** Aplica desde la siguiente vuelta que se arme. */
   setTonic: (tonic: NoteId) => void
   setBpm: (bpm: number) => void
@@ -256,16 +258,18 @@ export function createPracticeStore(engine: Engine) {
       const { bassFigure, bassOctave, withChord, chordType, style } = get()
       // todas las vueltas de una progresión suenan igual: la primera no se liga a la anterior
       if (bar === round.firstBar) lastVoicing = undefined
-      const bass = bassAttacks(meter, bassFigure).map(
-        ({ at, length }): Bar['events'][number] => ({
-          at,
-          sound: {
-            kind: 'bass',
-            pitch: `${chordAt(chords, at).root.id}${bassOctave}`,
-            length
-          }
-        })
-      )
+      const bass = bassAttacks(
+        meter,
+        bassFigure,
+        chords.map((chord) => chord.at)
+      ).map(({ at, length }): Bar['events'][number] => ({
+        at,
+        sound: {
+          kind: 'bass',
+          pitch: `${chordAt(chords, at).root.id}${bassOctave}`,
+          length
+        }
+      }))
       const chord: Bar['events'] = withChord
         ? chords.map((chord, i): Bar['events'][number] => {
             const pitches = voicingOf(
@@ -355,6 +359,10 @@ export function createPracticeStore(engine: Engine) {
       setMode(mode) {
         if (get().status !== 'stopped') get().stop()
         set({ mode })
+      },
+      setProgression(progression) {
+        if (get().status !== 'stopped') get().stop()
+        set({ progression })
       },
       setTonic(tonic) {
         set({ tonic })

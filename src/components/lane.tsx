@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { Fragment, useEffect, useRef, type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
 import { groupOf, METER_BY_ID, type Meter } from '@/music/meters'
@@ -71,16 +71,45 @@ export function Lane() {
                 state === 'far' && 'opacity-40'
               )}
             >
-              <span
-                className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
-                style={{ '--chars': labels.join('').length } as CSSProperties}
-              >
-                {chords.map((chord, j) => (
-                  <span key={chord.at} data-at={chord.at}>
-                    {labels[j]}
-                  </span>
-                ))}
-              </span>
+              {chords.length > 1 ? (
+                // compás partido: cada parte, de ancho proporcional a sus golpes, ajusta su cifrado
+                <span className="flex w-full">
+                  {chords.map((chord, j) => (
+                    <Fragment key={chord.at}>
+                      {j > 0 && (
+                        <span
+                          aria-hidden
+                          className="w-px self-stretch bg-current opacity-40"
+                        />
+                      )}
+                      <span
+                        data-at={chord.at}
+                        style={{
+                          flexGrow:
+                            (chords[j + 1]?.at ?? meter.beats) - chord.at
+                        }}
+                        className="flex basis-0 justify-center [container-type:inline-size]"
+                      >
+                        <span
+                          className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                          style={
+                            { '--chars': labels[j].length } as CSSProperties
+                          }
+                        >
+                          {labels[j]}
+                        </span>
+                      </span>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <span
+                  className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                  style={{ '--chars': labels[0].length } as CSSProperties}
+                >
+                  <span data-at={chords[0].at}>{labels[0]}</span>
+                </span>
+              )}
               <BeatSlashes meter={meter} beat={current ? beat : undefined} />
               {current && (
                 <span

@@ -19,7 +19,12 @@ import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES, type NoteId } from '@/music/notes'
-import { PROGRESSION_BY_ID, tonicOf } from '@/music/progressions'
+import {
+  PROGRESSION_BY_ID,
+  PROGRESSIONS,
+  type ProgressionId,
+  tonicOf
+} from '@/music/progressions'
 import type { Mode } from '@/practice/settings'
 import { NOT_ENOUGH_NOTES, STYLE_LABELS, usePractice } from '@/practice/store'
 
@@ -135,13 +140,43 @@ function ModePicker() {
   )
 }
 
+/** Los grupos de la biblioteca, en el orden de `PROGRESSIONS`. */
+const PROGRESSION_GROUPS = [...new Set(PROGRESSIONS.map(({ group }) => group))]
+
 function ProgressionPicker() {
   const progression =
     PROGRESSION_BY_ID[usePractice((state) => state.progression)]
+  const setProgression = usePractice((state) => state.setProgression)
   const tonic = usePractice((state) => state.tonic)
   const setTonic = usePractice((state) => state.setTonic)
   return (
     <Section title="Progresión">
+      <div className="relative">
+        <select
+          aria-label="Progresión"
+          className="h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          value={progression.id}
+          onChange={(event) =>
+            setProgression(event.target.value as ProgressionId)
+          }
+        >
+          {PROGRESSION_GROUPS.map((group) => (
+            <optgroup key={group} label={group}>
+              {PROGRESSIONS.filter((item) => item.group === group).map(
+                ({ id, name }) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                )
+              )}
+            </optgroup>
+          ))}
+        </select>
+        <ChevronDown
+          aria-hidden
+          className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-muted-foreground"
+        />
+      </div>
       <p className={CAPTION}>Tonalidad</p>
       <ToggleGroup
         type="single"

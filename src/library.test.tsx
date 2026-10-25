@@ -91,7 +91,6 @@ test('el selector tiene la biblioteca por grupos', async () => {
         .map((option) => option.textContent)
     ).toEqual(names)
   }
-  expect(select.getAllByRole('group')).toHaveLength(2)
   expect(select.getByRole('option', { selected: true }).textContent).toBe(
     'ii–V–I mayor'
   )

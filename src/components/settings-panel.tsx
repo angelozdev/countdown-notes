@@ -1,6 +1,7 @@
 import { ChevronDown, Settings, Volume2, VolumeX } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import type { Channel, Style } from '@/audio/engine'
+import { ChordTypeSelect, SELECT } from '@/components/chord-type-select'
 import { Stepper } from '@/components/stepper'
 import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,6 @@ import { Switch } from '@/components/ui/switch'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
-import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
 import { type Progression, PROGRESSIONS } from '@/music/progressions'
@@ -34,10 +34,6 @@ import {
 const SECTION = 'flex flex-col gap-3 border-t border-border pt-5'
 const HEADING = 'text-lg font-bold'
 const CAPTION = 'text-sm text-muted-foreground'
-
-/** Un `<select>` con el aspecto de los botones del panel; la flecha va aparte, encima. */
-const SELECT =
-  'h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -247,9 +243,6 @@ function MeterPicker() {
   )
 }
 
-/** Las familias de los acordes, en el orden de la tabla. */
-const FAMILIES = [...new Set(CHORD_TYPES.map(({ family }) => family))]
-
 function SoundPicker() {
   const withChord = usePractice((state) => state.withChord)
   const setWithChord = usePractice((state) => state.setWithChord)
@@ -283,32 +276,7 @@ function SoundPicker() {
       {withChord && choosesType && (
         <>
           <p className={CAPTION}>Tipo de acorde</p>
-          <div className="relative">
-            <select
-              aria-label="Tipo de acorde"
-              className={SELECT}
-              value={chordType}
-              onChange={(event) =>
-                setChordType(event.target.value as ChordTypeId)
-              }
-            >
-              {FAMILIES.map((family) => (
-                <optgroup key={family} label={family}>
-                  {CHORD_TYPES.filter((type) => type.family === family).map(
-                    ({ id, name }) => (
-                      <option key={id} value={id}>
-                        {chordSymbol('C', id)} · {name}
-                      </option>
-                    )
-                  )}
-                </optgroup>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-muted-foreground"
-            />
-          </div>
+          <ChordTypeSelect value={chordType} onChange={setChordType} />
         </>
       )}
       <p className={CAPTION}>Estilo</p>

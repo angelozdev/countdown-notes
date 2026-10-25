@@ -1,5 +1,6 @@
 import { type CSSProperties, useId, useState } from 'react'
 import { PlayButton } from '@/App'
+import { ChordTypeSelect } from '@/components/chord-type-select'
 import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +13,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
-import { spell } from '@/music/notes'
+import { NOTE_BY_ID, NOTES, type NoteId, spell } from '@/music/notes'
 import { myProgression } from '@/music/progressions'
 import { canSave, isDirty, usePractice } from '@/practice/store'
 
@@ -31,12 +32,18 @@ export function ProgressionEditor() {
   const closeEditor = usePractice((state) => state.closeEditor)
   const discardDraft = usePractice((state) => state.discardDraft)
   const deleteProgression = usePractice((state) => state.deleteProgression)
+  const setChord = usePractice((state) => state.setChord)
+  const addBar = usePractice((state) => state.addBar)
+  const removeBar = usePractice((state) => state.removeBar)
+  // el compás del selector; `open` aparte para que no cambie de compás mientras se cierra
+  const [picking, setPicking] = useState({ bar: 0, open: false })
   // lo que se borra es lo guardado, no el nombre que se está escribiendo
   const savedName = usePractice(
     (state) => state.mine.find(({ id }) => id === state.editor?.id)?.name
   )
   if (!editor) return null
   const { name, key, text, errors, bars } = editor
+  const chord = bars[picking.bar]?.[0]
 
   return (
     <main
@@ -131,6 +138,7 @@ export function ProgressionEditor() {
                 type="button"
                 aria-label={`Compás ${i + 1}: ${label}`}
                 className="flex min-h-20 w-full items-center justify-center"
+                onClick={() => setPicking({ bar: i, open: true })}
               >
                 <span
                   className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
@@ -143,6 +151,14 @@ export function ProgressionEditor() {
           )
         })}
       </ol>
+      <Button
+        variant="secondary"
+        size="lg"
+        className="h-12 text-base"
+        onClick={addBar}
+      >
+        Agregar compás
+      </Button>
       <div className="mt-auto flex items-center gap-3">
         <PlayButton />
         <Button
@@ -154,6 +170,74 @@ export function ProgressionEditor() {
           Guardar
         </Button>
       </div>
+      <Sheet
+        open={picking.open}
+        onOpenChange={(open) => setPicking({ ...picking, open })}
+      >
+        <SheetContent
+          side="bottom"
+          aria-describedby={undefined}
+          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+        >
+          <SheetHeader>
+            <SheetTitle className="text-xl">{`Compás ${picking.bar + 1}`}</SheetTitle>
+          </SheetHeader>
+          {chord && (
+            <div className="flex flex-col gap-3 px-4">
+              <ToggleGroup
+                type="single"
+                aria-label="Raíz"
+                variant="outline"
+                size="lg"
+                className="grid w-full grid-cols-6"
+                value={spell(chord.root).id}
+                onValueChange={(id) =>
+                  id &&
+                  setChord(picking.bar, 0, {
+                    ...chord,
+                    root: NOTE_BY_ID[id as NoteId].label
+                      .replace('♭', 'b')
+                      .replace('♯', '#')
+                  })
+                }
+              >
+                {NOTES.map(({ id, name, label }) => (
+                  <ToggleGroupItem
+                    key={id}
+                    value={id}
+                    aria-label={name}
+                    className={PICKED_ITEM}
+                  >
+                    <span className="note-label [--note-size:1.25rem]">
+                      {label}
+                    </span>
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+              <ChordTypeSelect
+                value={chord.type}
+                onChange={(type) =>
+                  setChord(picking.bar, 0, { ...chord, type })
+                }
+              />
+            </div>
+          )}
+          <SheetFooter>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 text-base"
+              disabled={bars.length < 2}
+              onClick={() => {
+                removeBar(picking.bar)
+                setPicking({ ...picking, open: false })
+              }}
+            >
+              Quitar
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
       <Sheet open={asking} onOpenChange={setAsking}>
         <SheetContent
           side="bottom"

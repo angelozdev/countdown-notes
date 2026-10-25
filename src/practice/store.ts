@@ -25,7 +25,9 @@ import {
 import {
   formatProgression,
   parseProgression,
-  type TextError
+  type TextError,
+  type WrittenBar,
+  type WrittenChord
 } from '@/music/progression-text'
 import { loadMyProgressions, saveMyProgressions } from './my-progressions'
 import { drawRound } from './round'
@@ -128,6 +130,12 @@ export type PracticeState = {
   setDraftName: (name: string) => void
   /** La tónica de ajustes pasa a la tónica de la tonalidad (FR-011). */
   setDraftKey: (key: Draft['key']) => void
+  /** Editar tocando: cambia el acorde de una parte y reescribe el texto (borra los errores). */
+  setChord: (bar: number, part: number, chord: WrittenChord) => void
+  /** Agrega al final una copia del último compás; sin compases, la tríada de la tónica. */
+  addBar: () => void
+  /** Quita un compás; con uno solo, no hace nada. */
+  removeBar: (bar: number) => void
   /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
   saveDraft: () => void
   /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
@@ -209,6 +217,14 @@ export const canSave = (state: PracticeState) =>
   isDirty(state) &&
   state.editor!.errors.length === 0 &&
   state.editor!.bars.length > 0
+
+/** El borrador con otros compases: editar tocando reescribe el texto y reemplaza uno con error. */
+const withBars = (editor: Draft, bars: WrittenBar[]): Draft => ({
+  ...editor,
+  bars,
+  text: formatProgression(bars),
+  errors: []
+})
 
 /** `Progresión N`, con el primer N libre entre los nombres de las guardadas. */
 function defaultName(mine: MyProgression[]) {
@@ -573,6 +589,42 @@ export function createPracticeStore(engine: Engine) {
       setDraftKey(key) {
         const { editor } = get()
         if (editor) set({ editor: { ...editor, key }, tonic: key.tonic })
+      },
+      setChord(bar, part, chord) {
+        const { editor } = get()
+        if (!editor) return
+        set({
+          editor: withBars(
+            editor,
+            editor.bars.map((chords, i) =>
+              i === bar
+                ? chords.map((c, j) => (j === part ? chord : c))
+                : chords
+            )
+          )
+        })
+      },
+      addBar() {
+        const { editor } = get()
+        if (!editor) return
+        const { bars, key } = editor
+        const triad: WrittenBar = [
+          {
+            root: myProgression(editor).key.tonic,
+            type: key.type === 'minor' ? 'm' : 'maj'
+          }
+        ]
+        set({ editor: withBars(editor, [...bars, bars.at(-1) ?? triad]) })
+      },
+      removeBar(bar) {
+        const { editor } = get()
+        if (!editor || editor.bars.length < 2) return
+        set({
+          editor: withBars(
+            editor,
+            editor.bars.filter((_, i) => i !== bar)
+          )
+        })
       },
       saveDraft() {
         const { editor, mine, progression, tonic } = get()

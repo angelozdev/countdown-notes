@@ -382,7 +382,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 **Independent Test**: quickstart §2, filas 13–14.
 
-- [ ] T023 [US3] Crear `src/tap-progression.test.tsx` (falla). Helpers:
+- [x] T023 [US3] Crear `src/tap-progression.test.tsx` (falla). Helpers:
   - `newProgression`, `chords` y `editorBars`, como en T006;
   - `pickChord(app, editor, bar, root, type)`: toca el botón del compás, en el `dialog` `Compás {bar}` toca el radio `root` del `radiogroup` `Raíz`, elige `type` con `selectOptions` en el `combobox` `Tipo de acorde`, y cierra con `Cerrar`.
 
@@ -404,7 +404,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr y **verlo fallar**.
 
-- [ ] T024 [US3] Implementar:
+- [x] T024 [US3] Implementar:
   - **`src/components/chord-type-select.tsx`** (nuevo): `ChordTypeSelect({ value, onChange })`. Es el `<select aria-label="Tipo de acorde">` del panel, con sus `optgroup` por familia, opciones `{chordSymbol('C', id)} · {name}`, clases y flecha. El panel lo usa sin cambiar lo que muestra.
   - **`src/practice/store.ts`**, según research §7 (cada una reescribe `editor.text` con `formatProgression` y vacía `errors`):
     - `setChord(bar, part, chord)`;

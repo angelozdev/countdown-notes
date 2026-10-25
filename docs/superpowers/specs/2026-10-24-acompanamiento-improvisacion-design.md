@@ -255,8 +255,8 @@ Cada entrega es una conducta visible, de punta a punta, que el usuario puede pro
 
 **El backlog lo maneja GitHub Issues**, en el repo `angelozdev/countdown-notes`:
 
-- Las entregas son los issues #1–#9, con la etiqueta `entrega`.
-- Sus tareas son sub-issues, con la etiqueta `tarea` (#10–#43).
+- Las entregas son los issues #1–#9 y #44, con la etiqueta `entrega`.
+- Sus tareas son sub-issues, con la etiqueta `tarea` (#10–#43 y #45).
 
 Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están en la sección Backlog de `.specify/memory/constitution.md`.
 
@@ -271,6 +271,7 @@ Esta tabla es la foto inicial; la fuente de verdad es GitHub. Las reglas están 
 | 6   | **Cambio automático de tonalidad**                                      | Activar "cambiar de tonalidad cada N vueltas", al azar o por cuartas.                                                                                                                                                                                                                                                 |
 | 7   | **Instalable y sin internet**                                           | Instalar la app en el iPhone (con una indicación de "Agregar a pantalla de inicio", porque iOS no muestra un aviso para instalar) y usarla sin conexión.                                                                                                                                                              |
 | 8   | **Audio en segundo plano** (deseable, no obligatorio; última prioridad) | Cambiar a otra app o bloquear el iPhone y que la música siga sonando; al volver, la pantalla se sincroniza con lo que suena. Si en iOS resulta demasiado frágil, se documenta y se deja fuera.                                                                                                                        |
+| 9   | **Corcheas swing**                                                      | Elegir corcheas swing en ajustes y practicar con el feel ternario del jazz: las corcheas suenan larga-corta. Qué suena en swing, cuánto y en qué compases lo decide el spec.                                                                                                                                          |
 
 ## 9. Cómo se construye (decidido por el usuario)
 

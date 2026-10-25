@@ -59,3 +59,35 @@ test('cada cambio de acorde del ii–V–I cae en su compás', async () => {
     expect(Math.abs((chord[k][2] as number) - (t0 + 1 + k))).toBeLessThan(0.001)
   }
 })
+
+// un golpe dura 0,25 s a 240 BPM; el turnaround es Cmaj7 A7 | Dm7 G7
+test.each([
+  { meter: '4/4', countIn: 4, ats: [0, 2, 4, 6], lengths: [2, 2, 2, 2] },
+  { meter: '3/4', countIn: 3, ats: [0, 2, 3, 5], lengths: [2, 1, 2, 1] }
+] as const)(
+  'en $meter, el cambio de mitad de compás cae a tiempo',
+  async ({ meter, countIn, ats, lengths }) => {
+    const { click, bass, chord } = await renderStore((state) => {
+      state.setMode('progression')
+      state.setProgression('turnaround')
+      state.setMeter(meter)
+      state.setWithChord(true)
+      state.setRepeats({ on: true, count: 1 })
+      state.setBpm(240)
+    }, 6)
+
+    const t0 = click[0][2] as number
+    const beat = 0.25
+    expect(bass.map((call) => call[0])).toEqual(['C2', 'A2', 'D2', 'G2'])
+    expect(chord).toHaveLength(4)
+    for (const k of ats.keys()) {
+      const time = t0 + (countIn + ats[k]) * beat
+      expect(Math.abs((bass[k][2] as number) - time)).toBeLessThan(0.001)
+      expect(Math.abs((chord[k][2] as number) - time)).toBeLessThan(0.001)
+      // 90 % de su largo
+      expect(
+        Math.abs((chord[k][1] as number) - 0.9 * lengths[k] * beat)
+      ).toBeLessThan(0.002)
+    }
+  }
+)

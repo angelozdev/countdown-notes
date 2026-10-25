@@ -325,14 +325,14 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### Audio y pantalla angosta
 
-- [ ] T022 [US3] En `src/practice/progression.browser.test.ts`, agregar `test.each(['4/4', '3/4'])` `'en $meter, el cambio de mitad de compás cae a tiempo'`. Con `setMode('progression')`, `setProgression('turnaround')`, `setMeter(meter)`, `setWithChord(true)`, `setRepeats({ on: true, count: 1 })` y `setBpm(240)`, con un golpe de 0,25 s:
+- [x] T022 [US3] En `src/practice/progression.browser.test.ts`, agregar `test.each(['4/4', '3/4'])` `'en $meter, el cambio de mitad de compás cae a tiempo'`. Con `setMode('progression')`, `setProgression('turnaround')`, `setMeter(meter)`, `setWithChord(true)`, `setRepeats({ on: true, count: 1 })` y `setBpm(240)`, con un golpe de 0,25 s:
   - en 4/4, el bajo tiene 4 llamadas, `C2 A2 D2 G2`, en `t0 + 1 + {0, 2, 4, 6} × 0,25` s;
   - en 3/4, `t0 + 0,75 + {0, 2, 3, 5} × 0,25` s;
   - en los dos, a menos de 1 ms;
   - el acorde cae en los mismos tiempos, con una duración de 0,9 × `length` × 0,25 s (± 2 ms);
   - nada después.
 
-  Si pasa al primer intento, hacer la comprobación de T009 con el `at` del segundo acorde. **Verde completo**. **Commit**: `test: el cambio de mitad de compás cae a tiempo (#31)`.
+  Si pasa al primer intento, hacer la comprobación de T009 con el `at` del segundo acorde. **Verde completo**. **Commit**: `test: el cambio de mitad de compás cae a tiempo (#31)`. Done: pasó al primer intento; sumar 1 al `at` del segundo acorde, en el bajo o en el acorde, lo hizo fallar y se deshizo.
 
 - [ ] T023 [US3] En `e2e/practice.spec.ts`, agregar `'los compases partidos caben a 320 px'` (falla si las partes desbordan):
   - a 320 × 640, en Ajustes: `Progresión`, `Coltrane (Giant Steps, avanzado)`, `Fa sostenido` y `Bajo + acorde`; cerrar y Play;

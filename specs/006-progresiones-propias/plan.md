@@ -154,6 +154,7 @@ Cada paso es test que falla → código mínimo → verde → commit con el issu
       - que escribir `Dm7 G7 Cmaj7 Cmaj7` llena la lista "Compases" con `Compás 1: Dm7`… `Compás 4: Cmaj7`;
       - con `Dm7 Hm7 G7`, el campo `aria-invalid`, su descripción con `«Hm7»`, la lista sin cambios y "Guardar" desactivado;
       - "Guardar", "Listo", y la línea de estado `Progresión 1 · Do mayor · Analógico cálido · 60 BPM · 4/4`;
+      - en el panel, el `<select>` "Progresión" con `Progresión 1` elegida, en el grupo `Mis progresiones`, primero;
       - con "Bajo + acorde", que Play da en `fake.played` lo mismo que el ii–V–I mayor de la biblioteca en otra app montada;
       - que "Nueva progresión" con otra progresión sonando la detiene (`fake.running` falso).
 
@@ -161,7 +162,7 @@ Cada paso es test que falla → código mínimo → verde → commit con el issu
       - en el store: `mine` (en memoria), `editor`, `openEditor`, `setDraftText`, `saveDraft`, `progressionOf`, `isDirty`, `canSave`, `canPlay`, y `progressionRound` con una `Progression`;
       - en `App`: práctica o editor, y la línea de estado con `progressionOf`;
       - `progression-editor.tsx` con "Listo", "Acordes" y sus errores, el carril estático y "Guardar";
-      - el botón en el panel.
+      - el botón y el grupo `Mis progresiones` en el panel.
 
    4. `write-progression.test.tsx` (falla). Debe comprobar:
       - "Listo" en una nueva sin escribir nada cierra sin preguntar;
@@ -176,7 +177,7 @@ Cada paso es test que falla → código mínimo → verde → commit con el issu
       - "Editar progresión" solo con una propia elegida, y que abre el editor con su texto;
       - con datos escritos a mano ([contracts](./contracts/interfaces.md) §6): las inválidas se descartan y las demás quedan; un JSON roto deja la lista vacía y los ajustes intactos; una elegida que no existe deja el ii–V–I mayor; un dato de ajustes de la entrega 4 se conserva.
 
-      Código: `my-progressions.ts` (decisión 1), `progression` en `settings.ts`, la comprobación al crear el store, `saveDraft` que escribe, el grupo del `<select>`, "Editar progresión" y `openEditor(id)`.
+      Código: `my-progressions.ts` (decisión 1), `progression` en `settings.ts`, la comprobación al crear el store, `saveDraft` que escribe, "Editar progresión" y `openEditor(id)`.
 
    2. (falla) Nombre. Debe comprobar:
       - el `textbox` "Nombre" con `Progresión 1`, y la siguiente nueva con `Progresión 2`;

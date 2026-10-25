@@ -81,7 +81,7 @@ Los de la entrega 4. Solo cambia la validación de `progression`:
 | Acción                                                                   | Efecto                                                                                                              |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
 | `openEditor()`                                                           | Un borrador nuevo, elegido; si sonaba otra progresión, se detiene (FR-007)                                          |
-| `openEditor(id)`                                                         | Copia la guardada y la elige; la tónica pasa a su `key.tonic`; si sonaba otra, se detiene                           |
+| `openEditor(id)`                                                         | Copia la guardada, que ya es la elegida ("Editar progresión" solo aparece con ella); no toca la tónica ni la música |
 | `setDraftText(text)`                                                     | `text`; si se lee, `bars` y `errors: []`; si no, solo `errors`                                                      |
 | `setDraftName(name)`                                                     | `name`                                                                                                              |
 | `setDraftKey(key)`                                                       | `key`, y la tónica de ajustes pasa a `key.tonic` (FR-011)                                                           |

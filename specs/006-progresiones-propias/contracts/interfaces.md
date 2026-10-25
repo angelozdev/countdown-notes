@@ -81,7 +81,7 @@ Se agrega a las tablas de la entrega 4. Los tests buscan por rol y nombre accesi
 | ----------------- | ----------------------- | --------------------------------------------------------------------------------------------------- | -------- |
 | Nueva progresión  | `button`                | `Nueva progresión`; solo en el modo progresión                                                      | US1      |
 | Editar progresión | `button`                | `Editar progresión`; solo con una progresión propia elegida                                         | US2      |
-| Progresión        | `combobox` (`<select>`) | Como en la entrega 4, con el `group` `Mis progresiones` primero; el `value` de cada propia es su id | US2      |
+| Progresión        | `combobox` (`<select>`) | Como en la entrega 4, con el `group` `Mis progresiones` primero; el `value` de cada propia es su id | US1      |
 
 ### Editor de progresiones
 

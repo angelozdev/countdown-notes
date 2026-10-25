@@ -83,7 +83,7 @@ Decisiones de diseño para la entrega 5. Cada una dice qué se eligió, por qué
 **Decisión**:
 
 - **Crear** (FR-007): `openEditor()` arma un borrador nuevo con id `propia-N` y lo elige. Si sonaba otra progresión, la detiene, como `setProgression`.
-- **Abrir una guardada**: la elige, sin detener la música si ya era la elegida.
+- **Abrir una guardada**: "Editar progresión" solo aparece con la propia elegida, así que abrirla no cambia la progresión, la tónica ni la música.
 - **Tonalidad por defecto** (FR-011): la tónica de ajustes, en mayor. Así, crear no cambia la tónica.
 - **Al elegir una propia**, en el panel o al abrirla en el editor, la tónica de ajustes pasa a `key.tonic`. Al cambiar la tonalidad en el editor, también.
 - **Al borrar** la elegida: queda `'ii-v-i-mayor'`, con la tónica intacta, y la práctica se detiene (FR-014).

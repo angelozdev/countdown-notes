@@ -38,12 +38,12 @@ export function Now() {
       {note && (
         <>
           <p
-            className="note-label note-fit font-heading font-black tracking-tight [--note-max:min(66cqh,46cqw)]"
+            className="note-label note-fit font-heading font-black [--note-max:min(66cqh,46cqw)]"
             style={{ '--chars': symbol.length } as CSSProperties}
           >
             {symbol}
           </p>
-          <p className="text-[clamp(1.5rem,10cqh,3rem)] leading-none font-semibold text-muted-foreground">
+          <p className="text-[clamp(1.5rem,10cqh,3rem)] leading-none font-semibold text-balance text-muted-foreground">
             {chordType ? chordName(note.id, chordType) : note.name}
           </p>
         </>

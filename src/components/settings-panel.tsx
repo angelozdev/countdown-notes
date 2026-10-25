@@ -1,4 +1,4 @@
-import { Settings, Volume2, VolumeX } from 'lucide-react'
+import { ChevronDown, Settings, Volume2, VolumeX } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import type { Channel, Style } from '@/audio/engine'
 import { Stepper } from '@/components/stepper'
@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES } from '@/music/notes'
@@ -155,26 +156,32 @@ function SoundPicker() {
       {withChord && (
         <>
           <p className={CAPTION}>Tipo de acorde</p>
-          <select
-            aria-label="Tipo de acorde"
-            className="h-12 w-full rounded-md border border-input bg-background px-3 text-lg font-bold"
-            value={chordType}
-            onChange={(event) =>
-              setChordType(event.target.value as ChordTypeId)
-            }
-          >
-            {FAMILIES.map((family) => (
-              <optgroup key={family} label={family}>
-                {CHORD_TYPES.filter((type) => type.family === family).map(
-                  ({ id, name }) => (
-                    <option key={id} value={id}>
-                      {chordSymbol('C', id)} · {name}
-                    </option>
-                  )
-                )}
-              </optgroup>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              aria-label="Tipo de acorde"
+              className="h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              value={chordType}
+              onChange={(event) =>
+                setChordType(event.target.value as ChordTypeId)
+              }
+            >
+              {FAMILIES.map((family) => (
+                <optgroup key={family} label={family}>
+                  {CHORD_TYPES.filter((type) => type.family === family).map(
+                    ({ id, name }) => (
+                      <option key={id} value={id}>
+                        {chordSymbol('C', id)} · {name}
+                      </option>
+                    )
+                  )}
+                </optgroup>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-muted-foreground"
+            />
+          </div>
         </>
       )}
       <p className={CAPTION}>Estilo</p>
@@ -189,7 +196,11 @@ function SoundPicker() {
       >
         {(Object.entries(STYLE_LABELS) as [Style, string][]).map(
           ([id, label]) => (
-            <ToggleGroupItem key={id} value={id} className={PICKED_ITEM}>
+            <ToggleGroupItem
+              key={id}
+              value={id}
+              className={cn(PICKED_ITEM, 'text-base')}
+            >
               {label}
             </ToggleGroupItem>
           )

@@ -326,12 +326,14 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
 ## Phase 5: Polish & cierre
 
-- [ ] T021 Pulido visual con el skill `frontend-design`, dentro de la dirección del diseño (§7.4):
+- [x] T021 Pulido visual con el skill `frontend-design`, dentro de la dirección del diseño (§7.4):
   - la sección `Sonido` y el `<select>` con el mismo lenguaje del panel (alto, tipografía y foco);
   - el cifrado largo y el nombre largo en "Ahora", legibles a 1–2 m;
   - los cifrados del carril.
 
   Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual de la sección Sonido (#4)`.
+
+  Done: el `<select>` toma el radio, el fondo, el hover y el foco de los botones del panel, con flecha propia; `Estilo` en `text-base` para que "Analógico cálido" no toque el borde a 320 px. El trazo del cifrado baja de 0,06 em a 0,03 em y "Ahora" pierde `tracking-tight`, porque `maj7` se fundía; el nombre del acorde usa `text-balance`. El carril solo hereda el trazo.
 
 - [ ] T022 Correr quickstart §1 completo. Si algún hallazgo cambió una decisión, actualizar research.md. Sin commit si no hay cambios. Comentar en #4 el resumen de la entrega.
 - [ ] T023 El usuario hace quickstart §2–§5: la prueba de oído de los niveles y de los voicings, el Pad en el iPhone y el corte del Pad al final (research §12). Si algo falla, se reabre el issue de esa historia.

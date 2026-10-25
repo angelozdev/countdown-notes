@@ -124,11 +124,12 @@
 }
 
 /* Cifrado como en una partitura: la letra en --note-size y la alteración más chica, arriba.
-   ♭ y ♯ no están en Geist y el respaldo del sistema es fino, así que se engrosan. */
+   ♭ y ♯ no están en Geist y el respaldo del sistema es fino, así que se engrosan, pero poco:
+   con más, las letras del sufijo (la a y la j de maj7) se funden. */
 @utility note-label {
   display: flow-root;
   font-size: calc(var(--note-size) * 0.6);
-  -webkit-text-stroke: 0.06em currentColor;
+  -webkit-text-stroke: 0.03em currentColor;
   &::first-letter {
     float: left;
     font-size: var(--note-size);

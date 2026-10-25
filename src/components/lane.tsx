@@ -58,6 +58,15 @@ export function Lane() {
                   : 'far'
           const current = state === 'current'
           const labels = chords.map((chord) => labelOf(chord, current))
+          // las mitades de un compás se leen juntas: comparten tamaño, el que le cabe a la más larga
+          const rootChars = Math.max(
+            ...chords.map(({ root }) => root.label.length)
+          )
+          const suffixChars = Math.max(
+            ...labels.map(
+              (label, j) => label.length - chords[j].root.label.length
+            )
+          )
           return (
             <li
               key={i}
@@ -73,13 +82,21 @@ export function Lane() {
             >
               {chords.length > 1 ? (
                 // compás partido: cada parte, de ancho proporcional a sus golpes, ajusta su cifrado
-                <span className="flex w-full">
+                <span
+                  className="my-auto flex w-full"
+                  style={
+                    {
+                      '--root-chars': rootChars,
+                      '--suffix-chars': suffixChars
+                    } as CSSProperties
+                  }
+                >
                   {chords.map((chord, j) => (
                     <Fragment key={chord.at}>
                       {j > 0 && (
                         <span
                           aria-hidden
-                          className="w-px self-stretch bg-current opacity-40"
+                          className="my-1 w-0.5 self-stretch rounded-full bg-current opacity-50"
                         />
                       )}
                       <span
@@ -90,21 +107,14 @@ export function Lane() {
                         }}
                         className="flex basis-0 justify-center [container-type:inline-size]"
                       >
-                        <span
-                          className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
-                          style={
-                            { '--chars': labels[j].length } as CSSProperties
-                          }
-                        >
-                          {labels[j]}
-                        </span>
+                        <SplitLabel root={chord.root.label} label={labels[j]} />
                       </span>
                     </Fragment>
                   ))}
                 </span>
               ) : (
                 <span
-                  className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                  className="note-label note-fit my-auto font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
                   style={{ '--chars': labels[0].length } as CSSProperties}
                 >
                   <span data-at={chords[0].at}>{labels[0]}</span>
@@ -135,6 +145,17 @@ export function Lane() {
         </p>
       )}
     </div>
+  )
+}
+
+/** El cifrado de una mitad de compás: la raíz arriba y el sufijo debajo, para que cada uno use todo el ancho de su mitad. */
+function SplitLabel({ root, label }: { root: string; label: string }) {
+  const suffix = label.slice(root.length)
+  return (
+    <span className="flex flex-col items-center gap-0.5 font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]">
+      <span className="note-label split-root">{root}</span>
+      {suffix && <span className="split-suffix">{suffix}</span>}
+    </span>
   )
 }
 

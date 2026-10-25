@@ -148,3 +148,20 @@
     100cqw / min(1.1 + 0.4 * var(--chars), 4.2)
   );
 }
+
+/* Un compás partido tiene poco ancho (a 320 px, ~33 px por mitad), así que la raíz va arriba y el
+   sufijo debajo, y cada uno se ajusta al ancho de su mitad (cqw). Mide unas (0,3 + 0,6 × caracteres)
+   veces --note-size la raíz y (0,25 + 0,7 × caracteres) veces su letra el sufijo, que nunca pasa
+   de 0,6 × --note-max. --root-chars y --suffix-chars son los de la mitad más larga del compás. */
+@utility split-root {
+  --note-size: min(var(--note-max), 100cqw / (0.3 + 0.6 * var(--root-chars)));
+}
+
+@utility split-suffix {
+  font-size: min(
+    calc(var(--note-max) * 0.6),
+    100cqw / (0.25 + 0.7 * var(--suffix-chars))
+  );
+  line-height: 1;
+  -webkit-text-stroke: 0.03em currentColor;
+}

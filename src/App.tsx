@@ -74,7 +74,7 @@ function StatusLine() {
       : state.style
   )
   return (
-    <p className="p-2 text-center text-sm text-muted-foreground">
+    <p className="p-2 text-center text-sm text-balance text-muted-foreground">
       {head} · {STYLE_LABELS[style]} · {bpm} BPM · {meter}
     </p>
   )

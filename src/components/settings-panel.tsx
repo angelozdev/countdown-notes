@@ -36,6 +36,10 @@ const CAPTION = 'text-sm text-muted-foreground'
 const PICKED_ITEM =
   'h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground'
 
+/** Un `<select>` con el aspecto de los botones del panel; la flecha va aparte, encima. */
+const SELECT =
+  'h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className={SECTION}>
@@ -154,7 +158,7 @@ function ProgressionPicker() {
       <div className="relative">
         <select
           aria-label="Progresión"
-          className="h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          className={SELECT}
           value={progression.id}
           onChange={(event) =>
             setProgression(event.target.value as ProgressionId)
@@ -271,7 +275,7 @@ function SoundPicker() {
           <div className="relative">
             <select
               aria-label="Tipo de acorde"
-              className="h-12 w-full appearance-none truncate rounded-lg border border-input bg-transparent pr-11 pl-3 text-lg font-bold transition-all outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className={SELECT}
               value={chordType}
               onChange={(event) =>
                 setChordType(event.target.value as ChordTypeId)

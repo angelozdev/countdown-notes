@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { chordSymbol } from './chords'
 import { METER_BY_ID } from './meters'
-import { spell } from './notes'
+import { NOTES, spell } from './notes'
 import {
   barsOf,
   keyLabel,
@@ -80,5 +80,32 @@ describe('ii–V–I mayor', () => {
         group: 'Jazz'
       })
     )
+  })
+
+  test.each([
+    ['F', 'Gm7 | C7 | Fmaj7 | Fmaj7'],
+    ['B', 'C♯m7 | F♯7 | Bmaj7 | Bmaj7'],
+    ['Gb', 'G♯m7 | C♯7 | F♯maj7 | F♯maj7'],
+    ['Eb', 'Fm7 | B♭7 | E♭maj7 | E♭maj7']
+  ] as const)('en %s suena %s', (tonic, expected) => {
+    const bars = barsOf(
+      PROGRESSION_BY_ID['ii-v-i-mayor'],
+      tonic,
+      METER_BY_ID['4/4']
+    )
+    expect(text(bars)).toBe(expected)
+  })
+
+  test('la tónica se escribe con la tabla mayor en las 12', () => {
+    const progression = PROGRESSION_BY_ID['ii-v-i-mayor']
+    expect(NOTES.map((note) => tonicOf(progression, note.id).label)).toEqual(
+      'C D♭ D E♭ E F F♯ G A♭ A B♭ B'.split(' ')
+    )
+  })
+
+  test('la tonalidad en Fa es Fa mayor y en Re bemol, Re bemol mayor', () => {
+    const progression = PROGRESSION_BY_ID['ii-v-i-mayor']
+    expect(keyLabel(progression, 'F')).toBe('Fa mayor')
+    expect(keyLabel(progression, 'Db')).toBe('Re bemol mayor')
   })
 })

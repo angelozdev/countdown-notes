@@ -188,7 +188,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 **Independent Test**: quickstart §2, filas 7–9.
 
-- [ ] T011 [P] [US2] En `src/music/progressions.test.ts`, agregar (falla):
+- [x] T011 [P] [US2] En `src/music/progressions.test.ts`, agregar (falla):
   - `text(barsOf(ii-v-i-mayor, t, 4/4))`:
     - en `'F'`, `'Gm7 | C7 | Fmaj7 | Fmaj7'`;
     - en `'B'`, `'C♯m7 | F♯7 | Bmaj7 | Bmaj7'`;
@@ -197,7 +197,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
   - `tonicOf(ii-v-i-mayor, t).label` en las 12 `NOTES`: `C D♭ D E♭ E F F♯ G A♭ A B♭ B`.
   - `keyLabel(ii-v-i-mayor, 'F')` es `'Fa mayor'`, y en `'Db'`, `'Re bemol mayor'`.
 
-- [ ] T012 [US2] Implementar:
+- [x] T012 [US2] Implementar:
   - `pnpm add -E @tonaljs/note@4.12.3 @tonaljs/interval@5.1.1`, y comprobar que `package.json` las tiene sin `^`.
   - **`src/music/progressions.ts`**:
     - la tabla `major` de research §5 (tónica escrita por clase);

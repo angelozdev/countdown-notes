@@ -77,7 +77,7 @@ function Counter() {
     const { on, count } = state.repeats
     return (
       now &&
-      `Vuelta ${now.round.number}${on ? ` de ${count}` : ''} · nota ${now.index + 1} de ${now.round.notes.length}`
+      `Vuelta ${now.round.number}${on ? ` de ${count}` : ''} · nota ${Math.floor(now.index / now.round.barsPerNote) + 1} de ${now.round.notes.length}`
     )
   })
   return text ? (

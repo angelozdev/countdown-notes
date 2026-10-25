@@ -12,7 +12,8 @@ import {
   type Meter,
   type MeterId
 } from '@/music/meters'
-import { NOTES, type Note, type NoteId } from '@/music/notes'
+import { NOTE_BY_ID, NOTES, type Note, type NoteId } from '@/music/notes'
+import type { RoundChord } from '@/music/progressions'
 import { drawRound } from './round'
 import {
   DEFAULT_SETTINGS,
@@ -24,7 +25,10 @@ import {
 export type Status = 'stopped' | 'countIn' | 'playing'
 
 export type Round = {
+  mode: 'random'
   number: number
+  /** Los compases de la vuelta, cada uno con sus acordes. */
+  bars: RoundChord[][]
   /** Orden sorteado: cada nota del pool una vez. */
   notes: NoteId[]
   /** Copia del ajuste al sortearla; no cambia después. */
@@ -74,18 +78,21 @@ export type PracticeState = {
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
 
-export const roundLength = (round: Round) =>
-  round.notes.length * round.barsPerNote
+export const roundLength = (round: Round) => round.bars.length
 
-/** Índice, dentro de la vuelta, de la nota que suena en ese compás. */
-export const noteIndexAt = (round: Round, bar: number) =>
-  Math.floor((bar - round.firstBar) / round.barsPerNote)
+/** Compases desde el inicio de la vuelta hasta que empieza su última nota: ahí se sortea la siguiente. */
+export const previewFrom = (round: Round) =>
+  (round.notes.length - 1) * round.barsPerNote
 
-/** La vuelta y la nota que están sonando, si ya pasó la cuenta de entrada. */
+/** El acorde que suena en ese golpe: el último que entró. */
+export const chordAt = (chords: RoundChord[], beat: number) =>
+  chords.findLast((chord) => chord.at <= beat)!
+
+/** La vuelta y el compás (su índice) que están sonando, si ya pasó la cuenta de entrada. */
 export function nowPlaying({ status, position, rounds }: PracticeState) {
   if (status !== 'playing' || !position) return undefined
   const round = rounds[0]
-  return { round, index: noteIndexAt(round, position.bar) }
+  return { round, index: position.bar - round.firstBar }
 }
 
 /** El compás que suena (el de la vuelta actual) o, detenida, el de los ajustes. */
@@ -114,6 +121,25 @@ const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]
 const settingsOf = (state: PracticeState) =>
   Object.fromEntries(SETTING_KEYS.map((key) => [key, state[key]])) as Settings
 
+/** Cada nota sorteada da `barsPerNote` compases con su raíz sola. */
+const randomRound = (
+  number: number,
+  notes: NoteId[],
+  barsPerNote: number,
+  meter: MeterId,
+  firstBar: number
+): Round => ({
+  mode: 'random',
+  number,
+  meter,
+  firstBar,
+  bars: notes.flatMap((id) =>
+    Array.from({ length: barsPerNote }, () => [{ root: NOTE_BY_ID[id], at: 0 }])
+  ),
+  notes,
+  barsPerNote
+})
+
 export function createPracticeStore(engine: Engine) {
   const store = createStore<PracticeState>()((set, get) => {
     // el último compás que el motor pidió con barAt: pide con anticipación, antes de su onBeat
@@ -128,13 +154,13 @@ export function createPracticeStore(engine: Engine) {
       const { notes, barsPerNote, meter } = get()
       // con menos de 2 notas no se puede sortear: sigue con las de la vuelta anterior
       const pool = notes.length >= 2 ? notes : previous.notes
-      return {
-        number: previous.number + 1,
-        notes: drawRound(pool, previous.notes.at(-1)),
+      return randomRound(
+        previous.number + 1,
+        drawRound(pool, previous.notes.at(-1)),
         barsPerNote,
         meter,
-        firstBar: previous.firstBar + roundLength(previous)
-      }
+        previous.firstBar + roundLength(previous)
+      )
     }
 
     const clicksOf = (meter: Meter) =>
@@ -158,9 +184,10 @@ export function createPracticeStore(engine: Engine) {
 
       // la siguiente vuelta se sortea al empezar la última nota, para mostrarla por adelantado.
       // Es >=, no ===: si N sube o se apaga durante la última nota, el compás pedido ya es el primero de ella
-      const lastNoteBar =
-        last.firstBar + (last.notes.length - 1) * last.barsPerNote
-      if (bar >= lastNoteBar && (!repeats.on || last.number < repeats.count)) {
+      if (
+        bar >= last.firstBar + previewFrom(last) &&
+        (!repeats.on || last.number < repeats.count)
+      ) {
         set({ rounds: [...rounds, nextRound(last)] })
       }
       const round = get().rounds.find(
@@ -169,7 +196,7 @@ export function createPracticeStore(engine: Engine) {
       // ninguna vuelta contiene el compás: la práctica termina aquí
       if (!round) return undefined
       const meter = METER_BY_ID[round.meter]
-      const index = noteIndexAt(round, bar)
+      const chords = round.bars[bar - round.firstBar]
       // figura, octava y acorde se leen aquí, al armar el compás: un cambio aplica desde el siguiente
       const { bassFigure, bassOctave, withChord, chordType, style } = get()
       const bass = bassAttacks(meter, bassFigure).map(
@@ -177,22 +204,20 @@ export function createPracticeStore(engine: Engine) {
           at,
           sound: {
             kind: 'bass',
-            pitch: `${round.notes[index]}${bassOctave}`,
+            pitch: `${chordAt(chords, at).root.id}${bassOctave}`,
             length
           }
         })
       )
       const chord: Bar['events'] = withChord
-        ? [
-            {
-              at: 0,
-              sound: {
-                kind: 'chord',
-                pitches: voicingOf(round.notes[index], chordType),
-                length: meter.beats
-              }
+        ? chords.map((chord, i): Bar['events'][number] => ({
+            at: chord.at,
+            sound: {
+              kind: 'chord',
+              pitches: voicingOf(chord.root.id, chord.type ?? chordType),
+              length: (chords[i + 1]?.at ?? meter.beats) - chord.at
             }
-          ]
+          }))
         : []
       planned.set(bar, { chordType: withChord ? chordType : null, style })
       // el sort es estable: en el mismo at, el click queda antes que el bajo y el bajo antes que el acorde
@@ -237,15 +262,7 @@ export function createPracticeStore(engine: Engine) {
           status: 'countIn',
           position: null,
           sounding: null,
-          rounds: [
-            {
-              number: 1,
-              notes: drawRound(notes),
-              barsPerNote,
-              meter,
-              firstBar: 1
-            }
-          ]
+          rounds: [randomRound(1, drawRound(notes), barsPerNote, meter, 1)]
         })
         engine
           .start({ bpm, mix, barAt, onBeat, onEnd: get().stop })

@@ -92,7 +92,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### La vuelta como lista de compases (refactor puro)
 
-- [ ] T006 [US1] **Refactor puro** (research §2): ningún test nuevo y ningún test cambia. En `src/practice/store.ts`:
+- [x] T006 [US1] **Refactor puro** (research §2): ningún test nuevo y ningún test cambia. En `src/practice/store.ts`:
   - `Round` pasa a `{ mode: 'random'; number; meter; firstBar; bars: RoundChord[][]; notes: NoteId[]; barsPerNote: number }` (la variante `'progression'` llega en T008). `RoundChord` viene de `@/music/progressions`.
   - La vuelta aleatoria arma `bars` con `barsPerNote` compases `[{ root: NOTE_BY_ID[id], at: 0 }]` por nota sorteada.
   - `roundLength(round)` es `round.bars.length`.

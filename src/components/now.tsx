@@ -1,21 +1,25 @@
 import type { CSSProperties } from 'react'
 import { chordName, chordSymbol } from '@/music/chords'
-import { NOTE_BY_ID } from '@/music/notes'
 import { groupOf } from '@/music/meters'
-import { meterOf, nowPlaying, usePractice } from '@/practice/store'
+import { chordAt, meterOf, nowPlaying, usePractice } from '@/practice/store'
 
 /** "Ahora": la nota que suena, lo más grande que quepa, con su nombre en español. */
 export function Now() {
   const stopped = usePractice((state) => state.status === 'stopped')
-  const id = usePractice((state) => {
+  const chord = usePractice((state) => {
     const now = nowPlaying(state)
-    return now && now.round.notes[now.index]
+    return (
+      now &&
+      state.position &&
+      chordAt(now.round.bars[now.index], state.position.beat)
+    )
   })
-  const note = id && NOTE_BY_ID[id]
-  const chordType = usePractice((state) => state.sounding?.chordType)
+  const sounding = usePractice((state) => state.sounding?.chordType)
+  const note = chord?.root
+  const chordType = chord && (chord.type ?? sounding)
   const symbol = note
     ? chordType
-      ? chordSymbol(note.id, chordType)
+      ? chordSymbol(note, chordType)
       : note.label
     : ''
   const countdown = usePractice((state) => {
@@ -44,7 +48,7 @@ export function Now() {
             {symbol}
           </p>
           <p className="text-[clamp(1.5rem,10cqh,3rem)] leading-none font-semibold text-balance text-muted-foreground">
-            {chordType ? chordName(note.id, chordType) : note.name}
+            {chordType ? chordName(note, chordType) : note.name}
           </p>
         </>
       )}

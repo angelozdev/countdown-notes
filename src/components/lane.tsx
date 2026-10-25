@@ -2,7 +2,7 @@ import { useEffect, useRef, type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
 import { groupOf, METER_BY_ID, type Meter } from '@/music/meters'
-import { NOTE_BY_ID, type NoteId } from '@/music/notes'
+import type { RoundChord } from '@/music/progressions'
 import { roundLength, usePractice } from '@/practice/store'
 
 /** El carril: la vuelta que suena como una partitura, en filas de 4 compases. */
@@ -35,9 +35,9 @@ export function Lane() {
   if (!round) return null
   const meter = METER_BY_ID[round.meter]
   // el compás que suena dice lo que suena; los demás, lo que hay en los ajustes
-  const labelOf = (id: NoteId, isCurrent: boolean) => {
-    const type = isCurrent ? sounding : withChord && chordType
-    return type ? chordSymbol(id, type) : NOTE_BY_ID[id].label
+  const labelOf = (chord: RoundChord, isCurrent: boolean) => {
+    const type = chord.type ?? (isCurrent ? sounding : withChord && chordType)
+    return type ? chordSymbol(chord.root, type) : chord.root.label
   }
 
   return (
@@ -47,8 +47,7 @@ export function Lane() {
         aria-label="Carril"
         className="mx-auto grid max-w-3xl grid-cols-4 gap-y-3"
       >
-        {Array.from({ length }, (_, i) => {
-          const note = round.notes[Math.floor(i / round.barsPerNote)]
+        {round.bars.map((chords, i) => {
           const state =
             i < currentIndex
               ? 'played'
@@ -58,7 +57,7 @@ export function Lane() {
                   ? 'near'
                   : 'far'
           const current = state === 'current'
-          const label = labelOf(note, current)
+          const labels = chords.map((chord) => labelOf(chord, current))
           return (
             <li
               key={i}
@@ -74,9 +73,13 @@ export function Lane() {
             >
               <span
                 className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
-                style={{ '--chars': label.length } as CSSProperties}
+                style={{ '--chars': labels.join('').length } as CSSProperties}
               >
-                {label}
+                {chords.map((chord, j) => (
+                  <span key={chord.at} data-at={chord.at}>
+                    {labels[j]}
+                  </span>
+                ))}
               </span>
               <BeatSlashes meter={meter} beat={current ? beat : undefined} />
               {current && (
@@ -99,7 +102,7 @@ export function Lane() {
       </ol>
       {next && (
         <p className="mx-auto mt-4 max-w-3xl text-center text-xl font-bold text-muted-foreground">
-          Vuelta {next.number}: {labelOf(next.notes[0], false)}
+          Vuelta {next.number}: {labelOf(next.bars[0][0], false)}
         </p>
       )}
     </div>

@@ -151,6 +151,7 @@ const PROGRESSION_GROUPS = [...new Set(PROGRESSIONS.map(({ group }) => group))]
 function ProgressionPicker() {
   const progression = usePractice(progressionOf)
   const mine = usePractice((state) => state.mine)
+  const chosen = mine.find(({ id }) => id === progression.id)
   const openEditor = usePractice((state) => state.openEditor)
   const setProgression = usePractice((state) => state.setProgression)
   const tonic = usePractice((state) => state.tonic)
@@ -217,10 +218,25 @@ function ProgressionPicker() {
         })}
       </ToggleGroup>
       <SheetClose asChild>
-        <Button variant="secondary" className="h-12" onClick={openEditor}>
+        <Button
+          variant="secondary"
+          className="h-12"
+          onClick={() => openEditor()}
+        >
           Nueva progresión
         </Button>
       </SheetClose>
+      {chosen && (
+        <SheetClose asChild>
+          <Button
+            variant="secondary"
+            className="h-12"
+            onClick={() => openEditor(chosen.id)}
+          >
+            Editar progresión
+          </Button>
+        </SheetClose>
+      )}
     </Section>
   )
 }

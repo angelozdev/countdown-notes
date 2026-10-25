@@ -22,7 +22,12 @@ import {
   type ProgressionId,
   type RoundChord
 } from '@/music/progressions'
-import { parseProgression, type TextError } from '@/music/progression-text'
+import {
+  formatProgression,
+  parseProgression,
+  type TextError
+} from '@/music/progression-text'
+import { loadMyProgressions, saveMyProgressions } from './my-progressions'
 import { drawRound } from './round'
 import {
   DEFAULT_SETTINGS,
@@ -117,8 +122,8 @@ export type PracticeState = {
   setRepeats: (patch: Partial<PracticeState['repeats']>) => void
   toggleNote: (id: NoteId) => void
   setGroup: (natural: boolean, included: boolean) => void
-  /** Un borrador nuevo, elegido; detiene la práctica. */
-  openEditor: () => void
+  /** Sin `id`, un borrador nuevo, elegido, y detiene la práctica; con `id`, el de esa guardada, sin tocar nada más. */
+  openEditor: (id?: MyProgression['id']) => void
   setDraftText: (text: string) => void
   /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
   saveDraft: () => void
@@ -388,13 +393,21 @@ export function createPracticeStore(engine: Engine) {
       if (get().status !== 'stopped') engine.setMix(mix)
     }
 
+    const settings = loadSettings()
+    const mine = loadMyProgressions()
     return {
-      ...loadSettings(),
+      ...settings,
+      // una propia que ya no está guardada deja la de siempre
+      progression:
+        settings.progression in PROGRESSION_BY_ID ||
+        mine.some(({ id }) => id === settings.progression)
+          ? settings.progression
+          : DEFAULT_SETTINGS.progression,
       status: 'stopped',
       position: null,
       sounding: null,
       rounds: [],
-      mine: [],
+      mine,
       editor: null,
       play() {
         const { status, mode, notes, barsPerNote, meter, tonic, bpm, mix } =
@@ -501,8 +514,22 @@ export function createPracticeStore(engine: Engine) {
           )
         })
       },
-      openEditor() {
+      openEditor(saved) {
         const { mine, progression, tonic } = get()
+        if (saved) {
+          const found = mine.find(({ id }) => id === saved)
+          if (!found) return
+          set({
+            editor: {
+              ...found,
+              text: formatProgression(found.bars),
+              errors: [],
+              isNew: false,
+              opened: { progression, tonic }
+            }
+          })
+          return
+        }
         if (get().status !== 'stopped') get().stop()
         const id: MyProgression['id'] = `propia-${Math.max(0, ...mine.map(({ id }) => Number(id.slice(7)))) + 1}`
         set({
@@ -540,10 +567,12 @@ export function createPracticeStore(engine: Engine) {
         const saved = mine.find((p) => p.id === id)
         const name = editor.name.trim() || saved?.name || defaultName(mine)
         const next: MyProgression = { id, name, key, bars }
+        const updated = saved
+          ? mine.map((p) => (p.id === id ? next : p))
+          : [...mine, next]
+        saveMyProgressions(updated)
         set({
-          mine: saved
-            ? mine.map((p) => (p.id === id ? next : p))
-            : [...mine, next],
+          mine: updated,
           editor: {
             ...editor,
             name,

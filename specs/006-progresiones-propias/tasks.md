@@ -219,14 +219,14 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### En el dispositivo
 
-- [ ] T011 [P] [US2] En `src/music/progressions.test.ts`, agregar `'una progresión propia menor se transporta y conserva su grafía'`:
+- [x] T011 [P] [US2] En `src/music/progressions.test.ts`, agregar `'una progresión propia menor se transporta y conserva su grafía'`:
   - con `Am G F E` en `{ tonic: 'A', type: 'minor' }`: en `'A'`, `Am | G | F | E`, y en `'C'`, `Cm | B♭ | A♭ | G`, con el helper `text` del archivo;
   - `keyLabel(…, 'A')` es `'La menor'`;
   - con `C#m7 F#7` en `{ tonic: 'Db', type: 'minor' }`, en `'Db'` da `C♯m7 | F♯7` (FR-005).
 
-  Puede pasar al primer intento, porque T005 ya usa las tablas de la entrega 4. Si pasa, se comprueba que falla cambiando a propósito `type` por `'major'` en `myProgression`, y se deshace.
+  Puede pasar al primer intento, porque T005 ya usa las tablas de la entrega 4. Si pasa, se comprueba que falla cambiando a propósito `type` por `'major'` en `myProgression`, y se deshace. Done: pasó al primer intento; con `type: 'major'` en `myProgression` falla (`'La mayor'` en vez de `'La menor'`), y se deshizo.
 
-- [ ] T012 [US2] Crear `src/saved-progressions.test.tsx` (falla). Helpers:
+- [x] T012 [US2] Crear `src/saved-progressions.test.tsx` (falla). Helpers:
   - `newProgression` y `chords`, como en T006;
   - `createAndSave(app, text)`: crea, escribe, `Guardar` y `Listo`;
   - `groups(panel)`: los `group` del `combobox` `Progresión`, con sus opciones;
@@ -259,9 +259,9 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   5. `'una progresión elegida que ya no existe deja el ii–V–I mayor'`: ajustes `{ mode: 'progression', progression: 'propia-7' }` y ninguna progresión guardada; la línea de estado empieza con `ii–V–I mayor · Do mayor`.
   6. `'los ajustes de la entrega 4 se conservan'`: ajustes `{ mode: 'progression', progression: 'blues-jazz', tonic: 'F', bpm: 100 }`; la línea de estado es `Blues de jazz · Fa mayor · Analógico cálido · 100 BPM · 4/4`.
 
-  Correr y **verlo fallar**.
+  Correr y **verlo fallar**. Done: fallaron 3 (1, 2 y 3: sin guardado ni «Editar progresión»); el 4, el 5 y el 6 pasaron a la primera, porque hoy no se lee la clave de progresiones y `progression` inválido ya vuelve al por defecto. Con T013, quitar la comprobación del store o los ids repetidos hace fallar el 5 y el 3.
 
-- [ ] T013 [US2] Implementar el esquema de research §1 (**decisión 1: confirmar con el usuario antes de empezar**):
+- [x] T013 [US2] Implementar el esquema de research §1 (**decisión 1: confirmar con el usuario antes de empezar**):
   - **`src/practice/my-progressions.ts`** (nuevo):
     - `MY_PROGRESSIONS_KEY = 'countdown-notes:progresiones'`.
     - Un `myProgressionSchema` de zod con estas reglas, copiadas de research §1:
@@ -283,7 +283,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
     - `openEditor(id)` copia la guardada al borrador, con `text: formatProgression(bars)`, `isNew: false` y `opened` con lo actual, sin cambiar la progresión, la tónica ni la música.
   - **`src/components/settings-panel.tsx`**: con una propia elegida, el botón `Editar progresión` (en `SheetClose asChild`) llama a `openEditor(progression)`.
 
-  **Verde completo**. **Commit**: `feat: las progresiones propias se guardan en el dispositivo (#34)`.
+  **Verde completo**. **Commit**: `feat: las progresiones propias se guardan en el dispositivo (#34)`. Done: decisión 1 confirmada por el usuario (research §1 tal cual); `Editar progresión` va tras `Nueva progresión`; `openEditor(id)` no hace nada si el id no está guardado.
 
 ### Nombre
 

@@ -57,7 +57,7 @@ export type Progression = {
 const MAJOR = { tonic: 'C', type: 'major' } as const
 const MINOR = { tonic: 'C', type: 'minor' } as const
 
-/** En el orden de FR-016, FR-018 y FR-019. */
+/** En el orden de FR-016, FR-018 y FR-019. El id queda `ProgressionId`, no el ancho: el `z.enum` de settings.ts lo necesita. */
 export const PROGRESSIONS: (Progression & { id: ProgressionId })[] = [
   {
     id: 'ciclo-cuartas',

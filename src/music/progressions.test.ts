@@ -420,4 +420,25 @@ describe('las progresiones propias', () => {
       bars: 'Dm7 | G7 | Cmaj7 | Cmaj7'
     })
   })
+
+  test('una progresión propia menor se transporta y conserva su grafía', () => {
+    const myProgression_ = (
+      source: string,
+      key: MyProgression['key']
+    ): Progression =>
+      myProgression({
+        id: 'propia-1',
+        name: 'Mía',
+        key,
+        bars: (parseProgression(source) as { bars: WrittenBar[] }).bars
+      })
+    const andaluza = myProgression_('Am G F E', { tonic: 'A', type: 'minor' })
+    expect(text(barsOf(andaluza, 'A', FOUR_FOUR))).toBe('Am | G | F | E')
+    expect(text(barsOf(andaluza, 'C', FOUR_FOUR))).toBe('Cm | B♭ | A♭ | G')
+    expect(keyLabel(andaluza, 'A')).toBe('La menor')
+
+    // la grafía de la tonalidad de origen se conserva (FR-005)
+    const sharps = myProgression_('C#m7 F#7', { tonic: 'Db', type: 'minor' })
+    expect(text(barsOf(sharps, 'Db', FOUR_FOUR))).toBe('C♯m7 | F♯7')
+  })
 })

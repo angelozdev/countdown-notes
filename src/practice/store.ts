@@ -15,10 +15,14 @@ import {
 import { NOTE_BY_ID, NOTES, type Note, type NoteId } from '@/music/notes'
 import {
   barsOf,
+  type MyProgression,
+  myProgression,
   PROGRESSION_BY_ID,
+  type Progression,
   type ProgressionId,
   type RoundChord
 } from '@/music/progressions'
+import { parseProgression, type TextError } from '@/music/progression-text'
 import { drawRound } from './round'
 import {
   DEFAULT_SETTINGS,
@@ -50,14 +54,24 @@ export type Round =
     })
   | (RoundBase & {
       mode: 'progression'
-      progression: ProgressionId
+      progression: Progression['id']
       /** Copia del ajuste al armarla; no cambia después. */
       tonic: NoteId
     })
 
+/** El borrador del editor: lo que se guarda, más el texto como se escribe (data-model.md, "Borrador"). */
+export type Draft = MyProgression & {
+  /** Nunca guardada. */
+  isNew: boolean
+  text: string
+  errors: TextError[]
+  /** Lo que regía al abrir el editor: vuelve al descartar. */
+  opened: { progression: Progression['id']; tonic: NoteId }
+}
+
 export type PracticeState = {
   mode: Mode
-  progression: ProgressionId
+  progression: Progression['id']
   tonic: NoteId
   status: Status
   /** Lo que está sonando: el compás 0 es la cuenta de entrada. */
@@ -78,12 +92,16 @@ export type PracticeState = {
   sounding: { chordType: ChordTypeId | null; style: Style } | null
   /** La vuelta que suena y, desde su última nota, la siguiente. */
   rounds: Round[]
+  /** Las progresiones propias guardadas, en orden de creación. */
+  mine: MyProgression[]
+  /** El borrador abierto en el editor, si lo hay. */
+  editor: Draft | null
   play: () => void
   stop: () => void
   /** Cambiar de modo detiene la práctica. */
   setMode: (mode: Mode) => void
   /** Cambiar de progresión detiene la práctica. */
-  setProgression: (progression: ProgressionId) => void
+  setProgression: (progression: Progression['id']) => void
   /** Aplica desde la siguiente vuelta que se arme. */
   setTonic: (tonic: NoteId) => void
   setBpm: (bpm: number) => void
@@ -99,6 +117,13 @@ export type PracticeState = {
   setRepeats: (patch: Partial<PracticeState['repeats']>) => void
   toggleNote: (id: NoteId) => void
   setGroup: (natural: boolean, included: boolean) => void
+  /** Un borrador nuevo, elegido; detiene la práctica. */
+  openEditor: () => void
+  setDraftText: (text: string) => void
+  /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
+  saveDraft: () => void
+  /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
+  closeEditor: () => void
 }
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
@@ -133,9 +158,53 @@ export const STYLE_LABELS: Record<Style, string> = {
   pad: 'Pad ambiental'
 }
 
+// las conversiones se guardan por objeto: mientras no cambie, la misma Progression, para los selectores
+const converted = new WeakMap<MyProgression, Progression>()
+
+/** La progresión elegida (o la de `id`): el borrador si es suyo, si no una propia guardada o la de la biblioteca. */
+export function progressionOf(
+  state: Pick<PracticeState, 'progression' | 'editor' | 'mine'>,
+  id = state.progression
+): Progression {
+  const mine =
+    state.editor?.id === id ? state.editor : state.mine.find((p) => p.id === id)
+  if (!mine) return PROGRESSION_BY_ID[id as ProgressionId]
+  if (!converted.has(mine)) converted.set(mine, myProgression(mine))
+  return converted.get(mine)!
+}
+
 /** En el modo aleatorio, con menos de 2 notas no se puede evitar repetir una nota seguida. */
 export const canPlay = (state: PracticeState) =>
-  state.mode === 'progression' || state.notes.length >= 2
+  state.mode === 'progression'
+    ? progressionOf(state).bars !== ''
+    : state.notes.length >= 2
+
+/** El borrador tiene algo que perder: una nueva con compases, o una guardada que difiere de lo guardado. */
+export function isDirty({ editor, mine }: PracticeState) {
+  if (!editor) return false
+  if (editor.isNew) return editor.bars.length > 0
+  const saved = mine.find((p) => p.id === editor.id)
+  return (
+    !saved ||
+    editor.name.trim() !== saved.name ||
+    editor.key.tonic !== saved.key.tonic ||
+    editor.key.type !== saved.key.type ||
+    JSON.stringify(editor.bars) !== JSON.stringify(saved.bars)
+  )
+}
+
+export const canSave = (state: PracticeState) =>
+  isDirty(state) &&
+  state.editor!.errors.length === 0 &&
+  state.editor!.bars.length > 0
+
+/** `Progresión N`, con el primer N libre entre los nombres de las guardadas. */
+function defaultName(mine: MyProgression[]) {
+  const taken = new Set(mine.map(({ name }) => name))
+  let n = 1
+  while (taken.has(`Progresión ${n}`)) n++
+  return `Progresión ${n}`
+}
 
 /** Las notas incluidas, sin duplicados y en orden cromático. */
 const notesWhere = (included: (note: Note) => boolean) =>
@@ -170,7 +239,7 @@ const randomRound = (
 
 const progressionRound = (
   number: number,
-  progression: ProgressionId,
+  progression: Progression,
   tonic: NoteId,
   meter: MeterId,
   firstBar: number
@@ -179,9 +248,9 @@ const progressionRound = (
   number,
   meter,
   firstBar,
-  progression,
+  progression: progression.id,
   tonic,
-  bars: barsOf(PROGRESSION_BY_ID[progression], tonic, METER_BY_ID[meter])
+  bars: barsOf(progression, tonic, METER_BY_ID[meter])
 })
 
 export function createPracticeStore(engine: Engine) {
@@ -198,12 +267,12 @@ export function createPracticeStore(engine: Engine) {
     let lastVoicing: string[] | undefined
 
     function nextRound(previous: Round): Round {
-      const { notes, barsPerNote, meter, progression, tonic } = get()
+      const { notes, barsPerNote, meter, tonic } = get()
       const firstBar = previous.firstBar + roundLength(previous)
       if (previous.mode === 'progression') {
         return progressionRound(
           previous.number + 1,
-          progression,
+          progressionOf(get()),
           tonic,
           meter,
           firstBar
@@ -323,18 +392,11 @@ export function createPracticeStore(engine: Engine) {
       position: null,
       sounding: null,
       rounds: [],
+      mine: [],
+      editor: null,
       play() {
-        const {
-          status,
-          mode,
-          notes,
-          barsPerNote,
-          meter,
-          progression,
-          tonic,
-          bpm,
-          mix
-        } = get()
+        const { status, mode, notes, barsPerNote, meter, tonic, bpm, mix } =
+          get()
         if (status !== 'stopped' || !canPlay(get())) return
         planned.clear()
         set({
@@ -343,7 +405,7 @@ export function createPracticeStore(engine: Engine) {
           sounding: null,
           rounds: [
             mode === 'progression'
-              ? progressionRound(1, progression, tonic, meter, 1)
+              ? progressionRound(1, progressionOf(get()), tonic, meter, 1)
               : randomRound(1, drawRound(notes), barsPerNote, meter, 1)
           ]
         })
@@ -436,6 +498,66 @@ export function createPracticeStore(engine: Engine) {
             note.natural === natural ? included : notes.includes(note.id)
           )
         })
+      },
+      openEditor() {
+        const { mine, progression, tonic } = get()
+        if (get().status !== 'stopped') get().stop()
+        const id: MyProgression['id'] = `propia-${Math.max(0, ...mine.map(({ id }) => Number(id.slice(7)))) + 1}`
+        set({
+          progression: id,
+          editor: {
+            id,
+            name: defaultName(mine),
+            key: { tonic, type: 'major' },
+            text: '',
+            bars: [],
+            errors: [],
+            isNew: true,
+            opened: { progression, tonic }
+          }
+        })
+      },
+      setDraftText(text) {
+        const { editor } = get()
+        if (!editor) return
+        const result = parseProgression(text)
+        set({
+          editor: {
+            ...editor,
+            text,
+            ...('bars' in result
+              ? { bars: result.bars, errors: [] }
+              : { errors: result.errors })
+          }
+        })
+      },
+      saveDraft() {
+        const { editor, mine, progression, tonic } = get()
+        if (!editor || !canSave(get())) return
+        const { id, key, bars } = editor
+        const saved = mine.find((p) => p.id === id)
+        const name = editor.name.trim() || saved?.name || defaultName(mine)
+        const next: MyProgression = { id, name, key, bars }
+        set({
+          mine: saved
+            ? mine.map((p) => (p.id === id ? next : p))
+            : [...mine, next],
+          editor: {
+            ...editor,
+            name,
+            isNew: false,
+            opened: { progression, tonic }
+          }
+        })
+      },
+      closeEditor() {
+        const { editor } = get()
+        // una nueva sin guardar desaparece: vuelve lo que regía (T009 lo hace también al descartar)
+        if (editor?.isNew) {
+          get().setProgression(editor.opened.progression)
+          set({ tonic: editor.opened.tonic })
+        }
+        set({ editor: null })
       }
     }
   })

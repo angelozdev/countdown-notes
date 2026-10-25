@@ -120,7 +120,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### El editor en la app
 
-- [ ] T006 [US1] Crear `src/write-progression.test.tsx` (falla). Helpers locales:
+- [x] T006 [US1] Crear `src/write-progression.test.tsx` (falla). Helpers locales:
   - `pickMode(app, name)`, como en `src/progression-mode.test.tsx`;
   - `pickSound(app, name)`, como en `src/chords.test.tsx`;
   - `newProgression(app)`: abre el panel, toca `Nueva progresión` y devuelve `within(screen.getByRole('main', { name: 'Editor de progresiones' }))`;
@@ -148,7 +148,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T007 [US1] Implementar ([data-model](./data-model.md), Borrador y Derivados):
+- [x] T007 [US1] Implementar ([data-model](./data-model.md), Borrador y Derivados): Done: también `useSpaceToggle` ignora el espacio en `input, textarea, select, [contenteditable]` (adelantado de T009: sin eso no se puede escribir un espacio en Acordes); `closeEditor()` de una nueva sin guardar devuelve lo que regía (`opened`), para no dejar `progression` apuntando a una propia que no existe.
   - **`src/practice/store.ts`**:
     - Estado `mine: MyProgression[]`, que empieza en `[]` (US2 lo carga), y `editor: Draft | null`, con `null` al empezar. `Draft` se exporta, con los campos de data-model.
     - Se exporta `progressionOf(state, id = state.progression)`: el borrador si `editor?.id === id`; si no, `myProgression` de la de `mine`; si no, `PROGRESSION_BY_ID[id]`.

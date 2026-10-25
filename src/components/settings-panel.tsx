@@ -5,6 +5,7 @@ import { Stepper } from '@/components/stepper'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -19,14 +20,14 @@ import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
 import { NOTES, type NoteId } from '@/music/notes'
-import {
-  PROGRESSION_BY_ID,
-  PROGRESSIONS,
-  type ProgressionId,
-  tonicOf
-} from '@/music/progressions'
+import { type Progression, PROGRESSIONS, tonicOf } from '@/music/progressions'
 import type { Mode } from '@/practice/settings'
-import { NOT_ENOUGH_NOTES, STYLE_LABELS, usePractice } from '@/practice/store'
+import {
+  NOT_ENOUGH_NOTES,
+  progressionOf,
+  STYLE_LABELS,
+  usePractice
+} from '@/practice/store'
 
 /** Un grupo del panel: filete arriba y título; los controles grandes van debajo. */
 const SECTION = 'flex flex-col gap-3 border-t border-border pt-5'
@@ -148,8 +149,9 @@ function ModePicker() {
 const PROGRESSION_GROUPS = [...new Set(PROGRESSIONS.map(({ group }) => group))]
 
 function ProgressionPicker() {
-  const progression =
-    PROGRESSION_BY_ID[usePractice((state) => state.progression)]
+  const progression = usePractice(progressionOf)
+  const mine = usePractice((state) => state.mine)
+  const openEditor = usePractice((state) => state.openEditor)
   const setProgression = usePractice((state) => state.setProgression)
   const tonic = usePractice((state) => state.tonic)
   const setTonic = usePractice((state) => state.setTonic)
@@ -161,9 +163,18 @@ function ProgressionPicker() {
           className={SELECT}
           value={progression.id}
           onChange={(event) =>
-            setProgression(event.target.value as ProgressionId)
+            setProgression(event.target.value as Progression['id'])
           }
         >
+          {mine.length > 0 && (
+            <optgroup label="Mis progresiones">
+              {mine.map(({ id, name }) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </optgroup>
+          )}
           {PROGRESSION_GROUPS.map((group) => (
             <optgroup key={group} label={group}>
               {PROGRESSIONS.filter((item) => item.group === group).map(
@@ -205,6 +216,11 @@ function ProgressionPicker() {
           )
         })}
       </ToggleGroup>
+      <SheetClose asChild>
+        <Button variant="secondary" className="h-12" onClick={openEditor}>
+          Nueva progresión
+        </Button>
+      </SheetClose>
     </Section>
   )
 }
@@ -242,9 +258,7 @@ function SoundPicker() {
   const setWithChord = usePractice((state) => state.setWithChord)
   // en la progresión cada acorde trae su tipo, salvo en los ciclos de solo raíces
   const choosesType = usePractice(
-    (state) =>
-      state.mode === 'random' ||
-      !!PROGRESSION_BY_ID[state.progression].rootsOnly
+    (state) => state.mode === 'random' || !!progressionOf(state).rootsOnly
   )
   const chordType = usePractice((state) => state.chordType)
   const setChordType = usePractice((state) => state.setChordType)

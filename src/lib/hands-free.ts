@@ -43,7 +43,7 @@ export function useWakeLock(active: boolean) {
   }, [active])
 }
 
-/** La barra espaciadora llama a `toggle`, salvo con el panel (diálogo) abierto o con modificadores. */
+/** La barra espaciadora llama a `toggle`, salvo con un diálogo abierto, en un campo editable o con modificadores. */
 export function useSpaceToggle(toggle: () => void) {
   useEffect(() => {
     const ours = (event: KeyboardEvent) =>
@@ -54,7 +54,9 @@ export function useSpaceToggle(toggle: () => void) {
       !event.shiftKey &&
       !(
         event.target instanceof Element &&
-        event.target.closest('[role="dialog"]')
+        event.target.closest(
+          '[role="dialog"], input, textarea, select, [contenteditable]'
+        )
       )
 
     function onKeyDown(event: KeyboardEvent) {

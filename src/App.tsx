@@ -3,10 +3,11 @@ import { useCallback, useContext, useState } from 'react'
 import type { Engine } from '@/audio/engine'
 import { Lane } from '@/components/lane'
 import { Now } from '@/components/now'
+import { ProgressionEditor } from '@/components/progression-editor'
 import { SettingsPanel } from '@/components/settings-panel'
 import { Button } from '@/components/ui/button'
 import { useSpaceToggle, useWakeLock } from '@/lib/hands-free'
-import { keyLabel, PROGRESSION_BY_ID } from '@/music/progressions'
+import { keyLabel } from '@/music/progressions'
 import {
   canPlay,
   createPracticeStore,
@@ -14,6 +15,7 @@ import {
   NOT_ENOUGH_NOTES,
   nowPlaying,
   PracticeContext,
+  progressionOf,
   STYLE_LABELS,
   usePractice
 } from '@/practice/store'
@@ -23,23 +25,32 @@ export default function App({ engine }: { engine: Engine }) {
   return (
     <PracticeContext value={store}>
       <HandsFree />
-      <main className="flex h-dvh flex-col p-safe">
-        <h1 className="sr-only">Countdown Notes</h1>
-        <StatusLine />
-        <Now />
-        <Lane />
-        <footer className="flex flex-col items-center gap-3 pt-4">
-          <Counter />
-          <NotEnoughNotes />
-          <div className="flex w-full max-w-sm items-center gap-3">
-            <QuickTempo delta={-5} />
-            <PlayButton />
-            <QuickTempo delta={5} />
-          </div>
-          <SettingsPanel />
-        </footer>
-      </main>
+      <Screen />
     </PracticeContext>
+  )
+}
+
+/** El editor ocupa la pantalla mientras hay un borrador; la música sigue sonando debajo. */
+function Screen() {
+  const editing = usePractice((state) => state.editor !== null)
+  if (editing) return <ProgressionEditor />
+  return (
+    <main className="flex h-dvh flex-col p-safe">
+      <h1 className="sr-only">Countdown Notes</h1>
+      <StatusLine />
+      <Now />
+      <Lane />
+      <footer className="flex flex-col items-center gap-3 pt-4">
+        <Counter />
+        <NotEnoughNotes />
+        <div className="flex w-full max-w-sm items-center gap-3">
+          <QuickTempo delta={-5} />
+          <PlayButton />
+          <QuickTempo delta={5} />
+        </div>
+        <SettingsPanel />
+      </footer>
+    </main>
   )
 }
 
@@ -63,8 +74,8 @@ function StatusLine() {
     if (state.mode === 'random') return 'Aleatorio'
     const round = state.rounds[0]
     const { progression, tonic } = round?.mode === 'progression' ? round : state
-    const library = PROGRESSION_BY_ID[progression]
-    return `${library.name} · ${keyLabel(library, tonic)}`
+    const chosen = progressionOf(state, progression)
+    return `${chosen.name} · ${keyLabel(chosen, tonic)}`
   })
   const bpm = usePractice((state) => state.bpm)
   const meter = usePractice((state) => meterOf(state).id)

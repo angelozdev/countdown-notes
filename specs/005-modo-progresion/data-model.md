@@ -82,7 +82,7 @@ Se reemplaza la forma de la entrega 1 (research §2):
 
 ## Ajustes (los que se guardan)
 
-Los de la entrega 3, más (research §9, pendiente de aprobación):
+Los de la entrega 3, más (research §9, aprobado por el usuario):
 
 | Campo         | Tipo                        | Por defecto      | Validación (zod, con `.catch`) | Cuándo aplica mientras suena |
 | ------------- | --------------------------- | ---------------- | ------------------------------ | ---------------------------- |

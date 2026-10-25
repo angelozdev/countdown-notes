@@ -21,12 +21,12 @@ El contrato del motor no cambia (research §10). Todo vive en `music/` y en el s
 
 Las decisiones están en [research.md](./research.md), el estado en [data-model.md](./data-model.md) y los contratos en [contracts/interfaces.md](./contracts/interfaces.md).
 
-## Decisiones para aprobar
+## Decisiones del usuario
 
-Las dos son del usuario según la constitución (dependencias y esquema guardado). Las demás decisiones de este plan las cubre la spec o son internas.
+Las dos son del usuario según la constitución (dependencias y esquema guardado), y las aprobó el 2026-10-24 con la opción recomendada. Las demás decisiones de este plan las cubre la spec o son internas.
 
-1. **Cómo entra tonal** (research §1). Recomendación: `@tonaljs/note@4.12.3` y `@tonaljs/interval@5.1.1`, los dos módulos de `tonal@6.5.1` que se usan. Pesan 4,4 KB minificados. El paquete `tonal`, con el nombre de la constitución, pesa 27,1 KB porque no permite descartar lo que no se usa.
-2. **Esquema guardado** (research §9). Recomendación: la misma clave y la versión 1, con `mode`, `progression` y `tonic`, cada uno con su `.catch` al valor por defecto, como en la entrega 3. Se revisaron las entregas 5 y 6, y las dos solo suman cosas sobre este esquema.
+1. **Cómo entra tonal** (research §1): `@tonaljs/note@4.12.3` y `@tonaljs/interval@5.1.1`, los dos módulos de `tonal@6.5.1` que se usan. Pesan 4,4 KB minificados. El paquete `tonal`, con el nombre de la constitución, pesa 27,1 KB porque no permite descartar lo que no se usa.
+2. **Esquema guardado** (research §9): la misma clave y la versión 1, con `mode`, `progression` y `tonic`, cada uno con su `.catch` al valor por defecto, como en la entrega 3. Se revisaron las entregas 5 y 6, y las dos solo suman cosas sobre este esquema.
 
 ## Technical Context
 
@@ -74,7 +74,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | IV. Manos libres          | Ningún control nuevo en la pantalla de práctica: modo, progresión y tonalidad viven en el panel. El carril muestra la progresión completa y la vista previa de la vuelta siguiente, así que se ve lo que viene sin tocar nada. Los compases partidos caben a 320 px (E2E).                                                                                                                   | ✅     |
 | V. Simplicidad            | Del stack, solo los dos módulos de tonal que se usan (decisión 1). La biblioteca es texto con un lector de unas líneas (research §6). Sin migración de datos (decisión 2). El motor no cambia (research §10).                                                                                                                                                                                | ✅     |
 | Restricciones técnicas    | Todo dentro del stack. Interfaz en español; cifrado americano con la grafía de la tonalidad.                                                                                                                                                                                                                                                                                                 | ✅     |
-| Flujo de trabajo          | Rama `005-modo-progresion`. Commit por paso en verde, con el issue de su historia; nunca en `main` ni push. Las dos decisiones del usuario de la spec están en GitHub (#30, #31) y en el diseño. Las decisiones 1 y 2 de este plan se aprueban antes de implementar. Los issues se cierran al quedar en verde en `main`.                                                                     | ✅     |
+| Flujo de trabajo          | Rama `005-modo-progresion`. Commit por paso en verde, con el issue de su historia; nunca en `main` ni push. Las dos decisiones del usuario de la spec están en GitHub (#30, #31) y en el diseño. Las decisiones 1 y 2 de este plan las aprobó el usuario. Los issues se cierran al quedar en verde en `main`.                                                                                | ✅     |
 
 **Re-check post-diseño**: sin cambios. No hay violaciones que justificar.
 
@@ -135,7 +135,7 @@ src/
 
 ## Orden sugerido para `/speckit-tasks` (porciones verticales)
 
-Cada paso es test que falla → código mínimo → verde → commit con el issue (`#29`…`#32`). La rama ya existe. Antes del primer paso, las decisiones 1 y 2 tienen que estar aprobadas.
+Cada paso es test que falla → código mínimo → verde → commit con el issue (`#29`…`#32`). La rama ya existe.
 
 1. **US1 · #29: un ii–V–I en Do, en loop**.
    1. `progressions.test.ts` (falla). Debe comprobar:

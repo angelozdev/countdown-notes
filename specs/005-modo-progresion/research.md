@@ -4,7 +4,7 @@ Decisiones de diseño técnico para la [spec](./spec.md). Cada una tiene la deci
 
 ## 1. Dependencias: tonal para transportar y deletrear
 
-**Decisión** (pendiente de aprobación del usuario, plan §Decisiones): los módulos de tonal que se usan, en versión exacta:
+**Decisión** (aprobada por el usuario, 2026-10-24): los módulos de tonal que se usan, en versión exacta:
 
 - `@tonaljs/note@4.12.3`: `transpose` y `simplify`.
 - `@tonaljs/interval@5.1.1`: `distance`.
@@ -145,7 +145,7 @@ Las tríadas tienen una sola forma y no cambian. `barAt` pasa `after` solo en el
 
 ## 9. Ajustes guardados
 
-**Decisión** (pendiente de aprobación del usuario, plan §Decisiones): la misma clave y la misma versión (1), con tres campos más que vuelven solos a su valor por defecto, como en la entrega 3:
+**Decisión** (aprobada por el usuario, 2026-10-24): la misma clave y la misma versión (1), con tres campos más que vuelven solos a su valor por defecto, como en la entrega 3:
 
 | Campo         | Tipo                        | Por defecto      |
 | ------------- | --------------------------- | ---------------- |

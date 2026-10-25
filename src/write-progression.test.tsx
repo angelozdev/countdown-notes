@@ -167,3 +167,84 @@ test('crear una progresión detiene la que suena', async () => {
   await newProgression(app)
   expect(app.fake.running).toBe(false)
 })
+
+test('Listo sin cambios cierra sin preguntar', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  const editor = await newProgression(app)
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+  expect(screen.getByRole('region', { name: 'Ahora' })).toBeDefined()
+})
+
+test('Listo con cambios pregunta', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  let editor = await newProgression(app)
+  await app.user.type(chords(editor), 'Dm7 G7')
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  let ask = within(screen.getByRole('dialog', { name: 'Cambios sin guardar' }))
+  expect(ask.getByRole('button', { name: 'Guardar' })).toBeDefined()
+  expect(ask.getByRole('button', { name: 'Descartar cambios' })).toBeDefined()
+
+  await app.user.click(ask.getByRole('button', { name: 'Seguir editando' }))
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(chords(editor).value).toBe('Dm7 G7')
+
+  // descartar: vuelve la progresión anterior y la nueva desaparece
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+  ask = within(screen.getByRole('dialog', { name: 'Cambios sin guardar' }))
+  await app.user.click(ask.getByRole('button', { name: 'Descartar cambios' }))
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+  expect(screen.getByText(/^ii–V–I mayor · Do mayor · /)).toBeDefined()
+  const panel = await app.openSettings()
+  const select = panel.getByRole('combobox', { name: 'Progresión' })
+  expect(
+    within(select).queryByRole('group', { name: 'Mis progresiones' })
+  ).toBeNull()
+  await app.closeSettings()
+
+  // guardar desde la pregunta: queda elegida
+  editor = await newProgression(app)
+  await app.user.type(chords(editor), 'Dm7 G7')
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+  ask = within(screen.getByRole('dialog', { name: 'Cambios sin guardar' }))
+  await app.user.click(ask.getByRole('button', { name: 'Guardar' }))
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+  expect(screen.getByText(/^Progresión 1 · Do mayor · /)).toBeDefined()
+})
+
+test('con errores, la pregunta no deja guardar', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  const editor = await newProgression(app)
+  await app.user.type(chords(editor), 'Dm7 Hm7')
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  const ask = within(
+    screen.getByRole('dialog', { name: 'Cambios sin guardar' })
+  )
+  expect(ask.getByRole('button', { name: 'Guardar' })).toHaveProperty(
+    'disabled',
+    true
+  )
+})
+
+test('el espacio en Acordes no hace Play ni Stop', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  const editor = await newProgression(app)
+  await app.user.type(chords(editor), 'Dm7 G7')
+
+  expect(chords(editor).value).toBe('Dm7 G7')
+  expect(app.fake.lastStart).toBeUndefined()
+})

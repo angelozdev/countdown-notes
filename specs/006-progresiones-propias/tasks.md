@@ -184,7 +184,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### Salir del editor
 
-- [ ] T008 [US1] En `src/write-progression.test.tsx`, agregar (falla):
+- [x] T008 [US1] En `src/write-progression.test.tsx`, agregar (falla):
   1. `'Listo sin cambios cierra sin preguntar'`: tras `newProgression`, `Listo` vuelve a la práctica sin ningún `dialog`.
   2. `'Listo con cambios pregunta'`: con `Dm7 G7` escrito, `Listo` abre el `dialog` `Cambios sin guardar`, con `Guardar`, `Descartar cambios` y `Seguir editando`:
      - `Seguir editando` cierra el diálogo y deja el editor con su texto;
@@ -193,15 +193,15 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   3. `'con errores, la pregunta no deja guardar'`: con `Dm7 Hm7`, el `Guardar` del diálogo está desactivado.
   4. `'el espacio en Acordes no hace Play ni Stop'`: tras `user.type(chords, 'Dm7 G7')`, `textarea.value` es `'Dm7 G7'` y `fake.lastStart` es `undefined`.
 
-  Correr y **verlo fallar**.
+  Correr y **verlo fallar**. Done: fallaron 2, los de la pregunta (2 y 3); el 1 y el 4 pasaron a la primera, porque el cierre sin cambios ya existía y el arreglo del espacio entró en la Fase 2.2 (T007).
 
-- [ ] T009 [US1] Implementar:
-  - **`src/practice/store.ts`**: `discardDraft()` deja `editor: null` y vuelven `opened.progression` y `opened.tonic`. Si la progresión elegida cambia y sonaba, `stop()`.
+- [x] T009 [US1] Implementar:
+  - **`src/practice/store.ts`**: `discardDraft()` deja `editor: null` y vuelven `opened.progression` y `opened.tonic`. Si la progresión elegida cambia y sonaba, `stop()`. Done: `closeEditor` de una nueva sin guardar llama a `discardDraft`.
   - **`src/components/progression-editor.tsx`**: `Listo` cierra si `!isDirty`. Si no, abre un `Sheet` (`side="bottom"`, abierto con estado local) con `SheetTitle` `Cambios sin guardar` y tres botones:
     - `Guardar` (desactivado sin `canSave`): `saveDraft` y `closeEditor`;
     - `Descartar cambios`: `discardDraft`;
     - `Seguir editando`: cierra el `Sheet`.
-  - **`src/lib/hands-free.ts`**: `useSpaceToggle` también ignora el espacio si `event.target` es un `Element` dentro de `input, textarea, select, [contenteditable]` (research §9). Se actualiza el comentario de la función.
+  - **`src/lib/hands-free.ts`**: `useSpaceToggle` también ignora el espacio si `event.target` es un `Element` dentro de `input, textarea, select, [contenteditable]` (research §9). Se actualiza el comentario de la función. Done: ya estaba en T007; el comentario ya era exacto.
 
   **Verde completo**. **Commit**: `feat: preguntar al salir con cambios sin guardar (#33)`. Comentar en #33.
 

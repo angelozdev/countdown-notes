@@ -1,18 +1,28 @@
-import { type CSSProperties, useId } from 'react'
+import { type CSSProperties, useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle
+} from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
 import { spell } from '@/music/notes'
-import { canSave, usePractice } from '@/practice/store'
+import { canSave, isDirty, usePractice } from '@/practice/store'
 
 /** El editor de una progresión, a pantalla completa mientras hay un borrador. */
 export function ProgressionEditor() {
   const errorsId = useId()
+  const [asking, setAsking] = useState(false)
   const editor = usePractice((state) => state.editor)
   const savable = usePractice(canSave)
+  const dirty = usePractice(isDirty)
   const setDraftText = usePractice((state) => state.setDraftText)
   const saveDraft = usePractice((state) => state.saveDraft)
   const closeEditor = usePractice((state) => state.closeEditor)
+  const discardDraft = usePractice((state) => state.discardDraft)
   if (!editor) return null
   const { text, errors, bars } = editor
 
@@ -26,7 +36,7 @@ export function ProgressionEditor() {
           variant="ghost"
           size="lg"
           className="h-12 rounded-full px-5 text-base"
-          onClick={closeEditor}
+          onClick={() => (dirty ? setAsking(true) : closeEditor())}
         >
           Listo
         </Button>
@@ -88,6 +98,51 @@ export function ProgressionEditor() {
           Guardar
         </Button>
       </div>
+      <Sheet open={asking} onOpenChange={setAsking}>
+        <SheetContent
+          side="bottom"
+          aria-describedby={undefined}
+          showCloseButton={false}
+          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+        >
+          <SheetHeader>
+            <SheetTitle className="text-xl">Cambios sin guardar</SheetTitle>
+          </SheetHeader>
+          <SheetFooter>
+            <Button
+              size="lg"
+              className="h-12 text-base"
+              disabled={!savable}
+              onClick={() => {
+                saveDraft()
+                closeEditor()
+                setAsking(false)
+              }}
+            >
+              Guardar
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 text-base"
+              onClick={() => {
+                discardDraft()
+                setAsking(false)
+              }}
+            >
+              Descartar cambios
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="h-12 text-base"
+              onClick={() => setAsking(false)}
+            >
+              Seguir editando
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </main>
   )
 }

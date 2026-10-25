@@ -124,6 +124,8 @@ export type PracticeState = {
   saveDraft: () => void
   /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
   closeEditor: () => void
+  /** Cierra el editor sin guardar; vuelven la progresión y la tónica que regían al abrirlo. */
+  discardDraft: () => void
 }
 
 export type PracticeStore = ReturnType<typeof createPracticeStore>
@@ -551,13 +553,19 @@ export function createPracticeStore(engine: Engine) {
         })
       },
       closeEditor() {
-        const { editor } = get()
-        // una nueva sin guardar desaparece: vuelve lo que regía (T009 lo hace también al descartar)
-        if (editor?.isNew) {
-          get().setProgression(editor.opened.progression)
-          set({ tonic: editor.opened.tonic })
+        // una nueva sin guardar desaparece: se descarta, para que vuelva lo que regía
+        if (get().editor?.isNew) get().discardDraft()
+        else set({ editor: null })
+      },
+      discardDraft() {
+        const { editor, progression } = get()
+        if (!editor) return
+        const { opened } = editor
+        // la práctica se detiene solo si cambia la elegida
+        if (opened.progression !== progression) {
+          get().setProgression(opened.progression)
         }
-        set({ editor: null })
+        set({ tonic: opened.tonic, editor: null })
       }
     }
   })

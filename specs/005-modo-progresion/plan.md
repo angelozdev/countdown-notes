@@ -164,7 +164,7 @@ Cada paso es test que falla → código mínimo → verde → commit con el issu
       - que cambiar de modo, sonando o en la cuenta, detiene el motor (`fake.running` falso);
       - que el modo se recuerda, y que un dato con la forma de la entrega 3 se conserva con los campos nuevos por defecto.
 
-      Código: `mode`, `progression` y `tonic` en `settings.ts`; `setMode`, `canPlay` y la vuelta de progresión en el store; `changes` en `bassAttacks`; el `radiogroup` "Modo" en el panel; la línea de estado y el contador en `App.tsx`.
+      Código: `mode`, `progression` y `tonic` en `settings.ts`; `setMode`, `canPlay` y la vuelta de progresión en el store; el `radiogroup` "Modo" en el panel; la línea de estado y el contador en `App.tsx`.
 
    5. `progression.browser.test.ts`, el test de aceptación de audio (research §12). Debe comprobar, con el store y el motor real, el ii–V–I con "Bajo + acorde" y "parar tras 2 vueltas":
       - 8 ataques del bajo y 8 del acorde, uno al inicio de cada compás de música, a menos de 1 ms;

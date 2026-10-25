@@ -52,7 +52,7 @@ export function bassAttacks(
 ): { at: number; length: number }[]
 ```
 
-- `changes` llega en US1 (con un solo acorde por compás, `[0]` no cambia nada); `splitAt`, en US3.
+- `splitAt` y `changes` llegan en US3, con el compás partido.
 - `meters.test.ts` suma `splitAt` en los 8 compases (tabla de research §4) y `bassAttacks` con `changes` en 4/4 y 6/8 con redondas y negras.
 
 ### `src/music/progressions.ts`

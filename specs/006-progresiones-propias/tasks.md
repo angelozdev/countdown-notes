@@ -327,7 +327,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### Probar sin guardar
 
-- [ ] T018 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
+- [x] T018 [US2] En `src/saved-progressions.test.tsx`, agregar (falla): Done: los tests 3 y 4 ya pasaban al agregarlos (T007 y T009 ya cumplían); fallaban solo 1 y 2.
   1. `'Play en el editor toca lo que muestra, sin guardar'`:
      - en `Editar progresión` de la andaluza, cambiar `Acordes` a `Am G F Bb`;
      - el `Play` del editor y `fake.beat(4 + 3 × 4 + 1)`: el `bass` del compás 4 es `Bb2`;
@@ -341,7 +341,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr y **verlo fallar**.
 
-- [ ] T019 [US2] Implementar:
+- [x] T019 [US2] Implementar: Done: `store.ts` sin cambios (`discardDraft` y `nextRound` ya cumplían).
   - **`src/App.tsx`**: se exporta `PlayButton`.
   - **`src/components/progression-editor.tsx`**: `<PlayButton />` abajo, junto a `Guardar`.
   - **`src/practice/store.ts`**: revisar que `discardDraft` ya vuelve `opened.tonic` (T009) y que `nextRound` lee `progressionOf(get())` (T007). Este paso solo agrega lo que falte.

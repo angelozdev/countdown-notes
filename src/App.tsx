@@ -118,7 +118,7 @@ function NotEnoughNotes() {
   ) : null
 }
 
-function PlayButton() {
+export function PlayButton() {
   const stopped = usePractice((state) => state.status === 'stopped')
   const playable = usePractice(canPlay)
   const play = usePractice((state) => state.play)

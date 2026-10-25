@@ -316,3 +316,100 @@ test('al elegirla, la tónica pasa a la suya', async () => {
   app.fake.beat(5)
   expect(laneBars()).toEqual(['Cm', 'B♭', 'A♭', 'G'])
 })
+
+/** Abre el panel y toca "Editar progresión" de la propia elegida. */
+async function editChosen(app: App) {
+  const panel = await app.openSettings()
+  await app.user.click(panel.getByRole('button', { name: 'Editar progresión' }))
+  return within(screen.getByRole('main', { name: 'Editor de progresiones' }))
+}
+
+/** La andaluza guardada y elegida, en La. */
+function andaluzaChosen() {
+  stored([andaluza])
+  savedSettings({ mode: 'progression', progression: 'propia-1', tonic: 'A' })
+}
+
+const bassByBar = (fake: App['fake']) =>
+  new Map(
+    fake.played.flatMap(({ bar, sound }) =>
+      sound.kind === 'bass' ? [[bar, sound.pitch] as const] : []
+    )
+  )
+
+/** Sale del editor descartando los cambios. */
+async function discard(app: App, editor: Panel) {
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+  await app.user.click(
+    within(
+      screen.getByRole('dialog', { name: 'Cambios sin guardar' })
+    ).getByRole('button', { name: 'Descartar cambios' })
+  )
+}
+
+test('Play en el editor toca lo que muestra, sin guardar', async () => {
+  andaluzaChosen()
+  const first = renderApp()
+  const editor = await editChosen(first)
+  await first.user.clear(chords(editor))
+  await first.user.type(chords(editor), 'Am G F Bb')
+  await first.user.click(editor.getByRole('button', { name: 'Play' }))
+  first.fake.beat(4 + 3 * 4 + 1)
+
+  expect(bassByBar(first.fake).get(4)).toBe('Bb2')
+  await first.user.click(editor.getByRole('button', { name: 'Stop' }))
+  await discard(first, editor)
+  first.unmount()
+
+  const app = renderApp()
+  expect(chords(await editChosen(app)).value).toBe('Am | G | F | E')
+})
+
+test('lo que empieza en el editor sigue al volver', async () => {
+  andaluzaChosen()
+  const app = renderApp()
+  const editor = await editChosen(app)
+  await app.user.click(editor.getByRole('button', { name: 'Play' }))
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+  expect(app.fake.running).toBe(true)
+})
+
+test('un cambio mientras suena aplica en la vuelta siguiente', async () => {
+  andaluzaChosen()
+  const app = renderApp()
+  await app.user.click(screen.getByRole('button', { name: 'Play' }))
+  app.fake.beat(5)
+  const editor = await editChosen(app)
+  await app.user.clear(chords(editor))
+  await app.user.type(chords(editor), 'Dm G F E')
+  app.fake.beat(4 * 4)
+
+  expect(bassByBar(app.fake).get(4)).toBe('E2')
+  expect(bassByBar(app.fake).get(5)).toBe('D2')
+
+  await discard(app, editor)
+  expect(app.fake.running).toBe(true)
+  app.fake.beat(4 * 4)
+  expect(bassByBar(app.fake).get(9)).toBe('A2')
+})
+
+test('descartar vuelve a la tónica de cuando se abrió', async () => {
+  andaluzaChosen()
+  const app = renderApp()
+  const editor = await editChosen(app)
+  await app.user.click(
+    within(
+      editor.getByRole('radiogroup', { name: 'Tonalidad de origen' })
+    ).getByRole('radio', { name: 'Do' })
+  )
+  await discard(app, editor)
+
+  const panel = await app.openSettings()
+  expect(checked(panel.getByRole('radiogroup', { name: 'Tonalidad' }))).toEqual(
+    ['La']
+  )
+})

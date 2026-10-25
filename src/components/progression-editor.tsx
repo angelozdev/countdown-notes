@@ -1,4 +1,5 @@
 import { type CSSProperties, useId, useState } from 'react'
+import { PlayButton } from '@/App'
 import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -126,7 +127,8 @@ export function ProgressionEditor() {
           )
         })}
       </ol>
-      <div className="mt-auto flex justify-end">
+      <div className="mt-auto flex items-center gap-3">
+        <PlayButton />
         <Button
           size="lg"
           className="h-12 px-6 text-base"

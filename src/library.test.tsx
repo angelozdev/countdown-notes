@@ -40,6 +40,8 @@ async function pick(app: App, group: string, name: string) {
 const pickMode = (app: App, name: string) => pick(app, 'Modo', name)
 const pickTonic = (app: App, name: string) => pick(app, 'Tonalidad', name)
 const pickSound = (app: App, name: string) => pick(app, 'Qué suena', name)
+const pickFigure = (app: App, name: string) =>
+  pick(app, 'Figura del bajo', name)
 const pickMeter = (app: App, id: string) => pick(app, 'Compás', id)
 
 async function pickProgression(app: App, name: string) {
@@ -146,6 +148,32 @@ test('el bajo y el acorde atacan en el cambio de mitad de compás', async () => 
   ).toEqual([
     [0, 2],
     [2, 2]
+  ])
+})
+
+test('con corcheas, el bajo de un compás partido sigue en corcheas y cambia de raíz en la mitad', async () => {
+  const app = renderApp()
+  await pickMode(app, 'Progresión')
+  await pickProgression(app, 'Blues de jazz')
+  await pickSound(app, 'Bajo + acorde')
+  await pickFigure(app, 'Corcheas')
+  await play(app)
+  app.fake.beat(4 + 11 * 4)
+
+  expect(
+    soundsOf(app.fake, 11, 'bass').map(({ beat, sound }) => [
+      beat,
+      sound.kind === 'bass' && sound.pitch
+    ])
+  ).toEqual([
+    [0, 'C2'],
+    [0.5, 'C2'],
+    [1, 'C2'],
+    [1.5, 'C2'],
+    [2, 'A2'],
+    [2.5, 'A2'],
+    [3, 'A2'],
+    [3.5, 'A2']
   ])
 })
 

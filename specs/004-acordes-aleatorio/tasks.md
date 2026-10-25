@@ -335,7 +335,7 @@ description: 'Lista de tareas de la Entrega 3 · Acordes en modo aleatorio'
 
   Done: el `<select>` toma el radio, el fondo, el hover y el foco de los botones del panel, con flecha propia; `Estilo` en `text-base` para que "Analógico cálido" no toque el borde a 320 px. El trazo del cifrado baja de 0,06 em a 0,03 em y "Ahora" pierde `tracking-tight`, porque `maj7` se fundía; el nombre del acorde usa `text-balance`. El carril solo hereda el trazo.
 
-- [ ] T022 Correr quickstart §1 completo. Si algún hallazgo cambió una decisión, actualizar research.md. Sin commit si no hay cambios. Comentar en #4 el resumen de la entrega.
+- [x] T022 Correr quickstart §1 completo. Si algún hallazgo cambió una decisión, actualizar research.md. Sin commit si no hay cambios. Comentar en #4 el resumen de la entrega. Done: los 5 comandos en verde sobre `0c67618` (566 tests, 14 e2e), sin cambios en research.md. Hallazgo: el test de audio de SC-001 mide el ataque a menos de 1 ms solo en el estilo cálido y en el primer compás; el Pad entra en 0,8 s y `onsets` no lo detecta, así que su puntualidad queda para la prueba de oído (T023).
 - [ ] T023 El usuario hace quickstart §2–§5: la prueba de oído de los niveles y de los voicings, el Pad en el iPhone y el corte del Pad al final (research §12). Si algo falla, se reabre el issue de esa historia.
 
 ---

@@ -140,7 +140,7 @@ Un compás se puede partir en dos acordes, y un acorde puede durar varios compas
   | Extensiones          | maj9, m9, 9, m11, 13                  |
   | Dominantes alterados | 7♭9, 7♯9, 7♯11, 7alt                  |
 
-  Además, MUST aceptar `ø` por m7♭5, y `o7` y `dim7` por °7, que son los cifrados difíciles de escribir en un teclado.
+  Además, MUST aceptar `ø` y `ø7` por m7♭5, y `o7` y `dim7` por °7, que son los cifrados difíciles de escribir en un teclado.
 
 - **FR-004**: Un acorde no reconocido MUST marcarse en el texto, citándolo. Mientras el texto tenga un error (FR-004 y FR-021), el carril MUST conservar la última progresión válida y nada se guarda.
 - **FR-005**: Una raíz que quedaría como E♯, B♯, C♭ o F♭ MUST escribirse con su enarmónica simple (entrega 4, FR-013). En su tonalidad de origen, cada otro acorde MUST verse como se escribió.
@@ -202,7 +202,7 @@ Un compás se puede partir en dos acordes, y un acorde puede durar varios compas
 - Depende de la entrega 4 (#5), que ya está en `main`; esta rama parte de `main`.
 - Fuera de alcance: editar o copiar las progresiones de la biblioteca, importar o exportar progresiones, compases de más de dos acordes, ciclos propios por las 12 tonalidades, y el cambio automático de tonalidad (entrega 6, #7).
 - Sintaxis del texto (diseño, sección 4.2: la decide el builder): la sugerida por el diseño, `Cmaj7 | C7 A7 | Dm7 G7`, más la forma sin `|` de un acorde por compás (#33). No hay sintaxis de repetición (`×2`): un acorde de varios compases se escribe varias veces, que es lo que pide #36 ("repetirlo").
-- Los alias `ø`, `o7` y `dim7` y la raíz en minúscula son decisión del builder: hacen escribible en el teclado del celular todo cifrado de la lista. Otros cifrados comunes (`-7`, `M7`, `Δ`) quedan fuera, para no agrandar lo que se reconoce sin que se pida.
+- Los alias `ø`, `ø7`, `o7` y `dim7` y la raíz en minúscula son decisión del builder: hacen escribible en el teclado del celular todo cifrado de la lista. Otros cifrados comunes (`-7`, `M7`, `Δ`) quedan fuera, para no agrandar lo que se reconoce sin que se pida.
 - "Medio compás solo en 2/4, 4/4, 6/8 y 12/8" (#36) se lee con la decisión del usuario de la spec 005: en los demás compases, un compás de dos acordes no se parte en mitades sino por grupos de acento (entrega 4, FR-017). Así, una progresión propia suena en cualquier compás, y "Partir" está disponible en todos.
 - El tipo de tonalidad de una progresión propia es mayor o menor; el dórico solo lo usa el modal de la biblioteca.
 - Las 12 raíces del selector tocando usan la grafía del modo aleatorio (decisión del builder). Otra grafía (C♯ en vez de D♭) se consigue escribiendo.

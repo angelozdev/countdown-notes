@@ -67,11 +67,11 @@ La primera vez que la pruebe con la guitarra, "ya me sirve" si tiene: **modo ale
 - **Tonalidad de origen** _(mi decisión)_:
   - Cada progresión guarda la tonalidad en que está escrita. La biblioteca está en Do; la cadencia andaluza, en La menor.
   - Una progresión propia guarda la tonalidad en que la escribiste y suena así hasta que elijas otra.
-- **Tonalidad**: la elige el usuario y transporta la progresión desde su tonalidad de origen. Opcionalmente, "cambiar de tonalidad cada N vueltas", **al azar** o **por cuartas** (C → F → B♭ → …) _(decisión mía que el usuario no objetó)_.
+- **Tonalidad**: la elige el usuario y transporta la progresión desde su tonalidad de origen. La tónica elegida es una sola para todas las progresiones: en Fa, el ii–V–I va en Fa mayor y la cadencia andaluza en Fa menor _(decisión del usuario, spec 005)_. Opcionalmente, "cambiar de tonalidad cada N vueltas", **al azar** o **por cuartas** (C → F → B♭ → …) _(decisión mía que el usuario no objetó)_.
 - **Duración de cada acorde** (el usuario pidió poder usar medio compás):
   - La unidad mínima es **medio compás**, así que caben dos acordes en un compás (`C7 A7 | Dm7 G7`).
   - Un acorde puede durar medio compás, uno o varios compases.
-  - Medio compás existe en los compases que se parten en dos mitades iguales: 2/4, 4/4, 6/8 y 12/8. En 3/4, 5/4, 7/8 y 9/8, la unidad mínima es el compás entero _(mi decisión; el builder puede ampliarlo partiendo por grupos si sale natural)_.
+  - Medio compás existe en los compases que se parten en dos mitades iguales: 2/4, 4/4, 6/8 y 12/8. En 3/4, 5/4, 7/8 y 9/8, un compás de dos acordes se parte por grupos de acento: 2 + 1 tiempos en 3/4, 3 + 2 en 5/4, 4 + 3 corcheas en 7/8 y 6 + 3 en 9/8 _(decisión del usuario, spec 005)_.
 - **Repetición**: en loop hasta Stop, o N vueltas.
 - **El largo es variable**: 4, 8, 12 o más compases, ya no "4 o 6 acordes fijos".
 - **Ciclos que recorren las 12 tonalidades** (ciclo de cuartas, ciclo de quintas, ii–V–I por las 12) _(mis decisiones)_:
@@ -334,7 +334,7 @@ Todas están marcadas _(mi decisión)_ en el texto. Las más relevantes:
 8. Grafía de las notas negras en el modo aleatorio: D♭, E♭, F♯, A♭, B♭.
 9. Corrección del ejemplo del ii–V–I: recorre las 12 tonalidades por cuartas.
 10. Qué cuenta el BPM: la negra con puntillo en 6/8, 9/8 y 12/8, y la corchea en 7/8.
-11. Medio compás solo en 2/4, 4/4, 6/8 y 12/8.
+11. Medio compás en 2/4, 4/4, 6/8 y 12/8; en los demás compases, el compás de dos acordes se parte por grupos de acento (decisión del usuario, spec 005).
 12. El bajo ataca en cada cambio de acorde, y el acorde se vuelve a atacar en cada compás.
 13. Cada progresión guarda su tonalidad de origen; las propias suenan como las escribiste.
 14. En el modo progresión también se elige entre "solo bajo" y "bajo + acorde".

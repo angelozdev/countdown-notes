@@ -244,3 +244,34 @@ test('el modo se recuerda y lo de la entrega 3 se conserva', async () => {
     screen.getByText('Aleatorio · Pad ambiental · 60 BPM · 4/4')
   ).toBeDefined()
 })
+
+test.each([
+  [
+    'progresión y tónica inválidas',
+    { mode: 'progression', progression: 'no-existe', tonic: 'H', bpm: 90 },
+    'ii–V–I mayor · Do mayor · Analógico cálido · 90 BPM · 4/4'
+  ],
+  [
+    'solo la progresión inválida',
+    { mode: 'progression', progression: 'no-existe', tonic: 'F', bpm: 90 },
+    'ii–V–I mayor · Fa mayor · Analógico cálido · 90 BPM · 4/4'
+  ],
+  [
+    'solo la tónica inválida',
+    { mode: 'progression', progression: 'blues-jazz', tonic: 'H', bpm: 90 },
+    'Blues de jazz · Do mayor · Analógico cálido · 90 BPM · 4/4'
+  ],
+  [
+    'el modo inválido',
+    { mode: 'otro', bpm: 90 },
+    'Aleatorio · Analógico cálido · 90 BPM · 4/4'
+  ]
+])(
+  'con %s, el ajuste vuelve a su valor por defecto y el resto se conserva',
+  (_case, settings, status) => {
+    saved(settings)
+    renderApp()
+
+    expect(screen.getByText(status)).toBeDefined()
+  }
+)

@@ -241,6 +241,28 @@ test('un nombre vacío conserva el anterior', async () => {
   expect(screen.getByText(/^Andaluza mía · La menor/)).toBeDefined()
 })
 
+test('el nombre se guarda sin espacios al borde', async () => {
+  savedSettings({ mode: 'progression' })
+  const app = renderApp()
+  const editor = await newProgression(app)
+  await app.user.clear(nameField(editor))
+  await app.user.type(nameField(editor), '  Mi blues  ')
+  await app.user.type(chords(editor), 'Dm7 G7 Cmaj7 Cmaj7')
+  await app.user.click(editor.getByRole('button', { name: 'Guardar' }))
+
+  expect(nameField(editor).value).toBe('Mi blues')
+  await app.user.clear(nameField(editor))
+  await app.user.type(nameField(editor), '  Mi blues  ')
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+
+  expect(
+    screen.queryByRole('dialog', { name: 'Cambios sin guardar' })
+  ).toBeNull()
+  expect(
+    screen.queryByRole('main', { name: 'Editor de progresiones' })
+  ).toBeNull()
+})
+
 /** Lo marcado en un grupo de radios: sus nombres accesibles. */
 const checked = (group: HTMLElement) =>
   within(group)

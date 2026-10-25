@@ -1,4 +1,4 @@
-import { type CSSProperties, Fragment, useId, useState } from 'react'
+import { type CSSProperties, Fragment, useId, useRef, useState } from 'react'
 import { PlayButton } from '@/App'
 import { ChordTypeSelect } from '@/components/chord-type-select'
 import { SplitLabel } from '@/components/lane'
@@ -23,6 +23,8 @@ import { canSave, isDirty, meterOf, usePractice } from '@/practice/store'
 /** El editor de una progresión, a pantalla completa mientras hay un borrador. */
 export function ProgressionEditor() {
   const errorsId = useId()
+  const lane = useRef<HTMLOListElement>(null)
+  const addButton = useRef<HTMLButtonElement>(null)
   const [asking, setAsking] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const editor = usePractice((state) => state.editor)
@@ -65,6 +67,16 @@ export function ProgressionEditor() {
     setPicking({ ...picking, open: false, kept: picked })
   }
   const starts = [0, splitAt(meter)]
+  // la hoja no tiene `Trigger`, así que Radix no sabe a dónde devolver el foco: va al botón que
+  // la abrió, o al que ocupa su lugar si ese ya no existe (Unir, Quitar)
+  const refocus = (event: Event) => {
+    event.preventDefault()
+    const items = Array.from(lane.current?.children ?? [])
+    const buttons =
+      items[Math.min(picking.bar, items.length - 1)]?.querySelectorAll('button')
+    const button = buttons?.[Math.min(picking.part, buttons.length - 1)]
+    ;(button ?? addButton.current)?.focus()
+  }
 
   return (
     <main
@@ -144,7 +156,7 @@ export function ProgressionEditor() {
           ))}
         </ul>
       )}
-      <ol aria-label="Compases" className="grid grid-cols-4 gap-y-3">
+      <ol ref={lane} aria-label="Compases" className="grid grid-cols-4 gap-y-3">
         {bars.map((chords, i) => {
           const notes = chords.map(({ root }) => spell(root))
           const labels = chords.map(({ type }, j) =>
@@ -207,6 +219,7 @@ export function ProgressionEditor() {
         })}
       </ol>
       <Button
+        ref={addButton}
         variant="secondary"
         size="lg"
         className="h-12 text-base"
@@ -232,6 +245,7 @@ export function ProgressionEditor() {
         <SheetContent
           side="bottom"
           aria-describedby={undefined}
+          onCloseAutoFocus={refocus}
           className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
         >
           <SheetHeader>

@@ -1,4 +1,5 @@
 import { type CSSProperties, useId, useState } from 'react'
+import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -7,9 +8,11 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
 import { spell } from '@/music/notes'
+import { myProgression } from '@/music/progressions'
 import { canSave, isDirty, usePractice } from '@/practice/store'
 
 /** El editor de una progresión, a pantalla completa mientras hay un borrador. */
@@ -21,11 +24,12 @@ export function ProgressionEditor() {
   const dirty = usePractice(isDirty)
   const setDraftText = usePractice((state) => state.setDraftText)
   const setDraftName = usePractice((state) => state.setDraftName)
+  const setDraftKey = usePractice((state) => state.setDraftKey)
   const saveDraft = usePractice((state) => state.saveDraft)
   const closeEditor = usePractice((state) => state.closeEditor)
   const discardDraft = usePractice((state) => state.discardDraft)
   if (!editor) return null
-  const { name, text, errors, bars } = editor
+  const { name, key, text, errors, bars } = editor
 
   return (
     <main
@@ -50,6 +54,31 @@ export function ProgressionEditor() {
         value={name}
         onChange={(event) => setDraftName(event.target.value)}
       />
+      <p className="text-sm text-muted-foreground">Tonalidad de origen</p>
+      <TonicPicker
+        label="Tonalidad de origen"
+        progression={myProgression(editor)}
+        value={key.tonic}
+        onChange={(tonic) => setDraftKey({ ...key, tonic })}
+      />
+      <ToggleGroup
+        type="single"
+        aria-label="Tipo de tonalidad"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-2"
+        value={key.type}
+        onValueChange={(type) =>
+          type && setDraftKey({ ...key, type: type as typeof key.type })
+        }
+      >
+        <ToggleGroupItem value="major" className={PICKED_ITEM}>
+          Mayor
+        </ToggleGroupItem>
+        <ToggleGroupItem value="minor" className={PICKED_ITEM}>
+          Menor
+        </ToggleGroupItem>
+      </ToggleGroup>
       <textarea
         aria-label="Acordes"
         aria-invalid={errors.length > 0 || undefined}

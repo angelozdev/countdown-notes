@@ -105,7 +105,7 @@ export type PracticeState = {
   stop: () => void
   /** Cambiar de modo detiene la práctica. */
   setMode: (mode: Mode) => void
-  /** Cambiar de progresión detiene la práctica. */
+  /** Cambiar de progresión detiene la práctica; una propia pone la tónica de su tonalidad. */
   setProgression: (progression: Progression['id']) => void
   /** Aplica desde la siguiente vuelta que se arme. */
   setTonic: (tonic: NoteId) => void
@@ -126,6 +126,8 @@ export type PracticeState = {
   openEditor: (id?: MyProgression['id']) => void
   setDraftText: (text: string) => void
   setDraftName: (name: string) => void
+  /** La tónica de ajustes pasa a la tónica de la tonalidad (FR-011). */
+  setDraftKey: (key: Draft['key']) => void
   /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
   saveDraft: () => void
   /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
@@ -440,7 +442,8 @@ export function createPracticeStore(engine: Engine) {
       },
       setProgression(progression) {
         if (get().status !== 'stopped') get().stop()
-        set({ progression })
+        const mine = get().mine.find(({ id }) => id === progression)
+        set({ progression, ...(mine && { tonic: mine.key.tonic }) })
       },
       setTonic(tonic) {
         set({ tonic })
@@ -564,6 +567,10 @@ export function createPracticeStore(engine: Engine) {
       setDraftName(name) {
         const { editor } = get()
         if (editor) set({ editor: { ...editor, name } })
+      },
+      setDraftKey(key) {
+        const { editor } = get()
+        if (editor) set({ editor: { ...editor, key }, tonic: key.tonic })
       },
       saveDraft() {
         const { editor, mine, progression, tonic } = get()

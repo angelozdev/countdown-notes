@@ -2,6 +2,7 @@ import { ChevronDown, Settings, Volume2, VolumeX } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import type { Channel, Style } from '@/audio/engine'
 import { Stepper } from '@/components/stepper'
+import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -19,8 +20,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
-import { NOTES, type NoteId } from '@/music/notes'
-import { type Progression, PROGRESSIONS, tonicOf } from '@/music/progressions'
+import { NOTES } from '@/music/notes'
+import { type Progression, PROGRESSIONS } from '@/music/progressions'
 import type { Mode } from '@/practice/settings'
 import {
   NOT_ENOUGH_NOTES,
@@ -33,9 +34,6 @@ import {
 const SECTION = 'flex flex-col gap-3 border-t border-border pt-5'
 const HEADING = 'text-lg font-bold'
 const CAPTION = 'text-sm text-muted-foreground'
-/** Una opción de un grupo de botones: grande, y en ámbar cuando está elegida. */
-const PICKED_ITEM =
-  'h-12 text-lg font-bold data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground'
 
 /** Un `<select>` con el aspecto de los botones del panel; la flecha va aparte, encima. */
 const SELECT =
@@ -194,29 +192,12 @@ function ProgressionPicker() {
         />
       </div>
       <p className={CAPTION}>Tonalidad</p>
-      <ToggleGroup
-        type="single"
-        aria-label="Tonalidad"
-        variant="outline"
-        size="lg"
-        className="grid w-full grid-cols-6"
+      <TonicPicker
+        label="Tonalidad"
+        progression={progression}
         value={tonic}
-        onValueChange={(value) => value && setTonic(value as NoteId)}
-      >
-        {NOTES.map(({ id }) => {
-          const { name, label } = tonicOf(progression, id)
-          return (
-            <ToggleGroupItem
-              key={id}
-              value={id}
-              aria-label={name}
-              className={PICKED_ITEM}
-            >
-              <span className="note-label [--note-size:1.25rem]">{label}</span>
-            </ToggleGroupItem>
-          )
-        })}
-      </ToggleGroup>
+        onChange={setTonic}
+      />
       <SheetClose asChild>
         <Button
           variant="secondary"

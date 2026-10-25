@@ -240,3 +240,79 @@ test('un nombre vacío conserva el anterior', async () => {
 
   expect(screen.getByText(/^Andaluza mía · La menor/)).toBeDefined()
 })
+
+/** Lo marcado en un grupo de radios: sus nombres accesibles. */
+const checked = (group: HTMLElement) =>
+  within(group)
+    .getAllByRole('radio')
+    .filter((radio) => radio.getAttribute('aria-checked') === 'true')
+    .map((radio) => radio.getAttribute('aria-label') ?? radio.textContent)
+
+const laneBars = () =>
+  within(screen.getByRole('list', { name: 'Carril' }))
+    .getAllByRole('listitem')
+    .map((bar) => bar.textContent)
+
+test('la tonalidad de origen empieza en la de ajustes, en mayor', async () => {
+  savedSettings({ mode: 'progression', tonic: 'F' })
+  const app = renderApp()
+  const editor = await newProgression(app)
+
+  expect(
+    checked(editor.getByRole('radiogroup', { name: 'Tonalidad de origen' }))
+  ).toEqual(['Fa'])
+  expect(
+    checked(editor.getByRole('radiogroup', { name: 'Tipo de tonalidad' }))
+  ).toEqual(['Mayor'])
+})
+
+test('cambiar la tonalidad no cambia lo escrito', async () => {
+  savedSettings({ mode: 'progression' })
+  const app = renderApp()
+  const editor = await newProgression(app)
+  await app.user.type(chords(editor), 'Am G F E')
+  const origin = within(
+    editor.getByRole('radiogroup', { name: 'Tonalidad de origen' })
+  )
+  await app.user.click(origin.getByRole('radio', { name: 'La' }))
+  await app.user.click(
+    within(
+      editor.getByRole('radiogroup', { name: 'Tipo de tonalidad' })
+    ).getByRole('radio', { name: 'Menor' })
+  )
+
+  expect(chords(editor).value).toBe('Am G F E')
+  expect(origin.getByRole('radio', { name: 'Do sostenido' })).toBeDefined()
+  await app.user.click(editor.getByRole('button', { name: 'Guardar' }))
+  await app.user.click(editor.getByRole('button', { name: 'Listo' }))
+  expect(screen.getByText(/^Progresión 1 · La menor/)).toBeDefined()
+})
+
+test('al elegirla, la tónica pasa a la suya', async () => {
+  stored([andaluza])
+  savedSettings({ mode: 'progression' })
+  const app = renderApp()
+  let panel = await app.openSettings()
+  await app.user.selectOptions(progressionSelect(panel), 'Andaluza mía')
+
+  expect(checked(panel.getByRole('radiogroup', { name: 'Tonalidad' }))).toEqual(
+    ['La']
+  )
+  await app.closeSettings()
+  await app.user.click(screen.getByRole('button', { name: 'Play' }))
+  app.fake.beat(5)
+  expect(laneBars()).toEqual(['Am', 'G', 'F', 'E'])
+
+  await app.user.click(screen.getByRole('button', { name: 'Stop' }))
+  panel = await app.openSettings()
+  await app.user.click(
+    within(panel.getByRole('radiogroup', { name: 'Tonalidad' })).getByRole(
+      'radio',
+      { name: 'Do' }
+    )
+  )
+  await app.closeSettings()
+  await app.user.click(screen.getByRole('button', { name: 'Play' }))
+  app.fake.beat(5)
+  expect(laneBars()).toEqual(['Cm', 'B♭', 'A♭', 'G'])
+})

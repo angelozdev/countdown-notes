@@ -302,7 +302,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### Tonalidad de origen
 
-- [ ] T016 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
+- [x] T016 [US2] En `src/saved-progressions.test.tsx`, agregar (falla):
   1. `'la tonalidad de origen empieza en la de ajustes, en mayor'`: con la tónica de ajustes en Fa, en una nueva, `Tonalidad de origen` tiene `Fa` marcado y `Tipo de tonalidad`, `Mayor`.
   2. `'cambiar la tonalidad no cambia lo escrito'`: con `Am G F E`, elegir `La` y `Menor`:
      - `Acordes` sigue en `Am G F E`;
@@ -315,7 +315,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr y **verlo fallar**.
 
-- [ ] T017 [US2] Implementar:
+- [x] T017 [US2] Implementar:
   - **`src/components/tonic-picker.tsx`** (nuevo): `TonicPicker({ label, progression, value, onChange })`. Es el `ToggleGroup` de 12 tónicas que hoy está en la sección `Progresión` del panel, con el mismo marcado, clases y `tonicOf(progression, id)`, más el `aria-label` que recibe.
   - **`src/components/settings-panel.tsx`**: la sección `Progresión` usa `<TonicPicker label="Tonalidad" … />`. Ningún test del panel cambia.
   - **`src/practice/store.ts`**:

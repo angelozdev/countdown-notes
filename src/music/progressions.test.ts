@@ -2,9 +2,12 @@ import { describe, expect, test } from 'vitest'
 import { chordSymbol } from './chords'
 import { METER_BY_ID } from './meters'
 import { NOTES, type NoteId, spell } from './notes'
+import { parseProgression, type WrittenBar } from './progression-text'
 import {
   barsOf,
   keyLabel,
+  type MyProgression,
+  myProgression,
   type Progression,
   PROGRESSION_BY_ID,
   type ProgressionId,
@@ -391,5 +394,30 @@ describe('los ciclos por las 12 tonalidades', () => {
     expect(tonicOf(PROGRESSION_BY_ID['ciclo-cuartas'], 'Gb').label).toBe('G♭')
     expect(tonicOf(PROGRESSION_BY_ID['ii-v-i-12'], 'Gb').label).toBe('G♭')
     expect(tonicOf(PROGRESSION_BY_ID['ciclo-quintas'], 'Gb').label).toBe('F♯')
+  })
+})
+
+describe('las progresiones propias', () => {
+  test('una progresión propia se lee como una de la biblioteca', () => {
+    const mine: MyProgression = {
+      id: 'propia-1',
+      name: 'Progresión 1',
+      key: { tonic: 'C', type: 'major' },
+      bars: (parseProgression('Dm7 G7 Cmaj7 Cmaj7') as { bars: WrittenBar[] })
+        .bars
+    }
+    const library = PROGRESSION_BY_ID['ii-v-i-mayor']
+    expect(barsOf(myProgression(mine), 'C', FOUR_FOUR)).toEqual(
+      barsOf(library, 'C', FOUR_FOUR)
+    )
+    expect(barsOf(myProgression(mine), 'F', FOUR_FOUR)).toEqual(
+      barsOf(library, 'F', FOUR_FOUR)
+    )
+    expect(keyLabel(myProgression(mine), 'C')).toBe('Do mayor')
+    expect(myProgression(mine)).toMatchObject({
+      group: 'Mis progresiones',
+      name: 'Progresión 1',
+      bars: 'Dm7 | G7 | Cmaj7 | Cmaj7'
+    })
   })
 })

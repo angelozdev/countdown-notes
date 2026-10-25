@@ -104,13 +104,13 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ### La progresión propia en la biblioteca
 
-- [ ] T004 [P] [US1] En `src/music/progressions.test.ts`, agregar `'una progresión propia se lee como una de la biblioteca'` (falla: `myProgression` no existe). Con `mine = { id: 'propia-1', name: 'Progresión 1', key: { tonic: 'C', type: 'major' }, bars }`, donde `bars` es `parseProgression('Dm7 G7 Cmaj7 Cmaj7').bars`:
+- [x] T004 [P] [US1] En `src/music/progressions.test.ts`, agregar `'una progresión propia se lee como una de la biblioteca'` (falla: `myProgression` no existe). Con `mine = { id: 'propia-1', name: 'Progresión 1', key: { tonic: 'C', type: 'major' }, bars }`, donde `bars` es `parseProgression('Dm7 G7 Cmaj7 Cmaj7').bars`:
   - `barsOf(myProgression(mine), 'C', METER_BY_ID['4/4'])` es igual (`toEqual`) a `barsOf(PROGRESSION_BY_ID['ii-v-i-mayor'], 'C', METER_BY_ID['4/4'])`;
   - en la tónica `'F'`, también es igual a la del ii–V–I mayor en `'F'`;
   - `keyLabel(myProgression(mine), 'C')` es `'Do mayor'`;
   - `myProgression(mine)` tiene `group: 'Mis progresiones'`, `name: 'Progresión 1'` y `bars: 'Dm7 | G7 | Cmaj7 | Cmaj7'`.
 
-- [ ] T005 [US1] En `src/music/progressions.ts`:
+- [x] T005 [US1] En `src/music/progressions.ts`:
   - `ProgressionGroup` suma `'Mis progresiones'`;
   - se agregan `MyProgressionId`, `MyProgression` y `myProgression` de [contracts](./contracts/interfaces.md) §3;
   - `Progression.id` pasa a `ProgressionId | MyProgressionId`;

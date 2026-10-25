@@ -3,9 +3,14 @@ import { simplify, transpose } from '@tonaljs/note'
 import { CHORD_TYPES, type ChordTypeId } from './chords'
 import { type Meter, splitAt } from './meters'
 import { type Note, NOTES, type NoteId, spell } from './notes'
+import { formatProgression, type WrittenBar } from './progression-text'
 
 export type KeyType = 'major' | 'minor' | 'dorian'
-export type ProgressionGroup = 'Ciclos' | 'Jazz' | 'Pop, rock y latino'
+export type ProgressionGroup =
+  | 'Mis progresiones'
+  | 'Ciclos'
+  | 'Jazz'
+  | 'Pop, rock y latino'
 export type ProgressionId =
   | 'ciclo-cuartas'
   | 'ciclo-quintas'
@@ -28,10 +33,19 @@ export type ProgressionId =
   | 'i-iv-v'
   | 'blues-rock'
   | 'andaluza'
+export type MyProgressionId = `propia-${number}`
 export type RoundChord = { root: Note; type?: ChordTypeId; at: number }
 
+/** Una progresión escrita por el usuario, en su tonalidad de origen. */
+export type MyProgression = {
+  id: MyProgressionId
+  name: string
+  key: { tonic: NoteId; type: 'major' | 'minor' }
+  bars: WrittenBar[]
+}
+
 export type Progression = {
-  id: ProgressionId
+  id: ProgressionId | MyProgressionId
   name: string
   group: ProgressionGroup
   key: { tonic: string; type: KeyType }
@@ -44,7 +58,7 @@ const MAJOR = { tonic: 'C', type: 'major' } as const
 const MINOR = { tonic: 'C', type: 'minor' } as const
 
 /** En el orden de FR-016, FR-018 y FR-019. */
-export const PROGRESSIONS: Progression[] = [
+export const PROGRESSIONS: (Progression & { id: ProgressionId })[] = [
   {
     id: 'ciclo-cuartas',
     name: 'Ciclo de cuartas',
@@ -237,6 +251,20 @@ const TONICS: Record<KeyType, Record<NoteId, string>> = {
   minor: MINOR_TONICS,
   dorian: MINOR_TONICS
 }
+
+/** Una progresión propia como una de la biblioteca: lo que leen barsOf, tonicOf y keyLabel. */
+export const myProgression = ({
+  id,
+  name,
+  key,
+  bars
+}: MyProgression): Progression => ({
+  id,
+  name,
+  group: 'Mis progresiones',
+  key: { tonic: TONICS[key.type][key.tonic], type: key.type },
+  bars: formatProgression(bars)
+})
 
 /** La tabla de los ciclos por cuartas (research §5): como la mayor, pero G♭ en vez de F♯. */
 const FOURTHS_TONICS: Record<NoteId, string> = { ...TONICS.major, Gb: 'Gb' }

@@ -371,7 +371,7 @@ export function ProgressionEditor() {
             className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
           >
             <SheetHeader>
-              <SheetTitle className="text-xl">{`¿Borrar «${savedName}»?`}</SheetTitle>
+              <SheetTitle className="text-xl wrap-anywhere">{`¿Borrar «${savedName}»?`}</SheetTitle>
             </SheetHeader>
             <SheetFooter>
               {/* Cancelar va primero: Radix le da el foco inicial, no a Borrar */}

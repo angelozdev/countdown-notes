@@ -178,6 +178,32 @@ test.describe('en un celular angosto', () => {
         .getByRole('option', { name: 'Progresión 1', selected: true })
     ).toBeAttached()
   })
+
+  test('un nombre largo sin espacios no desborda la pantalla', async ({
+    page
+  }) => {
+    const name = 'Progresion'.padEnd(75, 'x')
+    const scrolls = () =>
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth >
+          document.documentElement.clientWidth
+      )
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Ajustes' }).click()
+    await page.getByRole('radio', { name: 'Progresión' }).click()
+    await page.getByRole('button', { name: 'Nueva progresión' }).click()
+    await page.getByRole('textbox', { name: 'Nombre' }).fill(name)
+    await page.getByRole('textbox', { name: 'Acordes' }).fill('Dm7 G7 Cmaj7')
+    await page.getByRole('button', { name: 'Guardar' }).click()
+    expect(await scrolls()).toBe(false)
+
+    await page.getByRole('button', { name: 'Listo' }).click()
+    await expect(
+      page.getByText(new RegExp(`^${name} · Do mayor`))
+    ).toBeVisible()
+    expect(await scrolls()).toBe(false)
+  })
 })
 
 function fits(element: Element) {

@@ -208,7 +208,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   **Verde completo**. **Commit**: `feat: transportar a las 12 tónicas con su grafía (#30)`.
 
-- [ ] T013 [US2] Crear `src/keys.test.tsx` (falla). Helpers: `pickMode`, `bassByBar` y `bars()` como en T007, y `pickTonic(app, name)`, que toca el radio `name` del `radiogroup` `Tonalidad`.
+- [x] T013 [US2] Crear `src/keys.test.tsx` (falla). Helpers: `pickMode`, `bassByBar` y `bars()` como en T007, y `pickTonic(app, name)`, que toca el radio `name` del `radiogroup` `Tonalidad`.
   1. `'hay 12 tónicas, con Do por defecto'`: en el modo progresión, el `radiogroup` `Tonalidad` tiene 12 radios con estos nombres accesibles y `textContent`, en este orden, con `Do` marcado: `Do C`, `Re bemol D♭`, `Re D`, `Mi bemol E♭`, `Mi E`, `Fa F`, `Fa sostenido F♯`, `Sol G`, `La bemol A♭`, `La A`, `Si bemol B♭`, `Si B`.
   2. `'en Fa suena y se ve el ii–V–I de Fa'`: con `Fa` y Play, los 4 `listitem` del carril dicen `Gm7`, `C7`, `Fmaj7` y `Fmaj7`, y el bajo en `G2`, `C2`, `F2` y `F2` en los compases 1 a 4.
   3. `'en Si, cada acorde con las alteraciones de Si mayor'`: con `Si` y Play, `fake.beat(5)`: "Ahora" dice `C♯m7` y `Do sostenido menor séptima`, y la línea de estado `ii–V–I mayor · Si mayor · Analógico cálido · 60 BPM · 4/4`.
@@ -223,7 +223,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Correr `pnpm test --project ui` y **verlo fallar**.
 
-- [ ] T014 [US2] Implementar:
+- [x] T014 [US2] Implementar:
   - **`src/practice/store.ts`**: `setTonic(tonic)`, que solo guarda el ajuste: `nextRound` y `play` ya leen `tonic` (T008).
   - **`src/components/settings-panel.tsx`**: en el modo progresión, una sección `Progresión` con el `ToggleGroup` `Tonalidad` en una grilla de 6 columnas. Cada `ToggleGroupItem` tiene `value` igual al `NoteId`, `aria-label` igual a `tonicOf(progression, id).name` y, visible, `tonicOf(…).label` con la clase `note-label`.
   - **`src/App.tsx`**: nada nuevo; `keyLabel` ya está en la línea de estado.

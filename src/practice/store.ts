@@ -82,6 +82,8 @@ export type PracticeState = {
   stop: () => void
   /** Cambiar de modo detiene la práctica. */
   setMode: (mode: Mode) => void
+  /** Aplica desde la siguiente vuelta que se arme. */
+  setTonic: (tonic: NoteId) => void
   setBpm: (bpm: number) => void
   setBarsPerNote: (barsPerNote: number) => void
   setMeter: (meter: MeterId) => void
@@ -353,6 +355,9 @@ export function createPracticeStore(engine: Engine) {
       setMode(mode) {
         if (get().status !== 'stopped') get().stop()
         set({ mode })
+      },
+      setTonic(tonic) {
+        set({ tonic })
       },
       setBpm(bpm) {
         const next = clamp(bpm, 30, 240)

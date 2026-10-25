@@ -18,7 +18,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { CHORD_TYPES, type ChordTypeId, chordSymbol } from '@/music/chords'
 import { type BassFigure, METERS, type MeterId } from '@/music/meters'
-import { NOTES } from '@/music/notes'
+import { NOTES, type NoteId } from '@/music/notes'
+import { PROGRESSION_BY_ID, tonicOf } from '@/music/progressions'
 import type { Mode } from '@/practice/settings'
 import { NOT_ENOUGH_NOTES, STYLE_LABELS, usePractice } from '@/practice/store'
 
@@ -70,6 +71,7 @@ export function SettingsPanel() {
         </SheetHeader>
         <div className="flex flex-col gap-6 px-4 pb-6">
           <ModePicker />
+          {!random && <ProgressionPicker />}
           <Section title="Tiempo">
             <Stepper
               label="BPM"
@@ -128,6 +130,41 @@ function ModePicker() {
             {label}
           </ToggleGroupItem>
         ))}
+      </ToggleGroup>
+    </Section>
+  )
+}
+
+function ProgressionPicker() {
+  const progression =
+    PROGRESSION_BY_ID[usePractice((state) => state.progression)]
+  const tonic = usePractice((state) => state.tonic)
+  const setTonic = usePractice((state) => state.setTonic)
+  return (
+    <Section title="Progresión">
+      <p className={CAPTION}>Tonalidad</p>
+      <ToggleGroup
+        type="single"
+        aria-label="Tonalidad"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-6"
+        value={tonic}
+        onValueChange={(value) => value && setTonic(value as NoteId)}
+      >
+        {NOTES.map(({ id }) => {
+          const { name, label } = tonicOf(progression, id)
+          return (
+            <ToggleGroupItem
+              key={id}
+              value={id}
+              aria-label={name}
+              className={PICKED_ITEM}
+            >
+              <span className="note-label [--note-size:1.25rem]">{label}</span>
+            </ToggleGroupItem>
+          )
+        })}
       </ToggleGroup>
     </Section>
   )

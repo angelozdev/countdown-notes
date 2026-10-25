@@ -33,6 +33,16 @@ Son las versiones que trae `tonal@6.5.1` (publicada el 2026-10-14), la última e
 - **Aritmética propia de letras y semitonos** (unas 20 líneas): sería una dependencia menos, pero reimplementa lo que el stack ya eligió. Se descarta.
 - **`Chord.get` y los diccionarios de voicings de tonal**: no hacen falta. Los tipos y sus voicings ya están en `chords.ts` (entrega 3), y el cifrado de la biblioteca se lee con el lector propio de §6.
 
+**Tamaño del bundle** (T031, `dist/assets/index-*.js` de `pnpm build`):
+
+| Momento                   | Minificado | gzip      |
+| ------------------------- | ---------- | --------- |
+| T001, antes de la entrega | 684,46 kB  | 198,59 kB |
+| T012, con tonal           | 691,66 kB  | 201,47 kB |
+| T031, entrega completa    | 696,76 kB  | 202,87 kB |
+
+La entrega suma 12,30 kB (1,8 %) y 4,28 kB en gzip. Los dos módulos de tonal son 4,4 KB minificados (spike); el resto es el código de la entrega: la biblioteca de 21 progresiones, su lector de cifrado, el carril y el panel. El aviso de chunks de más de 500 kB ya estaba antes.
+
 ## 2. Una vuelta es una lista de compases, en los dos modos
 
 **Decisión**: `Round` pasa a describir sus compases. Cada compás es una lista de uno o dos acordes, y cada acorde tiene su raíz escrita, su tipo y el golpe donde entra:
@@ -177,7 +187,7 @@ Las tríadas tienen una sola forma y no cambian. `barAt` pasa `after` solo en el
 - **Tonalidad**: `radiogroup` "Tonalidad" con 12 radios en dos filas de 6. Cada uno muestra el cifrado de la tónica (`D♭` o `C♯`, según la tabla de §5) y su nombre accesible es su nombre en español (`Re bemol`, `Do sostenido`). El nombre completo de la tonalidad ("Fa mayor") está en la línea de estado.
 - **En el modo progresión** se ocultan "Compases por nota" y la sección de notas. "Tipo de acorde" solo aparece con "Bajo + acorde" en el modo aleatorio y en los ciclos de solo raíces.
 - **Línea de estado**: `{nombre} · {tonalidad} · {estilo} · {bpm} BPM · {compás}`. La tonalidad es `{tónica} {mayor|menor|dórico}`, y en los ciclos que recorren las 12, `desde {tónica}` ("Ciclo de cuartas · desde Fa · …").
-- **Carril**: un compás de dos acordes es un `listitem` con dos partes en fila, de ancho proporcional a su duración (`flex-grow` igual a sus golpes), separadas por una barra fina. Cada parte ajusta el cifrado a su ancho con la técnica de la entrega 3 (`note-fit` y `--chars`, research §6). El compás actual se resalta entero, como hoy.
+- **Carril**: un compás de dos acordes es un `listitem` con dos partes en fila, de ancho proporcional a su duración (`flex-grow` igual a sus golpes), separadas por una barra de 2 px. Cada parte pone la raíz arriba y el sufijo debajo, y ajusta cada uno a su ancho (`split-root` y `split-suffix`, con `--root-chars` y `--suffix-chars` del compás, que comparten sus dos partes). Con la técnica de la entrega 3 (`note-fit` y `--chars`, research §6) en una sola línea, a 320 px una parte medía unos 32 px y la raíz de `F♯maj7` quedaba en 9 px; apilada, en 21 px (T030). Los compases de una sola parte siguen con `note-fit`. El compás actual se resalta entero, como hoy.
 - **"Ahora"**: el acorde del golpe que suena: el último del compás con `at ≤ beat`.
 
 **Razón**: todo con los componentes y patrones que ya tiene el panel. Ningún control nuevo en la pantalla de práctica (principio IV).

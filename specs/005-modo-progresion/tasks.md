@@ -414,7 +414,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del modo progresión (#5)`. Done: `Modo` y `Progresión` ya hablaban el lenguaje del panel, así que solo se unificó el estilo del `<select>`; el compás partido pone la raíz arriba y el sufijo debajo, con una barra de 2 px entre partes (a 320 px, en Giant Steps en Fa sostenido, la raíz pasó de 9,3 a 21,3 px y el sufijo de 5,6 a 10,5 px); la línea de estado usa `text-balance` y no desborda (2–3 líneas a 320 px).
 
-- [ ] T031 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §1. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #5 el resumen de la entrega.
+- [x] T031 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §1. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #5 el resumen de la entrega. Done: quickstart §1 en verde (710 tests, 16 e2e); el bundle pasó de 684,46 kB (gzip 198,59) a 696,76 kB (gzip 202,87), +12,30 kB, anotado en research §1; research §11 (carril) ya dice cómo se ajustan las partes tras T030.
 - [ ] T032 El usuario hace quickstart §2–§5: la prueba de oído de 10 minutos a 60 y 200 BPM y la sesión con la guitarra (SC-005). Si algo falla, se reabre el issue de esa historia.
 
 ---

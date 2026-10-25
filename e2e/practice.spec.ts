@@ -151,6 +151,33 @@ test.describe('en un celular angosto', () => {
     )
     expect(hasHorizontalScroll).toBe(false)
   })
+
+  test('crear, guardar y recargar una progresión propia', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Ajustes' }).click()
+    await page.getByRole('radio', { name: 'Progresión' }).click()
+    await page.getByRole('button', { name: 'Nueva progresión' }).click()
+
+    await page
+      .getByRole('textbox', { name: 'Acordes' })
+      .fill('Cmaj7 | C7 A7 | Dm7 G7')
+    await page.getByRole('button', { name: 'Guardar' }).click()
+    const hasHorizontalScroll = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
+    )
+    expect(hasHorizontalScroll).toBe(false)
+
+    await page.getByRole('button', { name: 'Listo' }).click()
+    await page.reload()
+    await page.getByRole('button', { name: 'Ajustes' }).click()
+    await expect(
+      page
+        .getByRole('combobox', { name: 'Progresión' })
+        .getByRole('option', { name: 'Progresión 1', selected: true })
+    ).toBeAttached()
+  })
 })
 
 function fits(element: Element) {

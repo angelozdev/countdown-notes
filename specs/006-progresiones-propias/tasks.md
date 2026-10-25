@@ -490,14 +490,14 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Puede pasar al primer intento, porque el camino es el de la biblioteca. Si pasa, se comprueba que falla corriendo a propósito el `at` en `barAt`, y se deshace. **Commit**: `test: una progresión propia con compases partidos, a tiempo (#36)`. Done: pasó al primer intento en Chromium y WebKit; con `at: chord.at` cambiado a `at: 0` en el acorde de `barAt` falla (`expected 0.5 to be less than 0.001`), y se deshizo.
 
-- [ ] T031 [P] [US4] En `e2e/practice.spec.ts`, agregar (falla), en los proyectos `chromium` e `iphone`:
+- [x] T031 [P] [US4] En `e2e/practice.spec.ts`, agregar (falla), en los proyectos `chromium` e `iphone`:
   - `'crear, guardar y recargar una progresión propia'`:
     - en el panel, `Progresión` y `Nueva progresión`;
     - `Acordes` con `Cmaj7 | C7 A7 | Dm7 G7` y `Guardar`;
     - con el viewport en 320 × 640, sin scroll horizontal (como el primer test del archivo);
     - `Listo`, `page.reload()`, abrir el panel: el `combobox` `Progresión` tiene `Progresión 1` elegida.
 
-  **Verde completo**. **Commit**: `test: e2e de una progresión propia (#36)`. Comentar en #36.
+  **Verde completo**. **Commit**: `test: e2e de una progresión propia (#36)`. Comentar en #36. Done: pasó al primer intento en `chromium` e `iphone` (WebKit), porque el guardado ya existía; con la lectura de lo guardado rota a propósito (`version !== 2` en `loadMyProgressions`) falla en los dos, y se deshizo. El test va dentro de `en un celular angosto` (320 × 640).
 
 - [ ] T032 [US4] Verificación manual: quickstart §2, filas 15–17, y §3 en el iPhone.
 

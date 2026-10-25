@@ -39,3 +39,26 @@ export const NOTES: Note[] = [
 export const NOTE_BY_ID = Object.fromEntries(
   NOTES.map((note) => [note.id, note])
 ) as Record<NoteId, Note>
+
+const LETTERS: Record<string, { pitch: number; name: string }> = {
+  C: { pitch: 0, name: 'Do' },
+  D: { pitch: 2, name: 'Re' },
+  E: { pitch: 4, name: 'Mi' },
+  F: { pitch: 5, name: 'Fa' },
+  G: { pitch: 7, name: 'Sol' },
+  A: { pitch: 9, name: 'La' },
+  B: { pitch: 11, name: 'Si' }
+}
+
+/** 'C#' → { id: 'Db', label: 'C♯', name: 'Do sostenido', natural: false } */
+export function spell(name: string): Note {
+  const [letter, accidental] = name
+  const { pitch, name: spoken } = LETTERS[letter]
+  const shift = accidental === '#' ? 1 : accidental === 'b' ? -1 : 0
+  return {
+    id: NOTES[(pitch + shift + 12) % 12].id,
+    label: letter + (shift === 1 ? '♯' : shift === -1 ? '♭' : ''),
+    name: spoken + (shift === 1 ? ' sostenido' : shift === -1 ? ' bemol' : ''),
+    natural: shift === 0
+  }
+}

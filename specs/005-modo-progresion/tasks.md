@@ -47,7 +47,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 **Purpose**: comprobar que la rama parte en verde.
 
-- [ ] T001 En la rama `005-modo-progresion`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Anotar el tamaño de `dist/assets/*.js` que imprime `pnpm build`, para comparar en T031. Sin commit.
+- [x] T001 En la rama `005-modo-progresion`, correr `pnpm install`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e` y `pnpm build`: los 6 en verde. Anotar el tamaño de `dist/assets/*.js` que imprime `pnpm build`, para comparar en T031. Sin commit.
 
 ---
 
@@ -59,7 +59,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### El ii–V–I en la biblioteca
 
-- [ ] T002 [P] [US1] Crear `src/music/progressions.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3):
+- [x] T002 [P] [US1] Crear `src/music/progressions.test.ts` (falla: el módulo no existe). Por API exportada ([contracts](./contracts/interfaces.md) §3):
   - Helper `text(bars)`: cada compás como sus acordes separados por espacio y los compases por `' | '`. Cada acorde es `chordSymbol(root, type)` si tiene `type`, y si no, `root.label`.
   - `spell`: `spell('C#')` es `{ id: 'Db', label: 'C♯', name: 'Do sostenido', natural: false }`, `spell('Gb')` es `{ id: 'Gb', label: 'G♭', name: 'Sol bemol', natural: false }` y `spell('F')` es `{ id: 'F', label: 'F', name: 'Fa', natural: true }`.
   - `text(barsOf(PROGRESSION_BY_ID['ii-v-i-mayor'], 'C', METER_BY_ID['4/4']))` es `'Dm7 | G7 | Cmaj7 | Cmaj7'`, y cada acorde tiene `at: 0`.
@@ -67,7 +67,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
   - `keyLabel(PROGRESSION_BY_ID['ii-v-i-mayor'], 'C')` es `'Do mayor'` y `tonicOf(…, 'C').label` es `'C'`.
   - `PROGRESSIONS` tiene el ii–V–I mayor con `name: 'ii–V–I mayor'` y `group: 'Jazz'`.
 
-- [ ] T003 [US1] Implementar:
+- [x] T003 [US1] Implementar:
   - **`src/music/notes.ts`**: `spell(name)` según [data-model](./data-model.md) (Nota escrita), sin tonal. La altura sale de la letra (C 0, D 2, E 4, F 5, G 7, A 9, B 11) más 1 por `#` y menos 1 por `b`, módulo 12, como índice en `NOTES`. El nombre es Do, Re, Mi, Fa, Sol, La o Si, más ` sostenido` o ` bemol`.
   - **`src/music/chords.ts`**: `chordSymbol` y `chordName` aceptan `root: NoteId | Note`. Con un string usan `NOTE_BY_ID[root]`, como hoy.
   - **`src/music/progressions.ts`**: los tipos de [contracts](./contracts/interfaces.md) §3. `ProgressionId` es `'ii-v-i-mayor'` (crece en US3 y US4), y `KeyType`, por ahora, `'major'`. `PROGRESSIONS` trae una sola progresión: `{ id: 'ii-v-i-mayor', name: 'ii–V–I mayor', group: 'Jazz', key: { tonic: 'C', type: 'major' }, bars: 'Dm7 | G7 | Cmaj7 | Cmaj7' }`. Además:

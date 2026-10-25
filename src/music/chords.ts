@@ -1,4 +1,4 @@
-import { NOTE_BY_ID, NOTES, type NoteId } from './notes'
+import { type Note, NOTE_BY_ID, NOTES, type NoteId } from './notes'
 
 export type ChordTypeId =
   | 'maj'
@@ -158,13 +158,16 @@ export const CHORD_TYPE_BY_ID = Object.fromEntries(
   CHORD_TYPES.map((type) => [type.id, type])
 ) as Record<ChordTypeId, ChordType>
 
-/** 'F♯m' */
-export const chordSymbol = (root: NoteId, type: ChordTypeId) =>
-  NOTE_BY_ID[root].label + CHORD_TYPE_BY_ID[type].suffix
+const noteOf = (root: NoteId | Note) =>
+  typeof root === 'string' ? NOTE_BY_ID[root] : root
+
+/** 'F♯m'; con un Note, su label: chordSymbol(spell('C#'), 'm7') → 'C♯m7' */
+export const chordSymbol = (root: NoteId | Note, type: ChordTypeId) =>
+  noteOf(root).label + CHORD_TYPE_BY_ID[type].suffix
 
 /** 'Fa sostenido menor' */
-export const chordName = (root: NoteId, type: ChordTypeId) =>
-  `${NOTE_BY_ID[root].name} ${CHORD_TYPE_BY_ID[type].name}`
+export const chordName = (root: NoteId | Note, type: ChordTypeId) =>
+  `${noteOf(root).name} ${CHORD_TYPE_BY_ID[type].name}`
 
 const pitchOf = (midi: number) =>
   `${NOTES[midi % 12].id}${Math.floor(midi / 12) - 1}`

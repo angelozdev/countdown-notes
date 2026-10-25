@@ -136,6 +136,12 @@ Para que un acorde dure más, lo repites o le cambias la duración. Para poner d
 - **Tocando**: partes el compás en dos mitades.
 - **Escribiendo**: la sintaxis exacta la decide el builder. Mi sugerencia es separar compases con `|` y repartir en partes iguales los acordes que caigan dentro: `Cmaj7 | C7 A7 | Dm7 G7`. Las progresiones se guardan en el dispositivo con nombre, y se pueden renombrar y borrar _(mi decisión: renombrar y borrar)_.
 
+El editor _(decisiones del usuario, spec 006)_:
+
+- **Dónde**: en una pantalla aparte, a pantalla completa, que se abre desde ajustes; la pantalla de práctica no cambia. Tiene su propio Play/Stop para probar la progresión sin guardarla.
+- **Guardar**: con un botón "Guardar". Al salir con cambios sin guardar, la app pregunta si guardarlos o descartarlos.
+- **Tonalidad de origen**: se elige en el editor (tónica y mayor o menor), con la tónica de ajustes en mayor por defecto.
+
 ## 5. Sonido
 
 ### 5.1 Estilos

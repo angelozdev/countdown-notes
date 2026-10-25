@@ -480,7 +480,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   **Verde completo**. **Commit**: `feat: partir, unir y duplicar compases (#36)`.
 
-- [ ] T030 [P] [US4] En `src/practice/progression.browser.test.ts`, agregar `'una progresión propia con compases partidos cae a tiempo'` (research §11). Con `renderStore` del archivo, en `setup`:
+- [x] T030 [P] [US4] En `src/practice/progression.browser.test.ts`, agregar `'una progresión propia con compases partidos cae a tiempo'` (research §11). Con `renderStore` del archivo, en `setup`:
   - `setMode('progression')`, `openEditor()`, `setDraftText('Cmaj7 A7 | Dm7 G7')` y `saveDraft()`;
   - `setWithChord(true)`, `setBassFigure('whole')`, `setRepeats({ on: true, count: 2 })` y `setBpm(240)`.
 
@@ -488,7 +488,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
   - 8 ataques del bajo, `C2 A2 D2 G2 C2 A2 D2 G2`, y 8 del acorde;
   - el ataque `k` en `t0 + 1 + floor(k / 2) + (k % 2) × 0.5`, a menos de 1 ms.
 
-  Puede pasar al primer intento, porque el camino es el de la biblioteca. Si pasa, se comprueba que falla corriendo a propósito el `at` en `barAt`, y se deshace. **Commit**: `test: una progresión propia con compases partidos, a tiempo (#36)`.
+  Puede pasar al primer intento, porque el camino es el de la biblioteca. Si pasa, se comprueba que falla corriendo a propósito el `at` en `barAt`, y se deshace. **Commit**: `test: una progresión propia con compases partidos, a tiempo (#36)`. Done: pasó al primer intento en Chromium y WebKit; con `at: chord.at` cambiado a `at: 0` en el acorde de `barAt` falla (`expected 0.5 to be less than 0.001`), y se deshizo.
 
 - [ ] T031 [P] [US4] En `e2e/practice.spec.ts`, agregar (falla), en los proyectos `chromium` e `iphone`:
   - `'crear, guardar y recargar una progresión propia'`:

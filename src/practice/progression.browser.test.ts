@@ -91,3 +91,28 @@ test.each([
     }
   }
 )
+
+test('una progresión propia con compases partidos cae a tiempo', async () => {
+  // a 240 BPM en 4/4, un compás dura 1 s; Cmaj7 A7 | Dm7 G7 son dos compases partidos
+  const { click, bass, chord } = await renderStore((state) => {
+    state.setMode('progression')
+    state.openEditor()
+    state.setDraftText('Cmaj7 A7 | Dm7 G7')
+    state.saveDraft()
+    state.setWithChord(true)
+    state.setBassFigure('whole')
+    state.setRepeats({ on: true, count: 2 })
+    state.setBpm(240)
+  }, 10)
+
+  const t0 = click[0][2] as number
+  const pitches = ['C2', 'A2', 'D2', 'G2', 'C2', 'A2', 'D2', 'G2']
+  expect(bass).toHaveLength(8)
+  expect(chord).toHaveLength(8)
+  for (const k of pitches.keys()) {
+    const time = t0 + 1 + Math.floor(k / 2) + (k % 2) * 0.5
+    expect(bass[k][0]).toBe(pitches[k])
+    expect(Math.abs((bass[k][2] as number) - time)).toBeLessThan(0.001)
+    expect(Math.abs((chord[k][2] as number) - time)).toBeLessThan(0.001)
+  }
+})

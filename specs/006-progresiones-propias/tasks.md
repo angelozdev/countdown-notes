@@ -447,7 +447,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   `formatProgression` ya separa con espacio los acordes de un compás (T003). **Verde completo**. **Commit**: `feat: compases de dos acordes en el texto (#36)`.
 
-- [ ] T028 [US4] Crear `src/durations.test.tsx` (falla). Helpers: los de T023, `pickFigure` y `pickMeter`, como en `src/library.test.tsx`, y `parts(editor, bar)`: los `button` cuyo nombre empieza con `Compás {bar}, parte`.
+- [x] T028 [US4] Crear `src/durations.test.tsx` (falla). Helpers: los de T023, `pickFigure` y `pickMeter`, como en `src/library.test.tsx`, y `parts(editor, bar)`: los `button` cuyo nombre empieza con `Compás {bar}, parte`.
 
   Los tests:
 
@@ -467,7 +467,7 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
   Correr y **verlo fallar**.
 
-- [ ] T029 [US4] Implementar:
+- [x] T029 [US4] Implementar:
   - **`src/practice/store.ts`**:
     - `splitBar(bar)`: `[c]` pasa a `[c, c]`;
     - `joinBar(bar)`: `[a, b]` pasa a `[a]`;

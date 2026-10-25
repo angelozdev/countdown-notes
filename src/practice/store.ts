@@ -136,6 +136,12 @@ export type PracticeState = {
   addBar: () => void
   /** Quita un compás; con uno solo, no hace nada. */
   removeBar: (bar: number) => void
+  /** Un compás de un acorde pasa a dos partes iguales; uno de dos, no cambia. */
+  splitBar: (bar: number) => void
+  /** Un compás de dos acordes queda con el primero; uno de un acorde, no cambia. */
+  joinBar: (bar: number) => void
+  /** Inserta una copia del compás justo después. */
+  duplicateBar: (bar: number) => void
   /** Con `canSave`, copia el borrador a `mine`; el editor sigue abierto. */
   saveDraft: () => void
   /** Cierra el editor; la UI pregunta antes si hay cambios sin guardar. */
@@ -623,6 +629,42 @@ export function createPracticeStore(engine: Engine) {
           editor: withBars(
             editor,
             editor.bars.filter((_, i) => i !== bar)
+          )
+        })
+      },
+      splitBar(bar) {
+        const { editor } = get()
+        if (!editor) return
+        set({
+          editor: withBars(
+            editor,
+            editor.bars.map((chords, i) =>
+              i === bar && chords.length === 1 ? [chords[0], chords[0]] : chords
+            )
+          )
+        })
+      },
+      joinBar(bar) {
+        const { editor } = get()
+        if (!editor) return
+        set({
+          editor: withBars(
+            editor,
+            editor.bars.map((chords, i) =>
+              i === bar ? chords.slice(0, 1) : chords
+            )
+          )
+        })
+      },
+      duplicateBar(bar) {
+        const { editor } = get()
+        if (!editor) return
+        set({
+          editor: withBars(
+            editor,
+            editor.bars.flatMap((chords, i) =>
+              i === bar ? [chords, chords] : [chords]
+            )
           )
         })
       },

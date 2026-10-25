@@ -1,6 +1,7 @@
-import { type CSSProperties, useId, useState } from 'react'
+import { type CSSProperties, Fragment, useId, useState } from 'react'
 import { PlayButton } from '@/App'
 import { ChordTypeSelect } from '@/components/chord-type-select'
+import { SplitLabel } from '@/components/lane'
 import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,9 +14,11 @@ import {
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { chordSymbol } from '@/music/chords'
+import { splitAt } from '@/music/meters'
 import { NOTE_BY_ID, NOTES, type NoteId, spell } from '@/music/notes'
 import { myProgression } from '@/music/progressions'
-import { canSave, isDirty, usePractice } from '@/practice/store'
+import type { WrittenBar, WrittenChord } from '@/music/progression-text'
+import { canSave, isDirty, meterOf, usePractice } from '@/practice/store'
 
 /** El editor de una progresión, a pantalla completa mientras hay un borrador. */
 export function ProgressionEditor() {
@@ -35,15 +38,33 @@ export function ProgressionEditor() {
   const setChord = usePractice((state) => state.setChord)
   const addBar = usePractice((state) => state.addBar)
   const removeBar = usePractice((state) => state.removeBar)
-  // el compás del selector; `open` aparte para que no cambie de compás mientras se cierra
-  const [picking, setPicking] = useState({ bar: 0, open: false })
+  const splitBar = usePractice((state) => state.splitBar)
+  const joinBar = usePractice((state) => state.joinBar)
+  const duplicateBar = usePractice((state) => state.duplicateBar)
+  const meter = usePractice(meterOf)
+  // el compás y la parte del selector; `open` aparte para que no cambie mientras se cierra,
+  // y `kept` es el compás como estaba al cerrarlo con una acción, para que no cambie al deslizarse
+  const [picking, setPicking] = useState<{
+    bar: number
+    part: number
+    open: boolean
+    kept?: WrittenBar
+  }>({ bar: 0, part: 0, open: false })
   // lo que se borra es lo guardado, no el nombre que se está escribiendo
   const savedName = usePractice(
     (state) => state.mine.find(({ id }) => id === state.editor?.id)?.name
   )
   if (!editor) return null
   const { name, key, text, errors, bars } = editor
-  const chord = bars[picking.bar]?.[0]
+  const picked = picking.kept ?? bars[picking.bar]
+  const chord = picked?.[picking.part]
+  const joined = picked?.length === 2
+  // cierra el selector después de una acción sobre su compás
+  const act = (action: (bar: number) => void) => {
+    action(picking.bar)
+    setPicking({ ...picking, open: false, kept: picked })
+  }
+  const starts = [0, splitAt(meter)]
 
   return (
     <main
@@ -124,29 +145,63 @@ export function ProgressionEditor() {
         </ul>
       )}
       <ol aria-label="Compases" className="grid grid-cols-4 gap-y-3">
-        {bars.map(([{ root, type }], i) => {
-          const label = chordSymbol(spell(root), type)
+        {bars.map((chords, i) => {
+          const notes = chords.map(({ root }) => spell(root))
+          const labels = chords.map(({ type }, j) =>
+            chordSymbol(notes[j], type)
+          )
+          const split = chords.length > 1
+          // las partes de un compás se leen juntas: comparten el tamaño que le cabe a la más larga
+          const rootChars = Math.max(...notes.map(({ label }) => label.length))
+          const suffixChars = Math.max(
+            ...labels.map((label, j) => label.length - notes[j].label.length)
+          )
           return (
             <li
               key={i}
+              style={
+                {
+                  '--root-chars': rootChars,
+                  '--suffix-chars': suffixChars
+                } as CSSProperties
+              }
               className={cn(
                 'flex [container-type:inline-size] border-l-2 border-foreground/30',
                 (i % 4 === 3 || i === bars.length - 1) && 'border-r-2'
               )}
             >
-              <button
-                type="button"
-                aria-label={`Compás ${i + 1}: ${label}`}
-                className="flex min-h-20 w-full items-center justify-center"
-                onClick={() => setPicking({ bar: i, open: true })}
-              >
-                <span
-                  className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
-                  style={{ '--chars': label.length } as CSSProperties}
-                >
-                  {label}
-                </span>
-              </button>
+              {chords.map((_, j) => (
+                <Fragment key={j}>
+                  {j > 0 && (
+                    <span
+                      aria-hidden
+                      className="my-1 w-0.5 self-stretch rounded-full bg-current opacity-50"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    aria-label={`Compás ${i + 1}${split ? `, parte ${j + 1}` : ''}: ${labels[j]}`}
+                    data-at={split ? starts[j] : undefined}
+                    // cada parte, de ancho proporcional a sus golpes, como en el carril de práctica
+                    style={{
+                      flexGrow: (starts[j + 1] ?? meter.beats) - starts[j]
+                    }}
+                    className="flex min-h-20 basis-0 items-center justify-center [container-type:inline-size]"
+                    onClick={() => setPicking({ bar: i, part: j, open: true })}
+                  >
+                    {split ? (
+                      <SplitLabel root={notes[j].label} label={labels[j]} />
+                    ) : (
+                      <span
+                        className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                        style={{ '--chars': labels[j].length } as CSSProperties}
+                      >
+                        {labels[j]}
+                      </span>
+                    )}
+                  </button>
+                </Fragment>
+              ))}
             </li>
           )
         })}
@@ -180,58 +235,37 @@ export function ProgressionEditor() {
           className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
         >
           <SheetHeader>
-            <SheetTitle className="text-xl">{`Compás ${picking.bar + 1}`}</SheetTitle>
+            <SheetTitle className="text-xl">{`Compás ${picking.bar + 1}${picked && picked.length > 1 ? `, parte ${picking.part + 1}` : ''}`}</SheetTitle>
           </SheetHeader>
           {chord && (
-            <div className="flex flex-col gap-3 px-4">
-              <ToggleGroup
-                type="single"
-                aria-label="Raíz"
-                variant="outline"
-                size="lg"
-                className="grid w-full grid-cols-6"
-                value={spell(chord.root).id}
-                onValueChange={(id) =>
-                  id &&
-                  setChord(picking.bar, 0, {
-                    ...chord,
-                    root: NOTE_BY_ID[id as NoteId].label
-                      .replace('♭', 'b')
-                      .replace('♯', '#')
-                  })
-                }
-              >
-                {NOTES.map(({ id, name, label }) => (
-                  <ToggleGroupItem
-                    key={id}
-                    value={id}
-                    aria-label={name}
-                    className={PICKED_ITEM}
-                  >
-                    <span className="note-label [--note-size:1.25rem]">
-                      {label}
-                    </span>
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-              <ChordTypeSelect
-                value={chord.type}
-                onChange={(type) =>
-                  setChord(picking.bar, 0, { ...chord, type })
-                }
-              />
-            </div>
+            <ChordFields
+              chord={chord}
+              onChange={(next) => setChord(picking.bar, picking.part, next)}
+            />
           )}
           <SheetFooter>
             <Button
               variant="secondary"
               size="lg"
               className="h-12 text-base"
+              onClick={() => act(joined ? joinBar : splitBar)}
+            >
+              {joined ? 'Unir' : 'Partir'}
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 text-base"
+              onClick={() => act(duplicateBar)}
+            >
+              Duplicar
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="h-12 text-base"
               disabled={bars.length < 2}
-              onClick={() => {
-                removeBar(picking.bar)
-                setPicking({ ...picking, open: false })
-              }}
+              onClick={() => act(removeBar)}
             >
               Quitar
             </Button>
@@ -315,5 +349,51 @@ export function ProgressionEditor() {
         </SheetContent>
       </Sheet>
     </main>
+  )
+}
+
+/** La raíz y el tipo de un acorde: el cuerpo del selector de un compás o de una de sus partes. */
+function ChordFields({
+  chord,
+  onChange
+}: {
+  chord: WrittenChord
+  onChange: (chord: WrittenChord) => void
+}) {
+  return (
+    <div className="flex flex-col gap-3 px-4">
+      <ToggleGroup
+        type="single"
+        aria-label="Raíz"
+        variant="outline"
+        size="lg"
+        className="grid w-full grid-cols-6"
+        value={spell(chord.root).id}
+        onValueChange={(id) =>
+          id &&
+          onChange({
+            ...chord,
+            root: NOTE_BY_ID[id as NoteId].label
+              .replace('♭', 'b')
+              .replace('♯', '#')
+          })
+        }
+      >
+        {NOTES.map(({ id, name, label }) => (
+          <ToggleGroupItem
+            key={id}
+            value={id}
+            aria-label={name}
+            className={PICKED_ITEM}
+          >
+            <span className="note-label [--note-size:1.25rem]">{label}</span>
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      <ChordTypeSelect
+        value={chord.type}
+        onChange={(type) => onChange({ ...chord, type })}
+      />
+    </div>
   )
 }

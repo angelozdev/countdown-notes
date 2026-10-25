@@ -153,7 +153,7 @@ export function Lane() {
 }
 
 /** El cifrado de una mitad de compás: la raíz arriba y el sufijo debajo, para que cada uno use todo el ancho de su mitad. */
-function SplitLabel({ root, label }: { root: string; label: string }) {
+export function SplitLabel({ root, label }: { root: string; label: string }) {
   const suffix = label.slice(root.length)
   return (
     <span className="flex flex-col items-center gap-0.5 font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]">

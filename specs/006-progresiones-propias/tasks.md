@@ -507,13 +507,13 @@ description: 'Lista de tareas de la Entrega 5 · Progresiones propias'
 
 ## Phase 6: Polish & cierre
 
-- [ ] T033 Pulido visual del editor con el skill `frontend-design`, dentro de la dirección del diseño (§7.4):
+- [x] T033 Pulido visual del editor con el skill `frontend-design`, dentro de la dirección del diseño (§7.4):
   - el editor con el lenguaje del panel (secciones, botones grandes, ámbar para lo elegido);
   - el carril del editor legible a 320 px, con compases partidos;
   - con el teclado del iPhone abierto, el campo y la primera fila del carril a la vista;
   - los mensajes de error junto al campo.
 
-  Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del editor de progresiones (#6)`.
+  Ningún test se modifica. **Verde completo**. **Commit**: `feat: pulido visual del editor de progresiones (#6)`. Done: el editor usa `Section` del panel (filete y título) y el orden pasó a nombre, acordes con el carril debajo y tonalidad, para que con el teclado a 393 × 430 px se vean el campo y la primera fila; los errores van pegados al campo, con fondo propio; la parte que se edita queda en ámbar mientras su hoja está abierta; el campo ya no se aplasta con progresiones largas; `Borrar progresión` pasó al final (cabe a 320 px) y el foco vuelve al compás al cerrar su hoja (commit aparte, `66cc950`).
 
 - [ ] T034 Correr quickstart §1 completo y comparar el tamaño de `dist/assets/*.js` con el de T001; anotar la diferencia en research §12. Si algún hallazgo cambió una decisión, actualizar research.md. Commit solo si hay cambios (`docs: …`). Comentar en #6 el resumen de la entrega.
 - [ ] T035 El usuario hace quickstart §2–§5: la prueba de oído, el blues de 12 compases en menos de 3 minutos (SC-005) y la sesión con la guitarra (SC-006). Si algo falla, se reabre el issue de esa historia.

@@ -35,7 +35,13 @@ const SECTION = 'flex flex-col gap-3 border-t border-border pt-5'
 const HEADING = 'text-lg font-bold'
 const CAPTION = 'text-sm text-muted-foreground'
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({
+  title,
+  children
+}: {
+  title: string
+  children: ReactNode
+}) {
   return (
     <section className={SECTION}>
       <h3 className={HEADING}>{title}</h3>

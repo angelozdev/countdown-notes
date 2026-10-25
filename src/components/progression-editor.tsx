@@ -2,6 +2,7 @@ import { type CSSProperties, Fragment, useId, useRef, useState } from 'react'
 import { PlayButton } from '@/App'
 import { ChordTypeSelect } from '@/components/chord-type-select'
 import { SplitLabel } from '@/components/lane'
+import { Section } from '@/components/settings-panel'
 import { PICKED_ITEM, TonicPicker } from '@/components/tonic-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -81,287 +82,319 @@ export function ProgressionEditor() {
   return (
     <main
       aria-label="Editor de progresiones"
-      className="flex h-dvh flex-col gap-4 overflow-y-auto p-safe"
+      className="h-dvh overflow-y-auto p-safe"
     >
-      <div className="flex items-center justify-between">
+      <div className="mx-auto flex min-h-full w-full max-w-xl flex-col gap-5">
+        <h1 className="sr-only">Editor de progresiones</h1>
         <Button
           variant="ghost"
           size="lg"
-          className="h-12 rounded-full px-5 text-base"
+          className="-ml-3 h-12 self-start rounded-full px-3 text-base"
           onClick={() => (dirty ? setAsking(true) : closeEditor())}
         >
           Listo
         </Button>
-        {!editor.isNew && (
-          <Button
-            variant="destructive"
-            size="lg"
-            className="h-12 rounded-full px-5 text-base"
-            onClick={() => setDeleting(true)}
-          >
-            Borrar progresión
-          </Button>
-        )}
-      </div>
-      <input
-        aria-label="Nombre"
-        autoCapitalize="sentences"
-        spellCheck={false}
-        className="h-12 w-full rounded-lg border border-input bg-transparent px-3 text-lg font-bold outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-        value={name}
-        onChange={(event) => setDraftName(event.target.value)}
-      />
-      <p className="text-sm text-muted-foreground">Tonalidad de origen</p>
-      <TonicPicker
-        label="Tonalidad de origen"
-        progression={myProgression(editor)}
-        value={key.tonic}
-        onChange={(tonic) => setDraftKey({ ...key, tonic })}
-      />
-      <ToggleGroup
-        type="single"
-        aria-label="Tipo de tonalidad"
-        variant="outline"
-        size="lg"
-        className="grid w-full grid-cols-2"
-        value={key.type}
-        onValueChange={(type) =>
-          type && setDraftKey({ ...key, type: type as typeof key.type })
-        }
-      >
-        <ToggleGroupItem value="major" className={PICKED_ITEM}>
-          Mayor
-        </ToggleGroupItem>
-        <ToggleGroupItem value="minor" className={PICKED_ITEM}>
-          Menor
-        </ToggleGroupItem>
-      </ToggleGroup>
-      <textarea
-        aria-label="Acordes"
-        aria-invalid={errors.length > 0 || undefined}
-        aria-describedby={errors.length > 0 ? errorsId : undefined}
-        autoCapitalize="none"
-        autoCorrect="off"
-        spellCheck={false}
-        placeholder="Dm7 G7 Cmaj7 Cmaj7"
-        rows={3}
-        className="w-full rounded-lg border border-input bg-transparent p-3 text-lg font-semibold outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20"
-        value={text}
-        onChange={(event) => setDraftText(event.target.value)}
-      />
-      {errors.length > 0 && (
-        <ul id={errorsId} className="text-sm font-medium text-destructive">
-          {errors.map(({ start, message }) => (
-            <li key={start}>{message}</li>
-          ))}
-        </ul>
-      )}
-      <ol ref={lane} aria-label="Compases" className="grid grid-cols-4 gap-y-3">
-        {bars.map((chords, i) => {
-          const notes = chords.map(({ root }) => spell(root))
-          const labels = chords.map(({ type }, j) =>
-            chordSymbol(notes[j], type)
-          )
-          const split = chords.length > 1
-          // las partes de un compás se leen juntas: comparten el tamaño que le cabe a la más larga
-          const rootChars = Math.max(...notes.map(({ label }) => label.length))
-          const suffixChars = Math.max(
-            ...labels.map((label, j) => label.length - notes[j].label.length)
-          )
-          return (
-            <li
-              key={i}
-              style={
-                {
-                  '--root-chars': rootChars,
-                  '--suffix-chars': suffixChars
-                } as CSSProperties
-              }
-              className={cn(
-                'flex [container-type:inline-size] border-l-2 border-foreground/30',
-                (i % 4 === 3 || i === bars.length - 1) && 'border-r-2'
-              )}
-            >
-              {chords.map((_, j) => (
-                <Fragment key={j}>
-                  {j > 0 && (
-                    <span
-                      aria-hidden
-                      className="my-1 w-0.5 self-stretch rounded-full bg-current opacity-50"
-                    />
-                  )}
-                  <button
-                    type="button"
-                    aria-label={`Compás ${i + 1}${split ? `, parte ${j + 1}` : ''}: ${labels[j]}`}
-                    data-at={split ? starts[j] : undefined}
-                    // cada parte, de ancho proporcional a sus golpes, como en el carril de práctica
-                    style={{
-                      flexGrow: (starts[j + 1] ?? meter.beats) - starts[j]
-                    }}
-                    className="flex min-h-20 basis-0 items-center justify-center [container-type:inline-size]"
-                    onClick={() => setPicking({ bar: i, part: j, open: true })}
-                  >
-                    {split ? (
-                      <SplitLabel root={notes[j].label} label={labels[j]} />
-                    ) : (
-                      <span
-                        className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
-                        style={{ '--chars': labels[j].length } as CSSProperties}
-                      >
-                        {labels[j]}
-                      </span>
-                    )}
-                  </button>
-                </Fragment>
-              ))}
-            </li>
-          )
-        })}
-      </ol>
-      <Button
-        ref={addButton}
-        variant="secondary"
-        size="lg"
-        className="h-12 text-base"
-        onClick={addBar}
-      >
-        Agregar compás
-      </Button>
-      <div className="mt-auto flex items-center gap-3">
-        <PlayButton />
-        <Button
-          size="lg"
-          className="h-12 px-6 text-base"
-          disabled={!savable}
-          onClick={saveDraft}
-        >
-          Guardar
-        </Button>
-      </div>
-      <Sheet
-        open={picking.open}
-        onOpenChange={(open) => setPicking({ ...picking, open })}
-      >
-        <SheetContent
-          side="bottom"
-          aria-describedby={undefined}
-          onCloseAutoFocus={refocus}
-          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-xl">{`Compás ${picking.bar + 1}${picked && picked.length > 1 ? `, parte ${picking.part + 1}` : ''}`}</SheetTitle>
-          </SheetHeader>
-          {chord && (
-            <ChordFields
-              chord={chord}
-              onChange={(next) => setChord(picking.bar, picking.part, next)}
+        <input
+          aria-label="Nombre"
+          autoCapitalize="sentences"
+          spellCheck={false}
+          className="h-12 w-full rounded-lg border border-input bg-transparent px-3 text-xl font-black outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          value={name}
+          onChange={(event) => setDraftName(event.target.value)}
+        />
+        {/* el campo y el carril van arriba: con el teclado abierto del iPhone se ven juntos */}
+        <Section title="Acordes">
+          <div className="flex flex-col gap-2">
+            <textarea
+              aria-label="Acordes"
+              aria-invalid={errors.length > 0 || undefined}
+              aria-describedby={errors.length > 0 ? errorsId : undefined}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="Dm7 G7 Cmaj7 Cmaj7"
+              rows={3}
+              className="w-full rounded-lg border border-input bg-transparent p-3 text-lg font-semibold outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20"
+              value={text}
+              onChange={(event) => setDraftText(event.target.value)}
             />
-          )}
-          <SheetFooter>
+            {errors.length > 0 && (
+              <ul
+                id={errorsId}
+                className="flex flex-col gap-1 rounded-lg bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive"
+              >
+                {errors.map(({ start, message }) => (
+                  <li key={start}>{message}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <ol
+            ref={lane}
+            aria-label="Compases"
+            className="grid grid-cols-4 gap-y-3"
+          >
+            {bars.map((chords, i) => {
+              const notes = chords.map(({ root }) => spell(root))
+              const labels = chords.map(({ type }, j) =>
+                chordSymbol(notes[j], type)
+              )
+              const split = chords.length > 1
+              // las partes de un compás se leen juntas: comparten el tamaño que le cabe a la más larga
+              const rootChars = Math.max(
+                ...notes.map(({ label }) => label.length)
+              )
+              const suffixChars = Math.max(
+                ...labels.map(
+                  (label, j) => label.length - notes[j].label.length
+                )
+              )
+              return (
+                <li
+                  key={i}
+                  style={
+                    {
+                      '--root-chars': rootChars,
+                      '--suffix-chars': suffixChars
+                    } as CSSProperties
+                  }
+                  className={cn(
+                    'flex [container-type:inline-size] border-l-2 border-foreground/30',
+                    (i % 4 === 3 || i === bars.length - 1) && 'border-r-2'
+                  )}
+                >
+                  {chords.map((_, j) => (
+                    <Fragment key={j}>
+                      {j > 0 && (
+                        <span
+                          aria-hidden
+                          className="my-1 w-0.5 self-stretch rounded-full bg-current opacity-50"
+                        />
+                      )}
+                      <button
+                        type="button"
+                        aria-label={`Compás ${i + 1}${split ? `, parte ${j + 1}` : ''}: ${labels[j]}`}
+                        data-at={split ? starts[j] : undefined}
+                        // la parte con la hoja abierta, en ámbar: es la que se está editando
+                        data-editing={
+                          (picking.open &&
+                            picking.bar === i &&
+                            picking.part === j) ||
+                          undefined
+                        }
+                        // cada parte, de ancho proporcional a sus golpes, como en el carril de práctica
+                        style={{
+                          flexGrow: (starts[j + 1] ?? meter.beats) - starts[j]
+                        }}
+                        className="flex min-h-20 basis-0 items-center justify-center rounded-sm outline-none transition-colors [container-type:inline-size] hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-muted data-editing:bg-primary data-editing:text-primary-foreground"
+                        onClick={() =>
+                          setPicking({ bar: i, part: j, open: true })
+                        }
+                      >
+                        {split ? (
+                          <SplitLabel root={notes[j].label} label={labels[j]} />
+                        ) : (
+                          <span
+                            className="note-label note-fit font-black [--note-max:1.875rem] sm:[--note-max:2.25rem]"
+                            style={
+                              { '--chars': labels[j].length } as CSSProperties
+                            }
+                          >
+                            {labels[j]}
+                          </span>
+                        )}
+                      </button>
+                    </Fragment>
+                  ))}
+                </li>
+              )
+            })}
+          </ol>
+          <Button
+            ref={addButton}
+            variant="secondary"
+            size="lg"
+            className="h-12 text-base"
+            onClick={addBar}
+          >
+            Agregar compás
+          </Button>
+        </Section>
+        <Section title="Tonalidad de origen">
+          <TonicPicker
+            label="Tonalidad de origen"
+            progression={myProgression(editor)}
+            value={key.tonic}
+            onChange={(tonic) => setDraftKey({ ...key, tonic })}
+          />
+          <ToggleGroup
+            type="single"
+            aria-label="Tipo de tonalidad"
+            variant="outline"
+            size="lg"
+            className="grid w-full grid-cols-2"
+            value={key.type}
+            onValueChange={(type) =>
+              type && setDraftKey({ ...key, type: type as typeof key.type })
+            }
+          >
+            <ToggleGroupItem value="major" className={PICKED_ITEM}>
+              Mayor
+            </ToggleGroupItem>
+            <ToggleGroupItem value="minor" className={PICKED_ITEM}>
+              Menor
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </Section>
+        <div className="mt-auto flex flex-col gap-5 border-t border-border pt-5">
+          <div className="flex items-center gap-3">
+            <PlayButton />
             <Button
               variant="secondary"
               size="lg"
-              className="h-12 text-base"
-              onClick={() => act(joined ? joinBar : splitBar)}
-            >
-              {joined ? 'Unir' : 'Partir'}
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              className="h-12 text-base"
-              onClick={() => act(duplicateBar)}
-            >
-              Duplicar
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              className="h-12 text-base"
-              disabled={bars.length < 2}
-              onClick={() => act(removeBar)}
-            >
-              Quitar
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-      <Sheet open={asking} onOpenChange={setAsking}>
-        <SheetContent
-          side="bottom"
-          aria-describedby={undefined}
-          showCloseButton={false}
-          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-xl">Cambios sin guardar</SheetTitle>
-          </SheetHeader>
-          <SheetFooter>
-            <Button
-              size="lg"
-              className="h-12 text-base"
+              className="h-16 rounded-full px-6 text-lg font-bold"
               disabled={!savable}
-              onClick={() => {
-                saveDraft()
-                closeEditor()
-                setAsking(false)
-              }}
+              onClick={saveDraft}
             >
               Guardar
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              className="h-12 text-base"
-              onClick={() => {
-                discardDraft()
-                setAsking(false)
-              }}
-            >
-              Descartar cambios
-            </Button>
-            <Button
-              variant="ghost"
-              size="lg"
-              className="h-12 text-base"
-              onClick={() => setAsking(false)}
-            >
-              Seguir editando
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-      <Sheet open={deleting} onOpenChange={setDeleting}>
-        <SheetContent
-          side="bottom"
-          aria-describedby={undefined}
-          showCloseButton={false}
-          className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-xl">{`¿Borrar «${savedName}»?`}</SheetTitle>
-          </SheetHeader>
-          <SheetFooter>
-            {/* Cancelar va primero: Radix le da el foco inicial, no a Borrar */}
-            <Button
-              variant="secondary"
-              size="lg"
-              className="h-12 text-base"
-              onClick={() => setDeleting(false)}
-            >
-              Cancelar
-            </Button>
+          </div>
+          {!editor.isNew && (
             <Button
               variant="destructive"
               size="lg"
               className="h-12 text-base"
-              onClick={() => deleteProgression(editor.id)}
+              onClick={() => setDeleting(true)}
             >
-              Borrar
+              Borrar progresión
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          )}
+        </div>
+        <Sheet
+          open={picking.open}
+          onOpenChange={(open) => setPicking({ ...picking, open })}
+        >
+          <SheetContent
+            side="bottom"
+            aria-describedby={undefined}
+            onCloseAutoFocus={refocus}
+            className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-xl">{`Compás ${picking.bar + 1}${picked && picked.length > 1 ? `, parte ${picking.part + 1}` : ''}`}</SheetTitle>
+            </SheetHeader>
+            {chord && (
+              <ChordFields
+                chord={chord}
+                onChange={(next) => setChord(picking.bar, picking.part, next)}
+              />
+            )}
+            <SheetFooter>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => act(joined ? joinBar : splitBar)}
+              >
+                {joined ? 'Unir' : 'Partir'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => act(duplicateBar)}
+              >
+                Duplicar
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 text-base"
+                disabled={bars.length < 2}
+                onClick={() => act(removeBar)}
+              >
+                Quitar
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+        <Sheet open={asking} onOpenChange={setAsking}>
+          <SheetContent
+            side="bottom"
+            aria-describedby={undefined}
+            showCloseButton={false}
+            className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-xl">Cambios sin guardar</SheetTitle>
+            </SheetHeader>
+            <SheetFooter>
+              <Button
+                size="lg"
+                className="h-12 text-base"
+                disabled={!savable}
+                onClick={() => {
+                  saveDraft()
+                  closeEditor()
+                  setAsking(false)
+                }}
+              >
+                Guardar
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => {
+                  discardDraft()
+                  setAsking(false)
+                }}
+              >
+                Descartar cambios
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => setAsking(false)}
+              >
+                Seguir editando
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+        <Sheet open={deleting} onOpenChange={setDeleting}>
+          <SheetContent
+            side="bottom"
+            aria-describedby={undefined}
+            showCloseButton={false}
+            className="mx-auto w-full max-w-lg rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-xl">{`¿Borrar «${savedName}»?`}</SheetTitle>
+            </SheetHeader>
+            <SheetFooter>
+              {/* Cancelar va primero: Radix le da el foco inicial, no a Borrar */}
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => setDeleting(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="h-12 text-base"
+                onClick={() => deleteProgression(editor.id)}
+              >
+                Borrar
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
     </main>
   )
 }

@@ -93,3 +93,62 @@ test('B♭m7♭5 se cifra B♭m7♭5 y se nombra Si bemol semidisminuido', () =>
 test('F♯m7 se toca en A3, D♭4, E4', () => {
   expect(voicingOf('Gb', 'm7')).toEqual(['A3', 'Db4', 'E4'])
 })
+
+test('el ii–V–I mueve poco las voces', () => {
+  expect(voicingOf('D', 'm7')).toEqual(['F3', 'A3', 'C4'])
+  expect(voicingOf('G', '7', ['F3', 'A3', 'C4'])).toEqual(['F3', 'B3', 'D4'])
+  expect(voicingOf('G', '7')).toEqual(['B3', 'D4', 'F4'])
+  expect(voicingOf('C', 'maj7', ['F3', 'B3', 'D4'])).toEqual(['E3', 'G3', 'B3'])
+})
+
+test('un acorde repetido conserva su voicing', () => {
+  expect(voicingOf('C', 'maj7', ['E3', 'G3', 'B3'])).toEqual(['E3', 'G3', 'B3'])
+})
+
+test('las tríadas no cambian con after', () => {
+  expect(voicingOf('C', 'maj', ['F3', 'B3', 'D4'])).toEqual(['C3', 'G3', 'E4'])
+})
+
+// La suma, sobre cada nota del voicing, de su distancia en semitonos a la nota más cercana del anterior.
+const movement = (voicing: string[], after: string[]) =>
+  voicing
+    .map(midi)
+    .reduce(
+      (sum, pitch) =>
+        sum + Math.min(...after.map((other) => Math.abs(pitch - midi(other)))),
+      0
+    )
+
+describe('la cadena ii–V–I en las 12 tónicas', () => {
+  test.each(NOTES.map((note, index) => ({ note, index })))(
+    'sobre $note.label: cada voicing cumple las reglas y se mueve lo menos posible',
+    ({ index }) => {
+      const chain: [ChordTypeId, number][] = [
+        ['m7', (index + 2) % 12],
+        ['7', (index + 7) % 12],
+        ['maj7', index]
+      ]
+      let before: string[] | undefined
+      for (const [type, rootIndex] of chain) {
+        const { id: root } = NOTES[rootIndex]
+        const voicing = voicingOf(root, type, before)
+        const pitches = voicing.map(midi)
+        const classes = pitches.map((pitch) => (pitch - rootIndex) % 12)
+        const required = JAZZ.find(([id]) => id === type)![3]
+        expect(classes).not.toContain(0)
+        for (const wanted of required) {
+          expect(
+            [wanted].flat().some((semitones) => classes.includes(semitones))
+          ).toBe(true)
+        }
+        expect(pitches.every((pitch) => pitch >= 48 && pitch <= 76)).toBe(true)
+        // el ii no tiene anterior: se compara consigo mismo (0 ≤ 0)
+        const reference = before ?? voicing
+        expect(movement(voicing, reference)).toBeLessThanOrEqual(
+          movement(voicingOf(root, type), reference)
+        )
+        before = voicing
+      }
+    }
+  )
+})

@@ -80,7 +80,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### Movimiento de voces
 
-- [ ] T004 [P] [US1] En `src/music/chords.test.ts`, agregar (falla: `voicingOf` ignora el tercer argumento):
+- [x] T004 [P] [US1] En `src/music/chords.test.ts`, agregar (falla: `voicingOf` ignora el tercer argumento):
   - `'el ii–V–I mueve poco las voces'`: `voicingOf('D', 'm7')` es `['F3', 'A3', 'C4']`; `voicingOf('G', '7', ['F3', 'A3', 'C4'])` es `['F3', 'B3', 'D4']` (sin `after` sería `['B3', 'D4', 'F4']`); y `voicingOf('C', 'maj7', ['F3', 'B3', 'D4'])` es `['E3', 'G3', 'B3']`.
   - `'un acorde repetido conserva su voicing'`: `voicingOf('C', 'maj7', ['E3', 'G3', 'B3'])` es `['E3', 'G3', 'B3']`.
   - `'las tríadas no cambian con after'`: `voicingOf('C', 'maj', ['F3', 'B3', 'D4'])` es `['C3', 'G3', 'E4']`.
@@ -88,7 +88,7 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
     - cumple las reglas del test de la entrega 3 para su tipo (sin la clase de la raíz, con las clases requeridas de la tabla `JAZZ` del archivo, todo entre 48 y 76);
     - y su movimiento (Σ, sobre cada nota nueva, de la distancia en semitonos a la nota más cercana del anterior) no es mayor que el del voicing sin `after`.
 
-- [ ] T005 [US1] En `src/music/chords.ts`, `voicingOf(root, type, after?)` según research §7: con `after`, entre los candidatos que hoy caen enteros en 48–76, gana el de menor movimiento; en un empate, el de menor distancia a C4, y después la forma A. Sin `after`, igual que hoy. Las tríadas no cambian. Un comentario de una línea dice qué mide el movimiento. **Verde completo**. **Commit**: `feat: movimiento de voces en voicingOf (#29)`.
+- [x] T005 [US1] En `src/music/chords.ts`, `voicingOf(root, type, after?)` según research §7: con `after`, entre los candidatos que hoy caen enteros en 48–76, gana el de menor movimiento; en un empate, el de menor distancia a C4, y después la forma A. Sin `after`, igual que hoy. Las tríadas no cambian. Un comentario de una línea dice qué mide el movimiento. **Verde completo**. **Commit**: `feat: movimiento de voces en voicingOf (#29)`.
 
 ### La vuelta como lista de compases (refactor puro)
 

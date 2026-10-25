@@ -172,8 +172,17 @@ export const chordName = (root: NoteId | Note, type: ChordTypeId) =>
 const pitchOf = (midi: number) =>
   `${NOTES[midi % 12].id}${Math.floor(midi / 12) - 1}`
 
-/** Alturas de Tone, de grave a agudo: ['C3', 'G3', 'E4'] */
-export function voicingOf(root: NoteId, type: ChordTypeId): string[] {
+const midiOf = (pitch: string) => {
+  const [, id, octave] = /^([A-G]b?)(\d)$/.exec(pitch)!
+  return NOTES.findIndex((note) => note.id === id) + 12 * (Number(octave) + 1)
+}
+
+/** Alturas de Tone, de grave a agudo: ['C3', 'G3', 'E4']. Con after, el voicing que menos se mueve desde él. */
+export function voicingOf(
+  root: NoteId,
+  type: ChordTypeId,
+  after?: string[]
+): string[] {
   const { forms } = CHORD_TYPE_BY_ID[type]
   const index = NOTES.findIndex((note) => note.id === root)
   // las tríadas: una sola forma, con la raíz en la octava 3
@@ -188,10 +197,22 @@ export function voicingOf(root: NoteId, type: ChordTypeId): string[] {
       )
     )
     .filter((midis) => midis[0] >= 48 && midis[midis.length - 1] <= 76)
-  // gana la más cercana a C4; en un empate, la primera (la A). Las formas tienen las mismas notas
+  // research §7: el movimiento es la suma, sobre cada nota, de su distancia en semitonos a la nota más cercana de after
+  const previous = after?.map(midiOf) ?? []
+  const movement = (midis: number[]) =>
+    previous.length === 0
+      ? 0
+      : midis.reduce(
+          (sum, midi) =>
+            sum + Math.min(...previous.map((other) => Math.abs(midi - other))),
+          0
+        )
+  // gana la de menos movimiento; en un empate, la más cercana a C4, y después la primera (la A)
   const distance = (midis: number[]) =>
     Math.abs(midis.reduce((sum, midi) => sum + midi) - 60 * midis.length)
+  const better = (a: number[], b: number[]) =>
+    (movement(a) - movement(b) || distance(a) - distance(b)) < 0
   return fits
-    .reduce((best, midis) => (distance(midis) < distance(best) ? midis : best))
+    .reduce((best, midis) => (better(midis, best) ? midis : best))
     .map(pitchOf)
 }

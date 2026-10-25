@@ -475,3 +475,18 @@ test('borrar la quita, deja el ii–V–I mayor y detiene la música', async () 
   expect(screen.getByText(/^ii–V–I mayor/)).toBeDefined()
   expect(await noGroup(app)).toBeNull()
 })
+
+test('una progresión nueva sin guardar no pisa lo elegido al reabrir', async () => {
+  savedSettings({ mode: 'progression', progression: 'blues-jazz', tonic: 'F' })
+  const first = renderApp()
+  const editor = await newProgression(first)
+  await first.user.click(
+    within(
+      editor.getByRole('radiogroup', { name: 'Tonalidad de origen' })
+    ).getByRole('radio', { name: 'La' })
+  )
+  first.unmount()
+
+  renderApp()
+  expect(screen.getByText(/^Blues de jazz · Fa mayor/)).toBeDefined()
+})

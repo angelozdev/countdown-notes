@@ -252,6 +252,12 @@ const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]
 const settingsOf = (state: PracticeState) =>
   Object.fromEntries(SETTING_KEYS.map((key) => [key, state[key]])) as Settings
 
+/** Lo que se guarda: mientras haya una nueva sin guardar, lo que regía al abrir el editor. */
+const persistedOf = (state: PracticeState): Settings => ({
+  ...settingsOf(state),
+  ...(state.editor?.isNew && state.editor.opened)
+})
+
 /** Cada nota sorteada da `barsPerNote` compases con su raíz sola. */
 const randomRound = (
   number: number,
@@ -721,8 +727,8 @@ export function createPracticeStore(engine: Engine) {
   })
   // se guarda solo cuando cambia un ajuste, no en cada golpe
   store.subscribe((state, prev) => {
-    const settings = settingsOf(state)
-    if (!shallow(settings, settingsOf(prev))) saveSettings(settings)
+    const settings = persistedOf(state)
+    if (!shallow(settings, persistedOf(prev))) saveSettings(settings)
   })
   return store
 }

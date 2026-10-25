@@ -334,11 +334,11 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
   Si pasa al primer intento, hacer la comprobación de T009 con el `at` del segundo acorde. **Verde completo**. **Commit**: `test: el cambio de mitad de compás cae a tiempo (#31)`. Done: pasó al primer intento; sumar 1 al `at` del segundo acorde, en el bajo o en el acorde, lo hizo fallar y se deshizo.
 
-- [ ] T023 [US3] En `e2e/practice.spec.ts`, agregar `'los compases partidos caben a 320 px'` (falla si las partes desbordan):
+- [x] T023 [US3] En `e2e/practice.spec.ts`, agregar `'los compases partidos caben a 320 px'` (falla si las partes desbordan):
   - a 320 × 640, en Ajustes: `Progresión`, `Coltrane (Giant Steps, avanzado)`, `Fa sostenido` y `Bajo + acorde`; cerrar y Play;
   - cada `[data-at]` del carril cumple `scrollWidth <= clientWidth`, y la página no tiene scroll horizontal.
 
-  Si falla, ajustar el `--note-max` de las partes en `src/components/lane.tsx` hasta que quepan. **Verde completo**. **Commit**: `feat: los compases partidos caben en pantalla (#31)`.
+  Si falla, ajustar el `--note-max` de las partes en `src/components/lane.tsx` hasta que quepan. **Verde completo**. **Commit**: `feat: los compases partidos caben en pantalla (#31)`. Done: pasó al primer intento en Chromium y WebKit (iphone), sin tocar `lane.tsx`; quitar `note-fit` de las partes lo hizo fallar y se deshizo.
 
 - [ ] T024 [US3] Verificación manual: quickstart §2, filas 10–14.
 

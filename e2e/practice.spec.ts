@@ -123,6 +123,34 @@ test.describe('en un celular angosto', () => {
     expect(bars.length).toBeGreaterThan(0)
     for (const bar of bars) expect(await bar.evaluate(fits)).toBe(true)
   })
+
+  test('los compases partidos caben a 320 px', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Ajustes' }).click()
+    await page.getByRole('radio', { name: 'Progresión' }).click()
+    await page
+      .getByRole('combobox', { name: 'Progresión' })
+      .selectOption({ label: 'Coltrane (Giant Steps, avanzado)' })
+    await page.getByRole('radio', { name: 'Fa sostenido' }).click()
+    await page.getByRole('radio', { name: 'Bajo + acorde' }).click()
+    await page.getByRole('button', { name: 'Cerrar' }).click()
+
+    await page.getByRole('button', { name: 'Play' }).click()
+    const parts = page
+      .getByRole('list', { name: 'Carril' })
+      .locator('[data-at]')
+    // Giant Steps: tres compases partidos y uno entero
+    await expect(parts).toHaveCount(7)
+    for (const part of await parts.all()) {
+      expect(await part.evaluate(fits)).toBe(true)
+    }
+    const hasHorizontalScroll = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
+    )
+    expect(hasHorizontalScroll).toBe(false)
+  })
 })
 
 function fits(element: Element) {

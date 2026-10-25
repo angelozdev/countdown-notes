@@ -244,14 +244,14 @@ description: 'Lista de tareas de la Entrega 4 · Modo progresión con biblioteca
 
 ### Compás partido y bajo en el cambio
 
-- [ ] T016 [P] [US3] En `src/music/meters.test.ts`, agregar (falla):
+- [x] T016 [P] [US3] En `src/music/meters.test.ts`, agregar (falla):
   - `test.each` de `splitAt(METER_BY_ID[id])` con la tabla de research §4: `2/4` → 1, `3/4` → 2, `4/4` → 2, `5/4` → 3, `6/8` → 3, `7/8` → 4, `9/8` → 6, `12/8` → 6;
   - `bassAttacks(4/4, 'whole', [0, 2])` es `[{ at: 0, length: 2 }, { at: 2, length: 2 }]`;
   - `bassAttacks(4/4, 'quarter', [0, 2])` son 4 ataques en 0, 1, 2 y 3, sin repetir;
   - `bassAttacks(6/8, 'whole', [0, 3])` es `[{ at: 0, length: 3 }, { at: 3, length: 3 }]`;
   - `bassAttacks(3/4, 'half', [0, 2])` tiene ataques en 0 y 2.
 
-- [ ] T017 [US3] En `src/music/meters.ts`:
+- [x] T017 [US3] En `src/music/meters.ts`:
   - `splitAt(meter)`: `groupStarts(meter).find((start) => 2 * start >= meter.beats)`;
   - `bassAttacks(meter, figure, changes = [])`: une los `at` de la figura con `changes`, ordenados y sin repetir, y cada uno dura hasta el siguiente o hasta `meter.beats`.
 

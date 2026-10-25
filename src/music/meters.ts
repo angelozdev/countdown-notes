@@ -52,15 +52,24 @@ export function accentAt(meter: Meter, beat: number): Accent {
 
 export type BassFigure = 'eighth' | 'quarter' | 'half' | 'whole'
 
-/** Los ataques del bajo en el compás, en golpes; cada uno dura hasta el siguiente. */
-export function bassAttacks(meter: Meter, figure: BassFigure) {
+/** El golpe donde entra el segundo acorde de un compás partido (research §4). */
+export const splitAt = (meter: Meter) =>
+  groupStarts(meter).find((start) => 2 * start >= meter.beats)!
+
+/** Los ataques del bajo en el compás, en golpes; cada uno dura hasta el siguiente. Los `changes` suman los cambios de acorde. */
+export function bassAttacks(
+  meter: Meter,
+  figure: BassFigure,
+  changes: number[] = []
+) {
   const starts = groupStarts(meter)
   const eighth = meter.groups.every((size) => size === 1) ? 0.5 : 1
-  const ats = {
+  const figureAts = {
     eighth: Array.from({ length: meter.beats / eighth }, (_, i) => i * eighth),
     quarter: starts,
     half: starts.filter((_, i) => i % 2 === 0),
     whole: [0]
   }[figure]
+  const ats = [...new Set([...figureAts, ...changes])].sort((a, b) => a - b)
   return ats.map((at, i) => ({ at, length: (ats[i + 1] ?? meter.beats) - at }))
 }

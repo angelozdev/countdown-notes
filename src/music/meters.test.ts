@@ -3,7 +3,8 @@ import {
   bassAttacks,
   type BassFigure,
   METER_BY_ID,
-  type MeterId
+  type MeterId,
+  splitAt
 } from './meters'
 
 const steps = (count: number, step: number) =>
@@ -63,4 +64,37 @@ test.each(
     expected.map((at, i) => (expected[i + 1] ?? meter.beats) - at)
   )
   expect(attacks.reduce((sum, { length }) => sum + length, 0)).toBe(meter.beats)
+})
+
+test.each([
+  ['2/4', 1],
+  ['3/4', 2],
+  ['4/4', 2],
+  ['5/4', 3],
+  ['6/8', 3],
+  ['7/8', 4],
+  ['9/8', 6],
+  ['12/8', 6]
+] as const)(
+  'en %s un compás partido cambia de acorde en el golpe %i',
+  (id, expected) => {
+    expect(splitAt(METER_BY_ID[id])).toBe(expected)
+  }
+)
+
+test('el bajo ataca también en el cambio de acorde, sin repetir', () => {
+  expect(bassAttacks(METER_BY_ID['4/4'], 'whole', [0, 2])).toEqual([
+    { at: 0, length: 2 },
+    { at: 2, length: 2 }
+  ])
+  expect(
+    bassAttacks(METER_BY_ID['4/4'], 'quarter', [0, 2]).map(({ at }) => at)
+  ).toEqual([0, 1, 2, 3])
+  expect(bassAttacks(METER_BY_ID['6/8'], 'whole', [0, 3])).toEqual([
+    { at: 0, length: 3 },
+    { at: 3, length: 3 }
+  ])
+  expect(
+    bassAttacks(METER_BY_ID['3/4'], 'half', [0, 2]).map(({ at }) => at)
+  ).toEqual([0, 2])
 })
